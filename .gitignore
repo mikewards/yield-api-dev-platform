@@ -1,0 +1,100 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Build outputs
+build/
+dist/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Kotlin
+*.kt.swp
+*.kt.bak
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Secrets and keys
+*.pem
+*.key
+*.cert
+secrets/
+*.secret
+
+# Generated files
+*.generated.*
+generated/
+
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output/
+
+# Application specific
+flow-api/build/
+flow-api/.gradle/
+flow-api/gradle-app.setting
+

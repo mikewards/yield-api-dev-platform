@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Flow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="api-styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Flow</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html">Get Started</a>
+                    
+                    <!-- Account dropdown (always shown on dashboard) -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item active">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Developer Dashboard</h1>
+                <p>Manage your applications, API keys, and yield accounts.</p>
+            </div>
+
+            <!-- Applications Section -->
+            <div class="section-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Applications
+                </h2>
+                <button class="btn-primary" id="createAppBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Create Application
+                </button>
+            </div>
+            
+            <div class="applications-grid" id="applicationsGrid">
+                <div class="loading-spinner">Loading applications...</div>
+            </div>
+
+            <!-- Yield Accounts Section -->
+            <div class="section-header" style="margin-top: 48px;">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Yield Accounts
+                </h2>
+                <button class="btn-primary" id="createYieldBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Create Yield Account
+                </button>
+            </div>
+            
+            <div class="dashboard-card full-width">
+                <div class="card-body">
+                    <div class="yield-accounts-list" id="yieldAccountsList">
+                        <div class="loading-spinner">Loading yield accounts...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Application Modal -->
+    <div class="modal" id="createAppModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Create New Application</h3>
+                <button class="modal-close" onclick="closeModal('createAppModal')">&times;</button>
+            </div>
+            <form id="createAppForm">
+                <div class="form-group">
+                    <label for="appName">Application Name *</label>
+                    <input type="text" id="appName" name="appName" required placeholder="My Application">
+                    <small>A unique name for your application</small>
+                </div>
+                <div class="form-group">
+                    <label for="appDescription">Description</label>
+                    <textarea id="appDescription" name="appDescription" rows="2" placeholder="Brief description of your application"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="appWebhook">Webhook URL</label>
+                    <input type="url" id="appWebhook" name="appWebhook" placeholder="https://your-server.com/webhooks/flow">
+                    <small>Receive real-time notifications for deposits, withdrawals, and yield events</small>
+                </div>
+                <div class="form-group">
+                    <label for="appOrigins">Allowed Origins (CORS)</label>
+                    <input type="text" id="appOrigins" name="appOrigins" placeholder="https://your-app.com, https://staging.your-app.com">
+                    <small>Comma-separated list of domains that can make API calls from browsers</small>
+                </div>
+                <div class="info-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <p><strong>Note:</strong> Applications support both sandbox (testnet) and production (mainnet) environments. You can configure RPC URLs and create environment-specific API keys after creating the application.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createAppModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div class="modal" id="appDetailsModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-xlarge">
+            <div class="modal-header">
+                <h3 id="appDetailsTitle">Application Details</h3>
+                <button class="modal-close" onclick="closeModal('appDetailsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="app-details-layout">
+                    <!-- Left: App Info -->
+                    <div class="app-info-section">
+                        <div class="app-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Application ID</span>
+                                <code class="meta-value" id="detailAppId"></code>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Environment</span>
+                                <span class="environment-badge" id="detailAppEnv"></span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Status</span>
+                                <span class="status-badge" id="detailAppStatus"></span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Created</span>
+                                <span class="meta-value" id="detailAppCreated"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="webhook-section">
+                            <h4>Webhook Configuration</h4>
+                            <div class="meta-item">
+                                <span class="meta-label">Webhook URL</span>
+                                <span class="meta-value" id="detailWebhookUrl">Not configured</span>
+                            </div>
+                            <div class="meta-item" id="webhookSecretRow" style="display: none;">
+                                <span class="meta-label">Webhook Secret</span>
+                                <div class="secret-display">
+                                    <code id="detailWebhookSecret">••••••••••••••••</code>
+                                    <button class="btn-small btn-secondary" onclick="toggleWebhookSecret()">Show</button>
+                                    <button class="btn-small btn-secondary" onclick="regenerateWebhookSecret()">Regenerate</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rpc-section">
+                            <div class="section-header-inline">
+                                <h4>Ethereum RPC Configuration</h4>
+                                <button class="btn-small btn-secondary" onclick="toggleRpcEdit()" id="editRpcBtn">Edit</button>
+                            </div>
+                            
+                            <div id="rpcDisplayMode">
+                                <div class="meta-item">
+                                    <span class="meta-label">Sandbox RPC URL</span>
+                                    <span class="meta-value" id="detailSandboxRpc">Not configured</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Production RPC URL</span>
+                                    <span class="meta-value" id="detailProductionRpc">Not configured</span>
+                                </div>
+                            </div>
+                            
+                            <form id="editRpcForm" style="display: none;">
+                                <div class="form-group">
+                                    <label for="editSandboxRpc">
+                                        Sandbox RPC URL (Testnet)
+                                        <span class="tooltip-trigger" id="sandboxTooltipTrigger">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </span>
+                                    </label>
+                                    <input type="url" id="editSandboxRpc" name="editSandboxRpc" 
+                                           placeholder="https://sepolia.infura.io/v3/YOUR_KEY">
+                                    <small>For Sepolia testnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
+                                    <div class="tooltip-content" id="rpc-sandbox-tooltip">
+                                        <div class="tooltip-header">
+                                            <h5>How to get a Sandbox RPC URL</h5>
+                                        </div>
+                                        <div class="tooltip-body">
+                                            <p><strong>Option 1: Infura (Free)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
+                                                <li>Create a new project</li>
+                                                <li>Select "Sepolia" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://sepolia.infura.io/v3/YOUR_KEY</code></li>
+                                            </ol>
+                                            <p><strong>Option 2: Alchemy (Free)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
+                                                <li>Create a new app</li>
+                                                <li>Select "Ethereum" → "Sepolia" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY</code></li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="editProductionRpc">
+                                        Production RPC URL (Mainnet)
+                                        <span class="tooltip-trigger" id="productionTooltipTrigger">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </span>
+                                    </label>
+                                    <input type="url" id="editProductionRpc" name="editProductionRpc" 
+                                           placeholder="https://mainnet.infura.io/v3/YOUR_KEY">
+                                    <small>For Ethereum mainnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
+                                    <div class="tooltip-content" id="rpc-production-tooltip">
+                                        <div class="tooltip-header">
+                                            <h5>How to get a Production RPC URL</h5>
+                                        </div>
+                                        <div class="tooltip-body">
+                                            <p><strong>Option 1: Infura (Free tier available)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
+                                                <li>Create a new project</li>
+                                                <li>Select "Ethereum Mainnet" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://mainnet.infura.io/v3/YOUR_KEY</code></li>
+                                            </ol>
+                                            <p><strong>Option 2: Alchemy (Free tier available)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
+                                                <li>Create a new app</li>
+                                                <li>Select "Ethereum" → "Ethereum Mainnet" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY</code></li>
+                                            </ol>
+                                            <p class="tooltip-note">💡 Both providers offer free tiers with generous rate limits for development.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary btn-small" onclick="cancelRpcEdit()">Cancel</button>
+                                    <button type="submit" class="btn-primary btn-small">Save RPC URLs</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: API Keys -->
+                    <div class="app-keys-section">
+                        <div class="keys-header">
+                            <h4>API Keys</h4>
+                            <button class="btn-primary btn-small" onclick="openCreateTokenModal()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Create Key
+                            </button>
+                        </div>
+                        <div class="tokens-list" id="appTokensList">
+                            <div class="loading-spinner">Loading keys...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-danger" onclick="deleteApplication()">Delete Application</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('appDetailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Token Modal -->
+    <div class="modal" id="createTokenModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create API Key</h3>
+                <button class="modal-close" onclick="closeModal('createTokenModal')">&times;</button>
+            </div>
+            <form id="createTokenForm">
+                <div class="form-group">
+                    <label for="tokenName">Key Name *</label>
+                    <input type="text" id="tokenName" name="tokenName" required placeholder="e.g., Production Server">
+                    <small>A descriptive name to identify this key</small>
+                </div>
+                <div class="form-group">
+                    <label for="tokenEnvironment">Environment *</label>
+                    <select id="tokenEnvironment" name="tokenEnvironment" required>
+                        <option value="sandbox">Sandbox (Testnet)</option>
+                        <option value="production">Production (Mainnet)</option>
+                    </select>
+                    <small>Choose the environment this API key will be used for</small>
+                </div>
+                <div class="form-group">
+                    <label for="tokenExpiry">Expiration</label>
+                    <select id="tokenExpiry" name="tokenExpiry">
+                        <option value="">Never expires</option>
+                        <option value="3600">1 hour</option>
+                        <option value="86400">24 hours</option>
+                        <option value="604800">7 days</option>
+                        <option value="2592000">30 days</option>
+                        <option value="7776000">90 days</option>
+                        <option value="31536000">1 year</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createTokenModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Key</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Token Created Modal -->
+    <div class="modal" id="tokenCreatedModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API Key Created!</h3>
+                <button class="modal-close" onclick="closeModal('tokenCreatedModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p><strong>Copy your API key now!</strong> You won't be able to see it again.</p>
+                </div>
+                <div class="token-display">
+                    <code id="newTokenValue"></code>
+                    <button class="copy-btn" onclick="copyNewToken()">Copy</button>
+                </div>
+                <div class="usage-example">
+                    <h4>Usage Example</h4>
+                    <div class="code-example-box">
+                        <pre><code id="tokenUsageExample"></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary" onclick="closeTokenCreatedModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Yield Account Modal -->
+    <div class="modal" id="createYieldModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Yield Account</h3>
+                <button class="modal-close" onclick="closeModal('createYieldModal')">&times;</button>
+            </div>
+            <form id="createYieldForm">
+                <div class="form-group">
+                    <label for="yieldCurrency">Currency</label>
+                    <select id="yieldCurrency" name="yieldCurrency" required>
+                        <option value="USDC">USDC</option>
+                        <option value="USDT">USDT</option>
+                        <option value="ETH">ETH</option>
+                        <option value="DAI">DAI</option>
+                    </select>
+                </div>
+                <div class="yield-info">
+                    <div class="yield-rate">
+                        <span class="rate-label">Annual Yield Rate</span>
+                        <span class="rate-value">6.00% APY</span>
+                    </div>
+                    <p class="yield-note">Your funds will be deployed to DeFi protocols (Morpho, Aave) to generate yield automatically.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createYieldModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+        let currentAppId = null;
+        let currentAppData = null;
+        let webhookSecretVisible = false;
+        
+        // Check authentication
+        const token = localStorage.getItem('flow_token');
+        const username = localStorage.getItem('flow_username');
+        
+        if (!token) {
+            window.location.href = 'signin.html';
+        }
+        
+        document.getElementById('userInfo').textContent = username || 'Account';
+        
+        // Dashboard dropdown toggle
+        const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
+        const dashboardDropdown = document.getElementById('dashboardDropdown');
+        
+        dashboardDropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dashboardDropdown.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!dashboardDropdown.contains(e.target) && !dashboardDropdownBtn.contains(e.target)) {
+                dashboardDropdown.classList.remove('active');
+            }
+        });
+        
+        // Sign out
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            localStorage.clear();
+            window.location.href = 'signin.html';
+        });
+        
+        // Load data on page load
+        loadApplications();
+        loadYieldAccounts();
+        
+        // Create Application
+        document.getElementById('createAppBtn').addEventListener('click', () => openModal('createAppModal'));
+        
+        // Tooltip functionality
+        document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+            trigger.addEventListener('mouseenter', function() {
+                const tooltipId = this.dataset.tooltip;
+                const tooltip = document.getElementById(tooltipId);
+                if (tooltip) {
+                    tooltip.style.display = 'block';
+                }
+            });
+            trigger.addEventListener('mouseleave', function() {
+                const tooltipId = this.dataset.tooltip;
+                const tooltip = document.getElementById(tooltipId);
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        });
+        
+        document.getElementById('createAppForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const origins = document.getElementById('appOrigins').value;
+            const body = {
+                name: document.getElementById('appName').value,
+                description: document.getElementById('appDescription').value || undefined,
+                webhook_url: document.getElementById('appWebhook').value || undefined,
+                allowed_origins: origins ? origins.split(',').map(o => o.trim()) : undefined
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response.ok) {
+                    closeModal('createAppModal');
+                    this.reset();
+                    loadApplications();
+                } else {
+                    const data = await response.json();
+                    alert(data.error?.message || 'Failed to create application');
+                }
+            } catch (error) {
+                alert('Failed to create application');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Application';
+            }
+        });
+        
+        // Create Yield Account
+        document.getElementById('createYieldBtn').addEventListener('click', () => openModal('createYieldModal'));
+        
+        document.getElementById('createYieldForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/yield/accounts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currency: document.getElementById('yieldCurrency').value })
+                });
+                
+                if (response.ok) {
+                    closeModal('createYieldModal');
+                    loadYieldAccounts();
+                } else {
+                    const data = await response.json();
+                    alert(data.error?.message || 'Failed to create yield account');
+                }
+            } catch (error) {
+                alert('Failed to create yield account');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        });
+        
+        // RPC Edit Functions
+        function toggleRpcEdit() {
+            document.getElementById('rpcDisplayMode').style.display = 'none';
+            document.getElementById('editRpcForm').style.display = 'block';
+            document.getElementById('editRpcBtn').style.display = 'none';
+        }
+        
+        function cancelRpcEdit() {
+            document.getElementById('rpcDisplayMode').style.display = 'block';
+            document.getElementById('editRpcForm').style.display = 'none';
+            document.getElementById('editRpcBtn').style.display = 'inline-block';
+            // Reset form values
+            if (currentAppData) {
+                document.getElementById('editSandboxRpc').value = currentAppData.sandbox_rpc_url || '';
+                document.getElementById('editProductionRpc').value = currentAppData.production_rpc_url || '';
+            }
+        }
+        
+        function setupRpcTooltips() {
+            // Remove existing listeners
+            const sandboxTrigger = document.getElementById('sandboxTooltipTrigger');
+            const productionTrigger = document.getElementById('productionTooltipTrigger');
+            
+            if (sandboxTrigger) {
+                sandboxTrigger.onmouseenter = function() {
+                    document.getElementById('rpc-sandbox-tooltip').style.display = 'block';
+                };
+                sandboxTrigger.onmouseleave = function() {
+                    document.getElementById('rpc-sandbox-tooltip').style.display = 'none';
+                };
+            }
+            
+            if (productionTrigger) {
+                productionTrigger.onmouseenter = function() {
+                    document.getElementById('rpc-production-tooltip').style.display = 'block';
+                };
+                productionTrigger.onmouseleave = function() {
+                    document.getElementById('rpc-production-tooltip').style.display = 'none';
+                };
+            }
+        }
+        
+        // Create Token Form
+        document.getElementById('createTokenForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const expiresIn = document.getElementById('tokenExpiry').value;
+            const body = {
+                name: document.getElementById('tokenName').value,
+                environment: document.getElementById('tokenEnvironment').value,
+                expires_in: expiresIn ? parseInt(expiresIn) : undefined
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeModal('createTokenModal');
+                    document.getElementById('newTokenValue').textContent = data.access_token;
+                    document.getElementById('tokenUsageExample').textContent = 
+`curl ${API_BASE_URL}/v1/yield/accounts \\
+  -H "Authorization: Bearer ${data.access_token}" \\
+  -H "Content-Type: application/json"`;
+                    openModal('tokenCreatedModal');
+                    this.reset();
+                } else {
+                    alert(data.error?.message || 'Failed to create key');
+                }
+            } catch (error) {
+                alert('Failed to create key');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Key';
+            }
+        });
+        
+        async function loadApplications() {
+            const grid = document.getElementById('applicationsGrid');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.applications?.length > 0) {
+                    grid.innerHTML = data.applications.map(app => `
+                        <div class="app-card" onclick="openAppDetails('${app.application_id}')">
+                            <div class="app-card-header">
+                                <span class="app-name">${app.name}</span>
+                                <span class="environment-badge">Both Environments</span>
+                            </div>
+                            <p class="app-description">${app.description || 'No description'}</p>
+                            <div class="app-card-footer">
+                                <span class="app-id">ID: ${app.application_id.substring(0, 8)}...</span>
+                                <span class="status-badge status-${app.status}">${app.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = `
+                        <div class="empty-state-large">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h3>No Applications Yet</h3>
+                            <p>Create your first application to get API keys and start building.</p>
+                            <button class="btn-primary" onclick="openModal('createAppModal')">Create Your First App</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                grid.innerHTML = '<div class="empty-state">Failed to load applications</div>';
+            }
+        }
+        
+        async function openAppDetails(appId) {
+            currentAppId = appId;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications/${appId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: { message: `HTTP ${response.status}` } }));
+                    console.error('API Error:', errorData);
+                    alert(`Failed to load application: ${errorData.error?.message || response.statusText}`);
+                    return;
+                }
+                
+                const app = await response.json();
+                currentAppData = app;
+                
+                document.getElementById('appDetailsTitle').textContent = app.name;
+                document.getElementById('detailAppId').textContent = app.application_id;
+                document.getElementById('detailAppEnv').textContent = 'Both (Sandbox & Production)';
+                document.getElementById('detailAppEnv').className = 'environment-badge';
+                document.getElementById('detailAppStatus').textContent = app.status;
+                document.getElementById('detailAppStatus').className = `status-badge status-${app.status}`;
+                document.getElementById('detailAppCreated').textContent = new Date(app.created_at).toLocaleString();
+                
+                // Webhook
+                document.getElementById('detailWebhookUrl').textContent = app.webhook_url || 'Not configured';
+                if (app.webhook_secret) {
+                    document.getElementById('webhookSecretRow').style.display = 'flex';
+                    document.getElementById('detailWebhookSecret').textContent = webhookSecretVisible ? app.webhook_secret : '••••••••••••••••';
+                } else {
+                    document.getElementById('webhookSecretRow').style.display = 'none';
+                }
+                
+                // RPC URLs
+                const detailSandboxRpc = document.getElementById('detailSandboxRpc');
+                const detailProductionRpc = document.getElementById('detailProductionRpc');
+                const editSandboxRpc = document.getElementById('editSandboxRpc');
+                const editProductionRpc = document.getElementById('editProductionRpc');
+                
+                if (detailSandboxRpc) detailSandboxRpc.textContent = app.sandbox_rpc_url || 'Not configured';
+                if (detailProductionRpc) detailProductionRpc.textContent = app.production_rpc_url || 'Not configured';
+                if (editSandboxRpc) editSandboxRpc.value = app.sandbox_rpc_url || '';
+                if (editProductionRpc) editProductionRpc.value = app.production_rpc_url || '';
+                
+                // Setup tooltips for RPC fields and RPC form
+                setupRpcTooltips();
+                
+                // Setup RPC form submit handler (only once)
+                const editRpcForm = document.getElementById('editRpcForm');
+                if (editRpcForm && !editRpcForm.dataset.listenerAttached) {
+                    editRpcForm.dataset.listenerAttached = 'true';
+                    editRpcForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    sandbox_rpc_url: document.getElementById('editSandboxRpc').value || undefined,
+                                    production_rpc_url: document.getElementById('editProductionRpc').value || undefined
+                                })
+                            });
+                            
+                            if (response.ok) {
+                                const app = await response.json();
+                                currentAppData = app;
+                                const detailSandboxRpc = document.getElementById('detailSandboxRpc');
+                                const detailProductionRpc = document.getElementById('detailProductionRpc');
+                                if (detailSandboxRpc) detailSandboxRpc.textContent = app.sandbox_rpc_url || 'Not configured';
+                                if (detailProductionRpc) detailProductionRpc.textContent = app.production_rpc_url || 'Not configured';
+                                cancelRpcEdit();
+                            } else {
+                                const data = await response.json();
+                                alert(data.error?.message || 'Failed to update RPC URLs');
+                            }
+                        } catch (error) {
+                            alert('Failed to update RPC URLs');
+                        }
+                    });
+                }
+                
+                loadAppTokens(appId);
+                openModal('appDetailsModal');
+            } catch (error) {
+                console.error('Error loading application details:', error);
+                alert(`Failed to load application details: ${error.message || error}`);
+            }
+        }
+        
+        async function loadAppTokens(appId) {
+            const list = document.getElementById('appTokensList');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications/${appId}/tokens`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.tokens?.length > 0) {
+                    list.innerHTML = data.tokens.map(t => `
+                        <div class="token-item">
+                            <div class="token-info">
+                                <span class="token-name">${t.name}</span>
+                                <code class="token-preview">${t.access_token.substring(0, 25)}...</code>
+                                <span class="token-meta">Created: ${new Date(t.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <button class="btn-danger btn-small" onclick="revokeAppToken('${t.token_id}')">Revoke</button>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="empty-state">No API keys yet. Create one to get started.</div>';
+                }
+            } catch (error) {
+                list.innerHTML = '<div class="empty-state">Failed to load keys</div>';
+            }
+        }
+        
+        async function loadYieldAccounts() {
+            const list = document.getElementById('yieldAccountsList');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/yield/accounts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data) && data.length > 0) {
+                    list.innerHTML = `
+                        <div class="yield-table">
+                            <div class="yield-table-header">
+                                <span>Currency</span>
+                                <span>Balance</span>
+                                <span>APY</span>
+                                <span>Protocol</span>
+                                <span>Status</span>
+                            </div>
+                            ${data.map(acc => `
+                                <div class="yield-table-row">
+                                    <span class="currency-badge">${acc.currency}</span>
+                                    <span class="balance">${parseFloat(acc.balance?.amount || 0).toFixed(2)} ${acc.currency}</span>
+                                    <span class="apy">${(acc.annual_yield_rate * 100).toFixed(2)}%</span>
+                                    <span class="protocol">${acc.protocol}</span>
+                                    <span class="status-badge status-${acc.status}">${acc.status}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    list.innerHTML = '<div class="empty-state">No yield accounts yet. Create one to start earning 6% APY!</div>';
+                }
+            } catch (error) {
+                list.innerHTML = '<div class="empty-state">Failed to load yield accounts</div>';
+            }
+        }
+        
+        function openCreateTokenModal() {
+            openModal('createTokenModal');
+        }
+        
+        async function revokeAppToken(tokenId) {
+            if (!confirm('Are you sure you want to revoke this key? This cannot be undone.')) return;
+            
+            try {
+                await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens/${tokenId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadAppTokens(currentAppId);
+            } catch (error) {
+                alert('Failed to revoke key');
+            }
+        }
+        
+        async function deleteApplication() {
+            if (!confirm('Are you sure you want to delete this application? All API keys will be revoked.')) return;
+            
+            try {
+                await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                closeModal('appDetailsModal');
+                loadApplications();
+            } catch (error) {
+                alert('Failed to delete application');
+            }
+        }
+        
+        function toggleWebhookSecret() {
+            webhookSecretVisible = !webhookSecretVisible;
+            document.getElementById('detailWebhookSecret').textContent = 
+                webhookSecretVisible ? currentAppData.webhook_secret : '••••••••••••••••';
+        }
+        
+        async function regenerateWebhookSecret() {
+            if (!confirm('Regenerate webhook secret? Your current secret will stop working.')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}/webhook-secret/regenerate`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                currentAppData.webhook_secret = data.webhook_secret;
+                document.getElementById('detailWebhookSecret').textContent = 
+                    webhookSecretVisible ? data.webhook_secret : '••••••••••••••••';
+            } catch (error) {
+                alert('Failed to regenerate secret');
+            }
+        }
+        
+        function closeTokenCreatedModal() {
+            closeModal('tokenCreatedModal');
+            loadAppTokens(currentAppId);
+        }
+        
+        function copyNewToken() {
+            navigator.clipboard.writeText(document.getElementById('newTokenValue').textContent);
+            const btn = event.target;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy', 2000);
+        }
+        
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', function() {
+                this.closest('.modal').classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

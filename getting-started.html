@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - Flow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="api-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Flow</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html" class="active">Get Started</a>
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Getting Started Header -->
+    <section class="api-header">
+        <div class="container">
+            <div class="api-header-content">
+                <h1>Getting Started</h1>
+                <p class="api-subtitle">
+                    Get up and running with Flow APIs in minutes. Create an account, generate an access token, and make your first API call.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started Content -->
+    <section class="api-content">
+        <div class="container">
+            <div class="getting-started-layout">
+                <aside class="getting-started-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Quick Start</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#step1">1. Create Account</a></li>
+                            <li><a href="#step2">2. Generate Token</a></li>
+                            <li><a href="#step3">3. Make API Call</a></li>
+                            <li><a href="#step4">4. Next Steps</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <main class="getting-started-main">
+                    <!-- Step 1 -->
+                    <section id="step1" class="guide-section">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h2>Create Your Account</h2>
+                            <p>Start by creating a Flow developer account. You'll need a username and password.</p>
+                            
+                            <div class="code-example-box">
+                                <div class="code-header">
+                                    <span>cURL</span>
+                                </div>
+                                <pre><code>curl https://api.flow.com/v1/accounts \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "your_username",
+    "password": "your_secure_password",
+    "email": "your_email@example.com"
+  }'</code></pre>
+                            </div>
+
+                            <div class="response-box">
+                                <strong>Response:</strong>
+                                <pre><code>{
+  "account_id": "acc_1234567890abcdef",
+  "username": "your_username",
+  "created_at": "2025-01-15T10:30:00Z",
+  "status": "active"
+}</code></pre>
+                            </div>
+
+                            <p class="note">
+                                <strong>Note:</strong> You can also create an account through our <a href="account.html">web interface</a>.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Step 2 -->
+                    <section id="step2" class="guide-section">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h2>Generate a Personal Access Token</h2>
+                            <p>Authenticate with your account credentials to receive an access token, then create a Personal Access Token for API calls.</p>
+                            
+                            <h3>Step 2a: Authenticate</h3>
+                            <div class="code-example-box">
+                                <div class="code-header">
+                                    <span>cURL</span>
+                                </div>
+                                <pre><code>curl https://api.flow.com/v1/auth/authenticate \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "your_username",
+    "password": "your_secure_password"
+  }'</code></pre>
+                            </div>
+
+                            <div class="response-box">
+                                <strong>Response:</strong>
+                                <pre><code>{
+  "access_token": "sk_live_temp_...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "account_id": "acc_1234567890abcdef"
+}</code></pre>
+                            </div>
+
+                            <h3>Step 2b: Create Personal Access Token</h3>
+                            <div class="code-example-box">
+                                <div class="code-header">
+                                    <span>cURL</span>
+                                </div>
+                                <pre><code>curl https://api.flow.com/v1/access-tokens \
+  -X POST \
+  -H "Authorization: Bearer sk_live_temp_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My API Key",
+    "expires_in": 31536000
+  }'</code></pre>
+                            </div>
+
+                            <div class="response-box">
+                                <strong>Response:</strong>
+                                <pre><code>{
+  "token_id": "tok_1234567890abcdef",
+  "access_token": "sk_live_1234567890abcdef",
+  "name": "My API Key",
+  "created_at": "2025-01-15T10:30:00Z",
+  "expires_at": null
+}</code></pre>
+                            </div>
+
+                            <div class="warning-box">
+                                <strong>⚠️ Important:</strong> Save your access token securely. You won't be able to see it again after creation. Use this token in the <code>Authorization: Bearer</code> header for all API requests.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Step 3 -->
+                    <section id="step3" class="guide-section">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h2>Make Your First API Call</h2>
+                            <p>Now that you have an access token, let's create your first yield account and start earning 6% yield.</p>
+                            
+                            <div class="code-example-box">
+                                <div class="code-header">
+                                    <span>cURL</span>
+                                </div>
+                                <pre><code>curl https://api.flow.com/v1/yield/accounts \
+  -X POST \
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currency": "USDC",
+    "initial_deposit": {
+      "amount": "1000.00",
+      "currency": "USDC"
+    },
+    "protocol_preference": "auto"
+  }'</code></pre>
+                            </div>
+
+                            <div class="response-box">
+                                <strong>Response:</strong>
+                                <pre><code>{
+  "account_id": "ya_1234567890abcdef",
+  "currency": "USDC",
+  "protocol": "morpho",
+  "annual_yield_rate": 0.06,
+  "status": "active",
+  "created_at": "2025-01-15T10:30:00Z",
+  "balance": {
+    "amount": "1000.00",
+    "currency": "USDC"
+  }
+}</code></pre>
+                            </div>
+
+                            <p class="success-note">
+                                <strong>🎉 Success!</strong> You've created your first yield account. Your funds are now earning 6% annual yield through Flow's integration with Morpho and Aave protocols.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Step 4 -->
+                    <section id="step4" class="guide-section">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h2>Next Steps</h2>
+                            <p>Now that you're set up, here's what you can do next:</p>
+                            
+                            <div class="next-steps-grid">
+                                <div class="next-step-card">
+                                    <h3>📚 Explore the API</h3>
+                                    <p>Browse our complete <a href="api-reference.html">API Reference</a> to see all available endpoints for managing yield accounts, positions, and transactions.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>💼 Manage Positions</h3>
+                                    <p>Use the Positions API to view your active yield positions, check balances, and track yield accruals in real-time.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>📊 View Markets</h3>
+                                    <p>Explore available markets across Morpho and Aave protocols to see current rates and opportunities.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>🔔 Set Up Webhooks</h3>
+                                    <p>Subscribe to webhooks to receive real-time notifications for yield accruals, deposits, withdrawals, and more.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Authentication Section -->
+                    <section class="guide-section">
+                        <h2>Authentication</h2>
+                        <p>All API requests must include your Personal Access Token in the Authorization header:</p>
+                        
+                        <div class="code-example-box">
+                            <pre><code>Authorization: Bearer sk_live_1234567890abcdef</code></pre>
+                        </div>
+
+                        <h3>Base URL</h3>
+                        <p>All API requests should be made to:</p>
+                        <div class="code-example-box">
+                            <pre><code>https://api.flow.com</code></pre>
+                        </div>
+
+                        <h3>API Versioning</h3>
+                        <p>Flow APIs are versioned. The current version is <code>2025-01-15</code>. Include the version in your API path:</p>
+                        <div class="code-example-box">
+                            <pre><code>https://api.flow.com/v1/yield/accounts</code></pre>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#6366F1"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Flow</span>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="nav-auth.js"></script>
+</body>
+</html>

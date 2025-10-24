@@ -1,0 +1,12 @@
+{
+  "name": "flow-landing-page",
+  "version": "1.0.0",
+  "description": "Flow DeFi Platform Landing Page",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -o",
+    "dev": "npx http-server . -p 3000 -o"
+  },
+  "keywords": ["defi", "landing-page", "flow"],
+  "author": "",
+  "license": "MIT"
+}
