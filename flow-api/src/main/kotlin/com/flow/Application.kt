@@ -1,6 +1,7 @@
 package com.flow
 
 import com.flow.api.routes.*
+import com.flow.api.routes.healthRoutes
 import com.flow.database.DatabaseFactory
 import com.flow.middleware.auth
 import com.flow.middleware.cors
