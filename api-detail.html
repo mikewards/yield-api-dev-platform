@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Detail - Flow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="api-styles.css">
+    <link rel="stylesheet" href="api-detail-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Flow</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html">Get Started</a>
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- API Detail Content -->
+    <section class="api-detail-content">
+        <div class="container">
+            <div class="detail-header">
+                <a href="api-reference.html" class="back-link">← API Reference</a>
+                <div class="detail-title-section">
+                    <div class="method-badge" id="method-badge">POST</div>
+                    <h1 id="api-title">Create Yield Account</h1>
+                </div>
+                <p class="detail-description" id="api-description">
+                    Creates a yield account using the provided parameters.
+                </p>
+                <div class="endpoint-info">
+                    <span class="endpoint-method-badge" id="endpoint-method-badge">POST</span>
+                    <code class="endpoint-path-inline" id="endpoint-path-inline">/v1/yield/accounts</code>
+                    <span class="permissions-badge">Permissions: <span id="permissions-inline">YIELD_WRITE</span></span>
+                </div>
+            </div>
+
+            <div class="detail-split-layout">
+                <!-- Left Column: Summary and Request Body -->
+                <div class="detail-left">
+                    <!-- Summary Section -->
+                    <div class="summary-section" id="summary-section">
+                        <h2>Summary</h2>
+                        <p id="summary-text">Create a new yield account to start earning interest on cryptocurrency deposits. Flow automatically routes funds to the best available protocol (Morpho or Aave) to ensure 6% yield.</p>
+                    </div>
+
+                    <!-- Request Body Section -->
+                    <div class="request-section" id="request-section">
+                        <h2>Request body</h2>
+                        <div class="params-container" id="request-body">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Examples and Response -->
+                <div class="detail-right">
+                    <!-- CURL Example -->
+                    <div class="example-section" id="example-section">
+                        <h2>Example request</h2>
+                        <div class="code-example-box">
+                            <div class="code-header-bar">
+                                <span class="code-lang">cURL</span>
+                            </div>
+                            <pre><code id="curl-example">curl https://api.flow.com/v1/yield/accounts \
+  -X POST \
+  -H "Authorization: Bearer sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currency": "USDC",
+    "initial_deposit": {
+      "amount": "1000.00",
+      "currency": "USDC"
+    },
+    "protocol_preference": "auto"
+  }'</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Response Section -->
+                    <div class="response-section-right" id="response-section">
+                        <h2>Response</h2>
+                        <div class="response-tabs">
+                            <button class="tab-btn active" data-tab="success">Success</button>
+                            <button class="tab-btn" data-tab="error">Error</button>
+                        </div>
+                        <div class="response-content">
+                            <div class="tab-content active" id="success-tab">
+                                <div class="code-example-box">
+                                    <pre><code id="success-response">{
+  "account_id": "ya_1234567890abcdef",
+  "currency": "USDC",
+  "protocol": "morpho",
+  "annual_yield_rate": 0.06,
+  "status": "active",
+  "created_at": "2025-01-15T10:30:00Z",
+  "balance": {
+    "amount": "1000.00",
+    "currency": "USDC"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                            <div class="tab-content" id="error-tab">
+                                <div class="code-example-box">
+                                    <pre><code id="error-response">{
+  "error": {
+    "code": "INSUFFICIENT_FUNDS",
+    "message": "Insufficient funds to create yield account",
+    "type": "invalid_request_error"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#6366F1"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Flow</span>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="api-detail-script.js"></script>
+    <script src="nav-auth.js"></script>
+</body>
+</html>

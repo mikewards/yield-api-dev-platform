@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Flow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="api-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Flow</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign In Section -->
+    <section class="account-section">
+        <div class="container">
+            <div class="account-container">
+                <div class="account-header">
+                    <h1>Sign In to Flow</h1>
+                    <p>Access your dashboard and manage your DeFi yield accounts.</p>
+                </div>
+
+                <form class="account-form" id="signinForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required placeholder="your_username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large btn-full">Sign In</button>
+                </form>
+
+                <div class="account-footer">
+                    <p>Don't have an account? <a href="account.html">Create one</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#6366F1"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Flow</span>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+        
+        // Check if already logged in
+        const existingToken = localStorage.getItem('flow_token');
+        if (existingToken) {
+            window.location.href = 'dashboard.html';
+        }
+        
+        document.getElementById('signinForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing In...';
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token and user info
+                    localStorage.setItem('flow_token', data.access_token);
+                    localStorage.setItem('flow_account_id', data.account_id);
+                    localStorage.setItem('flow_username', formData.username);
+                    localStorage.setItem('flow_token_expires', Date.now() + (data.expires_in * 1000));
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    showErrorMessage(data.error?.message || 'Invalid username or password');
+                }
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showErrorMessage('Unable to connect to the server. Please ensure the API is running.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+        
+        function showErrorMessage(message) {
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const form = document.getElementById('signinForm');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>${message}</span>
+            `;
+            form.insertBefore(errorDiv, form.firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
