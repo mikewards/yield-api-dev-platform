@@ -74,3 +74,21 @@ tasks.withType<KotlinCompile> {
 tasks.test {
     useJUnitPlatform()
 }
+
+// Configure JAR task to create a fat JAR with manifest
+tasks.jar {
+    manifest {
+        attributes(
+            mapOf(
+                "Main-Class" to "com.flow.ApplicationKt"
+            )
+        )
+    }
+    
+    // Include all dependencies in the JAR
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
