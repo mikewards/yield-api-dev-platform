@@ -1,0 +1,37 @@
+# Don't exclude flow-api - we need it for the build
+!flow-api/
+
+# Exclude build artifacts
+build/
+.gradle/
+*.class
+*.jar
+!flow-api/build/libs/*.jar
+
+# Exclude IDE files
+.idea/
+.vscode/
+*.iml
+
+# Exclude git
+.git/
+.gitignore
+
+# Exclude docs (not needed in container)
+*.md
+!flow-api/README.md
+
+# Exclude frontend files (not needed for API)
+*.html
+*.css
+*.js
+!flow-api/**/*.js
+
+# Exclude scripts
+*.sh
+!flow-api/**/*.sh
+
+# Exclude env files
+.env
+.env.*
+
