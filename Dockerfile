@@ -2,6 +2,7 @@ FROM gradle:8.4-jdk17 AS build
 WORKDIR /app
 
 # Copy Gradle files first for better caching
+# Handle both root and flow-api build contexts
 COPY flow-api/build.gradle.kts flow-api/settings.gradle.kts ./
 COPY flow-api/gradle ./gradle
 
@@ -33,4 +34,3 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
