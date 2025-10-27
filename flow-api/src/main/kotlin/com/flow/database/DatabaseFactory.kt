@@ -36,9 +36,18 @@ object DatabaseFactory {
         val dataSource = HikariDataSource(hikariConfig)
         Database.connect(dataSource)
         
-        // Create tables
-        transaction {
-            Schema.createTables()
+        // Create tables (with error handling)
+        try {
+            transaction {
+                Schema.createTables()
+            }
+            println("✅ Database tables created successfully")
+        } catch (e: Exception) {
+            println("⚠️  Warning: Error creating tables: ${e.message}")
+            // If tables already exist, that's okay - continue
+            if (!e.message?.contains("already exists")!!) {
+                throw e
+            }
         }
     }
 }
