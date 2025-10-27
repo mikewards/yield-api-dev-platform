@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.9.20"
     kotlin("plugin.serialization") version "1.9.20"
     application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.flow"
@@ -75,20 +76,18 @@ tasks.test {
     useJUnitPlatform()
 }
 
-// Configure JAR task to create a fat JAR with manifest
-tasks.jar {
+// Configure Shadow JAR (fat JAR with all dependencies)
+tasks.shadowJar {
+    archiveBaseName.set("flow-api")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    
     manifest {
-        attributes(
-            mapOf(
-                "Main-Class" to "com.flow.ApplicationKt"
-            )
-        )
+        attributes(mapOf("Main-Class" to "com.flow.ApplicationKt"))
     }
-    
-    // Include all dependencies in the JAR
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-    
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Make shadowJar the default JAR task
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }

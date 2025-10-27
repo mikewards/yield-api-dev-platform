@@ -12,8 +12,8 @@ RUN gradle dependencies --no-daemon || true
 # Copy source code
 COPY flow-api/src ./src
 
-# Build the application
-RUN gradle build --no-daemon -x test
+# Build the application (creates shadow JAR)
+RUN gradle shadowJar --no-daemon -x test
 
 # Runtime stage
 FROM eclipse-temurin:17-jre
@@ -22,8 +22,8 @@ WORKDIR /app
 # Install curl for health checks
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Copy the built JAR
-COPY --from=build /app/build/libs/*.jar app.jar
+# Copy the built shadow JAR (fat JAR with all dependencies)
+COPY --from=build /app/build/libs/flow-api.jar app.jar
 
 # Expose port
 EXPOSE 8080
