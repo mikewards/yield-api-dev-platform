@@ -21,19 +21,37 @@ object DatabaseFactory {
         val maxPoolSize = if (config.hasPath("database.maxPoolSize")) config.getInt("database.maxPoolSize") else 10
         
         // Validate required fields
-        requireNotNull(dbUrl) { "DATABASE_URL environment variable or database.url config is required" }
+        requireNotNull(dbUrl) { 
+            "❌ DATABASE_URL is missing! Please set DATABASE_URL in Railway (flow-platform service → Variables). " +
+            "Copy the value from flow-db service → Variables → DATABASE_URL"
+        }
         
         // Convert Railway's postgresql:// format to jdbc:postgresql:// if needed
         var jdbcUrl = dbUrl.trim()
+        
+        // Check if empty after trimming
+        if (jdbcUrl.isEmpty()) {
+            throw IllegalArgumentException(
+                "❌ DATABASE_URL is empty! Please set DATABASE_URL in Railway (flow-platform service → Variables). " +
+                "Copy the value from flow-db service → Variables → DATABASE_URL"
+            )
+        }
+        
         if (jdbcUrl.startsWith("postgresql://")) {
             jdbcUrl = jdbcUrl.replace("postgresql://", "jdbc:postgresql://")
         } else if (!jdbcUrl.startsWith("jdbc:postgresql://")) {
-            throw IllegalArgumentException("DATABASE_URL must be in format 'postgresql://...' or 'jdbc:postgresql://...'. Got: ${jdbcUrl.take(50)}...")
+            throw IllegalArgumentException(
+                "❌ DATABASE_URL format error! Must start with 'postgresql://' or 'jdbc:postgresql://'. " +
+                "Got: ${if (jdbcUrl.length > 50) jdbcUrl.take(50) + "..." else jdbcUrl}"
+            )
         }
         
         // Validate URL format
         if (!jdbcUrl.contains("@") || !jdbcUrl.contains(":")) {
-            throw IllegalArgumentException("DATABASE_URL appears malformed. Expected format: postgresql://user:password@host:port/database. Got: ${jdbcUrl.take(100)}")
+            throw IllegalArgumentException(
+                "❌ DATABASE_URL appears malformed! Expected format: postgresql://user:password@host:port/database. " +
+                "Got: ${if (jdbcUrl.length > 100) jdbcUrl.take(100) + "..." else jdbcUrl}"
+            )
         }
         
         val hikariConfig = HikariConfig().apply {
