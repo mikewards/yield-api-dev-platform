@@ -12,8 +12,14 @@ object DatabaseFactory {
         
         // Read from environment variables first, then config file
         // Trim all values to handle accidental whitespace from Railway UI
-        var dbUrl = System.getenv("DATABASE_URL")?.trim()
+        val envDbUrl = System.getenv("DATABASE_URL")
+        println("🔍 DEBUG: DATABASE_URL from env = ${if (envDbUrl == null) "NULL" else if (envDbUrl.isEmpty()) "EMPTY" else "${envDbUrl.take(30)}..."}")
+        
+        var dbUrl = envDbUrl?.trim()
             ?: (if (config.hasPath("database.url")) config.getString("database.url").trim() else null)
+        
+        println("🔍 DEBUG: dbUrl after processing = ${if (dbUrl == null) "NULL" else if (dbUrl.isEmpty()) "EMPTY" else "${dbUrl.take(30)}..."}")
+        
         val dbUser = System.getenv("DATABASE_USER")?.trim()
             ?: (if (config.hasPath("database.user")) config.getString("database.user").trim() else "postgres")
         val dbPassword = System.getenv("DATABASE_PASSWORD")?.trim()
@@ -29,6 +35,8 @@ object DatabaseFactory {
         // Convert Railway's postgresql:// format to jdbc:postgresql:// if needed
         var jdbcUrl = dbUrl.trim()
         
+        println("🔍 DEBUG: jdbcUrl before conversion = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(50)}..."}")
+        
         // Check if empty after trimming
         if (jdbcUrl.isEmpty()) {
             throw IllegalArgumentException(
@@ -40,6 +48,7 @@ object DatabaseFactory {
         if (jdbcUrl.startsWith("postgresql://")) {
             jdbcUrl = jdbcUrl.replace("postgresql://", "jdbc:postgresql://")
         } else if (!jdbcUrl.startsWith("jdbc:postgresql://")) {
+            println("🔍 DEBUG: jdbcUrl doesn't start with postgresql:// or jdbc:postgresql://")
             throw IllegalArgumentException(
                 "❌ DATABASE_URL format error! Must start with 'postgresql://' or 'jdbc:postgresql://'. " +
                 "Got: ${if (jdbcUrl.length > 50) jdbcUrl.take(50) + "..." else jdbcUrl}"
@@ -54,6 +63,10 @@ object DatabaseFactory {
             )
         }
         
+        println("🔍 DEBUG: Final jdbcUrl = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(50)}..."}")
+        println("🔍 DEBUG: dbUser = $dbUser")
+        println("🔍 DEBUG: dbPassword = ${if (dbPassword.isEmpty()) "EMPTY" else "***"}")
+        
         val hikariConfig = HikariConfig().apply {
             jdbcUrl = jdbcUrl
             username = dbUser
@@ -62,6 +75,7 @@ object DatabaseFactory {
             maximumPoolSize = maxPoolSize
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            println("🔍 DEBUG: About to validate HikariConfig...")
             validate()
         }
         
