@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Wallets SDK Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            color: #0F172A;
+            padding: 24px;
+        }
+        .sdk-container {
+            max-width: 100%;
+        }
+        .sdk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .sdk-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .wallets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .wallet-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        .wallet-card:hover {
+            border-color: #6366F1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+        .wallet-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 6px;
+        }
+        .wallet-address {
+            font-size: 12px;
+            color: #64748B;
+            font-family: 'Monaco', monospace;
+        }
+        .wallet-balance {
+            text-align: right;
+        }
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+        .balance-yield {
+            font-size: 12px;
+            color: #10B981;
+            font-weight: 600;
+        }
+        .wallet-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E2E8F0;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 14px;
+            color: #0F172A;
+            font-weight: 500;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .wallet-card.new {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="sdk-container">
+        <div class="sdk-header">
+            <div class="sdk-title">Wallets</div>
+            <button class="btn-primary" onclick="createWallet()">+ Create Wallet</button>
+        </div>
+        <div class="wallets-list" id="wallets-list">
+            <div class="wallet-card">
+                <div class="wallet-header">
+                    <div>
+                        <div class="wallet-name">Main Wallet</div>
+                        <div class="wallet-address">0x742d35Cc6635C0532925a3b844Bc9e7595f0bEb</div>
+                    </div>
+                    <div class="wallet-balance">
+                        <div class="balance-amount">$1,250.50</div>
+                        <div class="balance-yield">+$12.50 yield</div>
+                    </div>
+                </div>
+                <div class="wallet-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value">1,250.50 USDC</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">47</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Created</div>
+                        <div class="stat-value">5 days ago</div>
+                    </div>
+                </div>
+            </div>
+            <div class="wallet-card">
+                <div class="wallet-header">
+                    <div>
+                        <div class="wallet-name">Savings Wallet</div>
+                        <div class="wallet-address">0x8f3a12Bd4567890aBc123DeF4567890aBc123DeF</div>
+                    </div>
+                    <div class="wallet-balance">
+                        <div class="balance-amount">$5,000.00</div>
+                        <div class="balance-yield">+$50.00 yield</div>
+                    </div>
+                </div>
+                <div class="wallet-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value">5,000.00 USDC</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">12</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Created</div>
+                        <div class="stat-value">2 weeks ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createWallet() {
+            const list = document.getElementById('wallets-list');
+            const address = '0x' + Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            const formattedAddress = address.substring(0, 10) + '...' + address.substring(36);
+            const balance = (Math.random() * 2000).toFixed(2);
+            const yieldAmount = (balance * 0.01).toFixed(2);
+            
+            const newWallet = document.createElement('div');
+            newWallet.className = 'wallet-card new';
+            newWallet.innerHTML = `
+                <div class="wallet-header">
+                    <div>
+                        <div class="wallet-name">New Wallet</div>
+                        <div class="wallet-address">${formattedAddress}</div>
+                    </div>
+                    <div class="wallet-balance">
+                        <div class="balance-amount">$${balance}</div>
+                        <div class="balance-yield">+$${yieldAmount} yield</div>
+                    </div>
+                </div>
+                <div class="wallet-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value">${balance} USDC</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Created</div>
+                        <div class="stat-value">Just now</div>
+                    </div>
+                </div>
+            `;
+            
+            list.insertBefore(newWallet, list.firstChild);
+            
+            // Notify parent window
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'wallet.created',
+                    wallet: { address, balance }
+                }, '*');
+            }
+        }
+    </script>
+</body>
+</html>
+

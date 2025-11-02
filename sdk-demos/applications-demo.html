@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Applications SDK Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            color: #0F172A;
+            padding: 24px;
+        }
+        .sdk-container {
+            max-width: 100%;
+        }
+        .sdk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .sdk-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .applications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .app-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .app-card:hover {
+            border-color: #6366F1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        .app-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+        .app-id {
+            font-size: 12px;
+            color: #64748B;
+            font-family: 'Monaco', monospace;
+        }
+        .app-badge {
+            background: #10B981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .app-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E2E8F0;
+        }
+        .app-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .app-detail-label {
+            font-size: 11px;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .app-detail-value {
+            font-size: 14px;
+            color: #0F172A;
+            font-weight: 500;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748B;
+        }
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .app-card.new {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="sdk-container">
+        <div class="sdk-header">
+            <div class="sdk-title">Applications</div>
+            <button class="btn-primary" onclick="createApplication()">+ Create Application</button>
+        </div>
+        <div class="applications-list" id="applications-list">
+            <div class="app-card">
+                <div class="app-header">
+                    <div>
+                        <div class="app-name">My DeFi App</div>
+                        <div class="app-id">app_abc123def456</div>
+                    </div>
+                    <div class="app-badge">Active</div>
+                </div>
+                <div class="app-details">
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Environment</div>
+                        <div class="app-detail-value">Sandbox & Production</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">API Keys</div>
+                        <div class="app-detail-value">2 Active</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Created</div>
+                        <div class="app-detail-value">2 days ago</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Wallets</div>
+                        <div class="app-detail-value">3 Wallets</div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-card">
+                <div class="app-header">
+                    <div>
+                        <div class="app-name">Production App</div>
+                        <div class="app-id">app_xyz789ghi012</div>
+                    </div>
+                    <div class="app-badge">Active</div>
+                </div>
+                <div class="app-details">
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Environment</div>
+                        <div class="app-detail-value">Production</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">API Keys</div>
+                        <div class="app-detail-value">1 Active</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Created</div>
+                        <div class="app-detail-value">1 week ago</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Wallets</div>
+                        <div class="app-detail-value">1 Wallet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createApplication() {
+            const list = document.getElementById('applications-list');
+            const names = ['Trading Bot', 'Yield Optimizer', 'DeFi Dashboard', 'Crypto Wallet', 'Staking Platform'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            const appId = 'app_' + Math.random().toString(36).substr(2, 12);
+            
+            const newApp = document.createElement('div');
+            newApp.className = 'app-card new';
+            newApp.innerHTML = `
+                <div class="app-header">
+                    <div>
+                        <div class="app-name">${name}</div>
+                        <div class="app-id">${appId}</div>
+                    </div>
+                    <div class="app-badge">Active</div>
+                </div>
+                <div class="app-details">
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Environment</div>
+                        <div class="app-detail-value">Sandbox</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">API Keys</div>
+                        <div class="app-detail-value">0 Active</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Created</div>
+                        <div class="app-detail-value">Just now</div>
+                    </div>
+                    <div class="app-detail-item">
+                        <div class="app-detail-label">Wallets</div>
+                        <div class="app-detail-value">0 Wallets</div>
+                    </div>
+                </div>
+            `;
+            
+            list.insertBefore(newApp, list.firstChild);
+            
+            // Notify parent window
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'application.created',
+                    application: { name, id: appId }
+                }, '*');
+            }
+        }
+    </script>
+</body>
+</html>
+
