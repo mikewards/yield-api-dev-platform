@@ -63,33 +63,178 @@
             margin-bottom: 32px;
             line-height: 1.6;
         }
-        .embed-demo {
-            background: var(--bg-gray);
+        .playground-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .code-playground {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .playground-header {
+            background: #252526;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3e3e42;
+        }
+        .playground-header span {
+            color: #cccccc;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .playground-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .playground-btn {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .playground-btn:hover {
+            background: #1177bb;
+        }
+        .playground-btn.secondary {
+            background: #3e3e42;
+        }
+        .playground-btn.secondary:hover {
+            background: #4e4e52;
+        }
+        .code-editor {
+            flex: 1;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d4d4d4;
+            background: #1e1e1e;
+            border: none;
+            resize: none;
+            outline: none;
+            min-height: 400px;
+        }
+        .live-preview {
+            background: white;
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 24px;
-            margin: 24px 0;
-            border: 2px dashed var(--border);
             min-height: 400px;
+            position: relative;
+            overflow: auto;
+        }
+        .live-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .live-preview-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .preview-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
+            gap: 6px;
         }
-        .embed-demo iframe {
-            width: 100%;
-            height: 400px;
+        .preview-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .mock-sdk {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .mock-sdk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .mock-sdk-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .mock-btn {
+            background: var(--primary);
+            color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
         }
-        .embed-placeholder {
-            text-align: center;
-            color: var(--text-tertiary);
+        .mock-btn:hover {
+            background: var(--primary-dark);
         }
-        .embed-placeholder svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+        .mock-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .mock-item {
+            background: var(--bg-gray);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mock-item-info h5 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .mock-item-info p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .mock-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        @media (max-width: 968px) {
+            .playground-container {
+                grid-template-columns: 1fr;
+            }
         }
         .sdk-features {
             display: grid;
@@ -240,25 +385,53 @@
                         <span>Fully skinnable & customizable</span>
                     </div>
                 </div>
-                <div class="embed-demo">
-                    <div class="embed-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="9" y1="3" x2="9" y2="21"/>
-                        </svg>
-                        <p>Applications SDK Embed Preview</p>
-                        <p style="font-size: 14px; margin-top: 8px;">Embeddable iframe will load here</p>
+                <!-- Interactive Playground -->
+                <div class="playground-container" id="applications-playground">
+                    <div class="code-playground">
+                        <div class="playground-header">
+                            <span>index.html</span>
+                            <div class="playground-actions">
+                                <button class="playground-btn" onclick="runApplicationsCode()">▶ Run</button>
+                                <button class="playground-btn secondary" onclick="resetApplicationsCode()">Reset</button>
+                            </div>
+                        </div>
+                        <textarea class="code-editor" id="applications-code" spellcheck="false">&lt;!-- Embed Applications SDK --&gt;
+&lt;iframe
+  src="https://sdks.flow.com/applications?apiKey=sk_live_demo123&theme=light"
+  width="100%"
+  height="600"
+  frameborder="0"
+  allowtransparency="true"
+&gt;&lt;/iframe&gt;</textarea>
                     </div>
-                </div>
-                <div class="code-example">
-                    <pre><code><span class="code-comment">&lt;!-- Embed Applications SDK --&gt;</span>
-<span class="code-keyword">&lt;iframe</span>
-  <span class="code-string">src="https://sdks.flow.com/applications?apiKey=YOUR_API_KEY&theme=light"</span>
-  <span class="code-string">width="100%"</span>
-  <span class="code-string">height="600"</span>
-  <span class="code-string">frameborder="0"</span>
-  <span class="code-string">allowtransparency="true"</span>
-<span class="code-keyword">&gt;&lt;/iframe&gt;</span></code></pre>
+                    <div class="live-preview">
+                        <div class="live-preview-header">
+                            <h4>Live Preview</h4>
+                            <div class="preview-badge">LIVE</div>
+                        </div>
+                        <div id="applications-preview" class="mock-sdk">
+                            <div class="mock-sdk-header">
+                                <div class="mock-sdk-title">Applications</div>
+                                <button class="mock-btn" onclick="mockCreateApplication()">+ Create Application</button>
+                            </div>
+                            <div class="mock-list" id="applications-list">
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>My DeFi App</h5>
+                                        <p>app_abc123 • Created 2 days ago</p>
+                                    </div>
+                                    <div class="mock-badge">Active</div>
+                                </div>
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>Production App</h5>
+                                        <p>app_xyz789 • Created 1 week ago</p>
+                                    </div>
+                                    <div class="mock-badge">Active</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="sdk-actions">
                     <a href="https://github.com/flow-platform/sdk-applications" class="btn-outline" target="_blank">View Repository</a>
@@ -302,24 +475,58 @@
                         <span>Multi-chain support</span>
                     </div>
                 </div>
-                <div class="embed-demo">
-                    <div class="embed-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="9" y1="3" x2="9" y2="21"/>
-                        </svg>
-                        <p>Wallets SDK Embed Preview</p>
-                        <p style="font-size: 14px; margin-top: 8px;">Embeddable iframe will load here</p>
+                <!-- Interactive Playground -->
+                <div class="playground-container" id="wallets-playground">
+                    <div class="code-playground">
+                        <div class="playground-header">
+                            <span>index.html</span>
+                            <div class="playground-actions">
+                                <button class="playground-btn" onclick="runWalletsCode()">▶ Run</button>
+                                <button class="playground-btn secondary" onclick="resetWalletsCode()">Reset</button>
+                            </div>
+                        </div>
+                        <textarea class="code-editor" id="wallets-code" spellcheck="false">&lt;!-- Embed Wallets SDK --&gt;
+&lt;iframe
+  src="https://sdks.flow.com/wallets?apiKey=sk_live_demo123&applicationId=app_abc123"
+  width="100%"
+  height="600"
+  frameborder="0"
+&gt;&lt;/iframe&gt;</textarea>
                     </div>
-                </div>
-                <div class="code-example">
-                    <pre><code><span class="code-comment">&lt;!-- Embed Wallets SDK --&gt;</span>
-<span class="code-keyword">&lt;iframe</span>
-  <span class="code-string">src="https://sdks.flow.com/wallets?apiKey=YOUR_API_KEY&applicationId=APP_ID"</span>
-  <span class="code-string">width="100%"</span>
-  <span class="code-string">height="600"</span>
-  <span class="code-string">frameborder="0"</span>
-<span class="code-keyword">&gt;&lt;/iframe&gt;</span></code></pre>
+                    <div class="live-preview">
+                        <div class="live-preview-header">
+                            <h4>Live Preview</h4>
+                            <div class="preview-badge">LIVE</div>
+                        </div>
+                        <div id="wallets-preview" class="mock-sdk">
+                            <div class="mock-sdk-header">
+                                <div class="mock-sdk-title">Wallets</div>
+                                <button class="mock-btn" onclick="mockCreateWallet()">+ Create Wallet</button>
+                            </div>
+                            <div class="mock-list" id="wallets-list">
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>Main Wallet</h5>
+                                        <p>0x742d35...Cc623 • 1,250.50 USDC</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">$1,250.50</div>
+                                        <div style="font-size: 11px; color: var(--success);">+$12.50 yield</div>
+                                    </div>
+                                </div>
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>Savings Wallet</h5>
+                                        <p>0x8f3a12...Bd456 • 5,000.00 USDC</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">$5,000.00</div>
+                                        <div style="font-size: 11px; color: var(--success);">+$50.00 yield</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="sdk-actions">
                     <a href="https://github.com/flow-platform/sdk-wallets" class="btn-outline" target="_blank">View Repository</a>
@@ -363,24 +570,58 @@
                         <span>Performance analytics</span>
                     </div>
                 </div>
-                <div class="embed-demo">
-                    <div class="embed-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="9" y1="3" x2="9" y2="21"/>
-                        </svg>
-                        <p>Yield Accounts SDK Embed Preview</p>
-                        <p style="font-size: 14px; margin-top: 8px;">Embeddable iframe will load here</p>
+                <!-- Interactive Playground -->
+                <div class="playground-container" id="yield-playground">
+                    <div class="code-playground">
+                        <div class="playground-header">
+                            <span>index.html</span>
+                            <div class="playground-actions">
+                                <button class="playground-btn" onclick="runYieldCode()">▶ Run</button>
+                                <button class="playground-btn secondary" onclick="resetYieldCode()">Reset</button>
+                            </div>
+                        </div>
+                        <textarea class="code-editor" id="yield-code" spellcheck="false">&lt;!-- Embed Yield Accounts SDK --&gt;
+&lt;iframe
+  src="https://sdks.flow.com/yield-accounts?apiKey=sk_live_demo123&walletId=wallet_xyz789"
+  width="100%"
+  height="700"
+  frameborder="0"
+&gt;&lt;/iframe&gt;</textarea>
                     </div>
-                </div>
-                <div class="code-example">
-                    <pre><code><span class="code-comment">&lt;!-- Embed Yield Accounts SDK --&gt;</span>
-<span class="code-keyword">&lt;iframe</span>
-  <span class="code-string">src="https://sdks.flow.com/yield-accounts?apiKey=YOUR_API_KEY&walletId=WALLET_ID"</span>
-  <span class="code-string">width="100%"</span>
-  <span class="code-string">height="700"</span>
-  <span class="code-string">frameborder="0"</span>
-<span class="code-keyword">&gt;&lt;/iframe&gt;</span></code></pre>
+                    <div class="live-preview">
+                        <div class="live-preview-header">
+                            <h4>Live Preview</h4>
+                            <div class="preview-badge">LIVE</div>
+                        </div>
+                        <div id="yield-preview" class="mock-sdk">
+                            <div class="mock-sdk-header">
+                                <div class="mock-sdk-title">Yield Accounts</div>
+                                <button class="mock-btn" onclick="mockCreateYieldAccount()">+ Create Account</button>
+                            </div>
+                            <div class="mock-list" id="yield-list">
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>USDC Yield Account</h5>
+                                        <p>6% APY • Deposited: $10,000.00</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--success);">$10,600.00</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">+$600 earned</div>
+                                    </div>
+                                </div>
+                                <div class="mock-item">
+                                    <div class="mock-item-info">
+                                        <h5>ETH Yield Account</h5>
+                                        <p>6% APY • Deposited: 2.5 ETH</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--success);">2.65 ETH</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">+0.15 ETH earned</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="sdk-actions">
                     <a href="https://github.com/flow-platform/sdk-yield-accounts" class="btn-outline" target="_blank">View Repository</a>
