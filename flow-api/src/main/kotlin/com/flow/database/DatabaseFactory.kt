@@ -33,7 +33,8 @@ object DatabaseFactory {
             "Railway will automatically set DATABASE_URL."
         }
         
-        // Convert Railway's postgresql:// format to jdbc:postgresql:// if needed
+        // Parse DATABASE_URL to extract components
+        // Format: postgresql://user:password@host:port/database
         var jdbcUrl = dbUrl.trim()
         
         println("🔍 DEBUG: jdbcUrl before conversion = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(50)}..."}")
@@ -41,39 +42,40 @@ object DatabaseFactory {
         // Check if empty after trimming
         if (jdbcUrl.isEmpty()) {
             throw IllegalArgumentException(
-                "❌ DATABASE_URL is empty! Please set DATABASE_URL in Railway (flow-platform service → Variables). " +
-                "Copy the value from flow-db service → Variables → DATABASE_URL"
+                "❌ DATABASE_URL is empty! Railway should auto-set this when PostgreSQL service is linked."
             )
         }
         
-        if (jdbcUrl.startsWith("postgresql://")) {
-            jdbcUrl = jdbcUrl.replace("postgresql://", "jdbc:postgresql://")
-        } else if (!jdbcUrl.startsWith("jdbc:postgresql://")) {
-            println("🔍 DEBUG: jdbcUrl doesn't start with postgresql:// or jdbc:postgresql://")
-            throw IllegalArgumentException(
-                "❌ DATABASE_URL format error! Must start with 'postgresql://' or 'jdbc:postgresql://'. " +
-                "Got: ${if (jdbcUrl.length > 50) jdbcUrl.take(50) + "..." else jdbcUrl}"
-            )
-        }
+        // Parse the URL to extract components
+        val urlPattern = Regex("""postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)""")
+        val match = urlPattern.find(jdbcUrl)
         
-        // Validate URL format
-        if (!jdbcUrl.contains("@") || !jdbcUrl.contains(":")) {
+        if (match == null) {
             throw IllegalArgumentException(
-                "❌ DATABASE_URL appears malformed! Expected format: postgresql://user:password@host:port/database. " +
+                "❌ DATABASE_URL format error! Expected: postgresql://user:password@host:port/database. " +
                 "Got: ${if (jdbcUrl.length > 100) jdbcUrl.take(100) + "..." else jdbcUrl}"
             )
         }
         
-        println("🔍 DEBUG: Final jdbcUrl length = ${jdbcUrl.length}")
-        println("🔍 DEBUG: Final jdbcUrl (FULL) = $jdbcUrl")
-        println("🔍 DEBUG: dbUser = $dbUser")
-        println("🔍 DEBUG: dbPassword = ${if (dbPassword.isEmpty()) "EMPTY" else "***"}")
+        val (urlUser, urlPassword, host, port, database) = match.destructured
         
-        // Create HikariConfig and set properties explicitly to avoid shadowing issues
+        // Use username/password from URL if DATABASE_USER/DATABASE_PASSWORD not set
+        val finalUser = if (dbUser == "postgres" && urlUser.isNotEmpty()) urlUser else dbUser
+        val finalPassword = if (dbPassword.isEmpty() && urlPassword.isNotEmpty()) urlPassword else dbPassword
+        
+        // Build clean JDBC URL without credentials (we'll set them separately)
+        val cleanJdbcUrl = "jdbc:postgresql://$host:$port/$database"
+        
+        println("🔍 DEBUG: Parsed - host=$host, port=$port, database=$database")
+        println("🔍 DEBUG: Final jdbcUrl (clean, no credentials) = $cleanJdbcUrl")
+        println("🔍 DEBUG: Final user = $finalUser")
+        println("🔍 DEBUG: Final password = ${if (finalPassword.isEmpty()) "EMPTY" else "***"}")
+        
+        // Create HikariConfig and set properties explicitly
         val hikariConfig = HikariConfig()
-        hikariConfig.jdbcUrl = jdbcUrl
-        hikariConfig.username = dbUser
-        hikariConfig.password = dbPassword
+        hikariConfig.jdbcUrl = cleanJdbcUrl
+        hikariConfig.username = finalUser
+        hikariConfig.password = finalPassword
         hikariConfig.driverClassName = "org.postgresql.Driver"
         hikariConfig.maximumPoolSize = maxPoolSize
         hikariConfig.isAutoCommit = false
