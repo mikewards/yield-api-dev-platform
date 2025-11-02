@@ -2,9 +2,17 @@
   publish = "."
   command = "echo 'No build needed'"
 
+# Only redirect 404s to index.html, not actual files
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   force = false
+  conditions = {Role = ["admin"], Country = ["US"]}
+  
+# Actually, let's remove the catch-all and only redirect 404s
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404
 
