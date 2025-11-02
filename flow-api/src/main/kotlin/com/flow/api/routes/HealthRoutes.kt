@@ -15,6 +15,24 @@ data class HealthResponse(
 
 fun Application.healthRoutes() {
     routing {
+        get("/") {
+            call.respond(
+                HttpStatusCode.OK,
+                mapOf(
+                    "service" to "Flow API Gateway",
+                    "status" to "running",
+                    "version" to "1.0.0",
+                    "endpoints" to mapOf(
+                        "health" to "/health",
+                        "accounts" to "/v1/accounts",
+                        "auth" to "/v1/auth",
+                        "applications" to "/v1/applications",
+                        "yield" to "/v1/yield"
+                    )
+                )
+            )
+        }
+        
         get("/health") {
             call.respond(
                 HttpStatusCode.OK,
