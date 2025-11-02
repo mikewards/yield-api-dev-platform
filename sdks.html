@@ -415,7 +415,7 @@
                         </div>
                         <iframe 
                             id="applications-iframe"
-                            src="sdk-demos/applications-demo.html"
+                            src="/sdk-demos/applications-demo.html"
                             style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
                             frameborder="0"
                         ></iframe>
@@ -488,7 +488,7 @@
                         </div>
                         <iframe 
                             id="wallets-iframe"
-                            src="sdk-demos/wallets-demo.html"
+                            src="/sdk-demos/wallets-demo.html"
                             style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
                             frameborder="0"
                         ></iframe>
@@ -561,7 +561,7 @@
                         </div>
                         <iframe 
                             id="yield-iframe"
-                            src="sdk-demos/yield-accounts-demo.html"
+                            src="/sdk-demos/yield-accounts-demo.html"
                             style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
                             frameborder="0"
                         ></iframe>
@@ -648,7 +648,7 @@
             const urlMatch = code.match(/src="([^"]+)"/);
             if (urlMatch && urlMatch[1]) {
                 // For demo, use our local demo page
-                iframe.src = 'sdk-demos/applications-demo.html';
+                iframe.src = '/sdk-demos/applications-demo.html';
             }
         }
 
@@ -676,7 +676,7 @@
         function runWalletsCode() {
             const code = document.getElementById('wallets-code').value;
             const iframe = document.getElementById('wallets-iframe');
-            iframe.src = 'sdk-demos/wallets-demo.html';
+            iframe.src = '/sdk-demos/wallets-demo.html';
         }
 
         function resetWalletsCode() {
@@ -703,7 +703,7 @@
         function runYieldCode() {
             const code = document.getElementById('yield-code').value;
             const iframe = document.getElementById('yield-iframe');
-            iframe.src = 'sdk-demos/yield-accounts-demo.html';
+            iframe.src = '/sdk-demos/yield-accounts-demo.html';
         }
 
         function resetYieldCode() {
