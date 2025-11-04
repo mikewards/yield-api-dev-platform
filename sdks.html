@@ -418,12 +418,16 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <iframe 
-                            id="applications-iframe"
-                            src="sdk-demos/applications-demo.html"
-                            style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
-                            frameborder="0"
-                        ></iframe>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="applications-iframe"
+                                src="sdk-demos/applications-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -491,12 +495,16 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <iframe 
-                            id="wallets-iframe"
-                            src="sdk-demos/wallets-demo.html"
-                            style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
-                            frameborder="0"
-                        ></iframe>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="wallets-iframe"
+                                src="sdk-demos/wallets-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -564,12 +572,16 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <iframe 
-                            id="yield-iframe"
-                            src="sdk-demos/yield-accounts-demo.html"
-                            style="width: 100%; height: 100%; border: none; border-radius: 8px; min-height: 500px;"
-                            frameborder="0"
-                        ></iframe>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="yield-iframe"
+                                src="sdk-demos/yield-accounts-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -648,8 +660,12 @@
 
         function runApplicationsCode() {
             const iframe = document.getElementById('applications-iframe');
-            // Reload the demo page
-            iframe.src = 'sdk-demos/applications-demo.html';
+            // Force reload the demo page
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = 'sdk-demos/applications-demo.html';
+            }, 10);
         }
 
         function resetApplicationsCode() {
@@ -675,8 +691,12 @@
 
         function runWalletsCode() {
             const iframe = document.getElementById('wallets-iframe');
-            // Reload the demo page
-            iframe.src = 'sdk-demos/wallets-demo.html';
+            // Force reload the demo page
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = 'sdk-demos/wallets-demo.html';
+            }, 10);
         }
 
         function resetWalletsCode() {
@@ -702,8 +722,12 @@
 
         function runYieldCode() {
             const iframe = document.getElementById('yield-iframe');
-            // Reload the demo page
-            iframe.src = 'sdk-demos/yield-accounts-demo.html';
+            // Force reload the demo page
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = 'sdk-demos/yield-accounts-demo.html';
+            }, 10);
         }
 
         function resetYieldCode() {
