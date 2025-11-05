@@ -47,6 +47,36 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #0F172A;
+            border: 1px solid #E2E8F0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-secondary:hover {
+            background: #E2E8F0;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
         .accounts-list {
             display: flex;
             flex-direction: column;
@@ -58,6 +88,7 @@
             border-radius: 12px;
             padding: 24px;
             transition: all 0.2s;
+            cursor: pointer;
         }
         .account-card:hover {
             border-color: #6366F1;
@@ -118,6 +149,155 @@
             color: #0F172A;
             font-weight: 600;
         }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1001;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #64748B;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        .modal-close:hover {
+            background: #F1F5F9;
+            color: #0F172A;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #64748B;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px;
+            border-top: 1px solid #E2E8F0;
+        }
+        .edit-section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .edit-section:last-child {
+            border-bottom: none;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-header h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0F172A;
+        }
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        .meta-label {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+        }
+        .meta-value {
+            font-size: 13px;
+            color: #0F172A;
+            font-weight: 500;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -137,10 +317,10 @@
     <div class="sdk-container">
         <div class="sdk-header">
             <div class="sdk-title">Yield Accounts</div>
-            <button class="btn-primary" onclick="createYieldAccount()">+ Create Account</button>
+            <button class="btn-primary" onclick="openCreateModal()">+ Create Account</button>
         </div>
         <div class="accounts-list" id="accounts-list">
-            <div class="account-card">
+            <div class="account-card" onclick="openEditModal('ya_usdc123', 'USDC', '$10,000.00', '$10,600.00', '$600.00')">
                 <div class="account-header">
                     <div>
                         <div class="account-name">USDC Yield Account</div>
@@ -170,7 +350,7 @@
                     </div>
                 </div>
             </div>
-            <div class="account-card">
+            <div class="account-card" onclick="openEditModal('ya_eth456', 'ETH', '2.5 ETH', '2.65 ETH', '+0.15 ETH')">
                 <div class="account-header">
                     <div>
                         <div class="account-name">ETH Yield Account</div>
@@ -203,11 +383,181 @@
         </div>
     </div>
 
+    <!-- Create Yield Account Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-backdrop" onclick="closeModal('createModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Yield Account</h3>
+                <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <form id="createForm" onsubmit="handleCreate(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="yieldCurrency">Currency *</label>
+                        <select id="yieldCurrency" name="yieldCurrency" required>
+                            <option value="USDC">USDC</option>
+                            <option value="ETH">ETH</option>
+                            <option value="DAI">DAI</option>
+                            <option value="USDT">USDT</option>
+                        </select>
+                        <small>Select the cryptocurrency for this yield account</small>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Yield Account Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-backdrop" onclick="closeModal('editModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="editAccountTitle">Yield Account Details</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-section">
+                    <div class="section-header">
+                        <h4>Account Information</h4>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Account ID</span>
+                        <span class="meta-value" id="displayAccountId">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Currency</span>
+                        <span class="meta-value" id="displayCurrency">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">APY</span>
+                        <span class="meta-value" style="color: #10B981;">6.00%</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="meta-value" style="color: #10B981;">Active</span>
+                    </div>
+                </div>
+                <div class="edit-section">
+                    <div class="section-header">
+                        <h4>Balance</h4>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Total Balance</span>
+                        <span class="meta-value" id="displayBalance" style="font-size: 18px; font-weight: 700; color: #10B981;">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Deposited</span>
+                        <span class="meta-value" id="displayDeposited">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Yield Earned</span>
+                        <span class="meta-value" id="displayEarned" style="color: #10B981;">-</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-primary btn-small" onclick="openDepositModal()">Deposit</button>
+                    <button class="btn-secondary btn-small" onclick="openWithdrawModal()">Withdraw</button>
+                    <button class="btn-secondary btn-small" onclick="viewHistory()">Transaction History</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal" id="depositModal">
+        <div class="modal-backdrop" onclick="closeModal('depositModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Deposit Funds</h3>
+                <button class="modal-close" onclick="closeModal('depositModal')">&times;</button>
+            </div>
+            <form id="depositForm" onsubmit="handleDeposit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="depositAmount">Amount *</label>
+                        <input type="number" id="depositAmount" name="depositAmount" step="0.01" min="0" required placeholder="0.00">
+                        <small>Enter the amount to deposit</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="depositCurrency">Currency *</label>
+                        <select id="depositCurrency" name="depositCurrency" required>
+                            <option value="USDC">USDC</option>
+                            <option value="ETH">ETH</option>
+                            <option value="DAI">DAI</option>
+                            <option value="USDT">USDT</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('depositModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Deposit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-backdrop" onclick="closeModal('withdrawModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Withdraw Funds</h3>
+                <button class="modal-close" onclick="closeModal('withdrawModal')">&times;</button>
+            </div>
+            <form id="withdrawForm" onsubmit="handleWithdraw(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="withdrawAmount">Amount *</label>
+                        <input type="number" id="withdrawAmount" name="withdrawAmount" step="0.01" min="0" required placeholder="0.00">
+                        <small>Enter the amount to withdraw</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="withdrawCurrency">Currency *</label>
+                        <select id="withdrawCurrency" name="withdrawCurrency" required>
+                            <option value="USDC">USDC</option>
+                            <option value="ETH">ETH</option>
+                            <option value="DAI">DAI</option>
+                            <option value="USDT">USDT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="destinationAddress">Destination Address *</label>
+                        <input type="text" id="destinationAddress" name="destinationAddress" required placeholder="0x...">
+                        <small>The wallet address to receive the withdrawn funds</small>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('withdrawModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Withdraw</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function createYieldAccount() {
-            const list = document.getElementById('accounts-list');
-            const currencies = ['USDC', 'ETH', 'DAI', 'USDT'];
-            const currency = currencies[Math.floor(Math.random() * currencies.length)];
+        let currentAccountId = null;
+        let currentAccountData = {};
+
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function handleCreate(event) {
+            event.preventDefault();
+            const currency = document.getElementById('yieldCurrency').value;
+            const accountId = 'ya_' + Math.random().toString(36).substr(2, 12);
             const deposited = currency === 'ETH' 
                 ? (Math.random() * 5 + 1).toFixed(2) + ' ETH'
                 : '$' + (Math.random() * 10000 + 1000).toFixed(2);
@@ -218,8 +568,10 @@
                 ? (parseFloat(deposited) * 1.06).toFixed(2) + ' ETH'
                 : '$' + (parseFloat(deposited.replace('$', '')) * 1.06).toFixed(2);
             
+            const list = document.getElementById('accounts-list');
             const newAccount = document.createElement('div');
             newAccount.className = 'account-card new';
+            newAccount.setAttribute('onclick', `openEditModal('${accountId}', '${currency}', '${deposited}', '${total}', '${earned}')`);
             newAccount.innerHTML = `
                 <div class="account-header">
                     <div>
@@ -252,16 +604,62 @@
             `;
             
             list.insertBefore(newAccount, list.firstChild);
-            
-            // Notify parent window
-            if (window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'account.created',
-                    account: { currency, deposited, earned }
-                }, '*');
-            }
+            closeModal('createModal');
+            document.getElementById('createForm').reset();
+        }
+
+        function openEditModal(accountId, currency, deposited, balance, earned) {
+            currentAccountId = accountId;
+            currentAccountData = {
+                account_id: accountId,
+                currency: currency,
+                deposited: deposited,
+                balance: balance,
+                earned: earned
+            };
+
+            document.getElementById('editAccountTitle').textContent = `${currency} Yield Account`;
+            document.getElementById('displayAccountId').textContent = currentAccountData.account_id;
+            document.getElementById('displayCurrency').textContent = currentAccountData.currency;
+            document.getElementById('displayBalance').textContent = currentAccountData.balance;
+            document.getElementById('displayDeposited').textContent = currentAccountData.deposited;
+            document.getElementById('displayEarned').textContent = currentAccountData.earned;
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function openDepositModal() {
+            document.getElementById('depositCurrency').value = currentAccountData.currency;
+            document.getElementById('depositModal').classList.add('active');
+        }
+
+        function openWithdrawModal() {
+            document.getElementById('withdrawCurrency').value = currentAccountData.currency;
+            document.getElementById('withdrawModal').classList.add('active');
+        }
+
+        function handleDeposit(event) {
+            event.preventDefault();
+            const amount = document.getElementById('depositAmount').value;
+            const currency = document.getElementById('depositCurrency').value;
+            alert(`Deposit of ${amount} ${currency} would be processed here. In production, this would call: POST /v1/yield/accounts/${currentAccountId}/deposit`);
+            closeModal('depositModal');
+            document.getElementById('depositForm').reset();
+        }
+
+        function handleWithdraw(event) {
+            event.preventDefault();
+            const amount = document.getElementById('withdrawAmount').value;
+            const currency = document.getElementById('withdrawCurrency').value;
+            const address = document.getElementById('destinationAddress').value;
+            alert(`Withdrawal of ${amount} ${currency} to ${address} would be processed here. In production, this would call: POST /v1/yield/accounts/${currentAccountId}/withdraw`);
+            closeModal('withdrawModal');
+            document.getElementById('withdrawForm').reset();
+        }
+
+        function viewHistory() {
+            alert('Transaction history would be displayed here');
         }
     </script>
 </body>
 </html>
-
