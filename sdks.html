@@ -742,11 +742,10 @@
             }
         });
 
-        // Auto-run on load and auto-update as you type
+        // Auto-update preview as you type (debounced)
         document.addEventListener('DOMContentLoaded', function() {
-            runApplicationsCode();
-            runWalletsCode();
-            runYieldCode();
+            // Iframes already have src set, they'll load automatically
+            // Only update when code changes
             
             // Auto-update preview as you type (debounced)
             let updateTimeout;
