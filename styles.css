@@ -597,8 +597,22 @@ body {
 }
 
 .security-icon {
-    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.security-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
 }
 
 .security-item h4 {
