@@ -37,11 +37,8 @@ fun Application.statusPages() {
         }
         
         exception<Exception> { call, cause ->
-            // Capture exception to Sentry
-            captureException(cause, mapOf(
-                "endpoint" to call.request.uri.path,
-                "method" to call.request.httpMethod.value
-            ))
+            // Capture exception to Sentry (without request context to avoid API issues)
+            captureException(cause)
             
             call.respond(
                 HttpStatusCode.InternalServerError,
