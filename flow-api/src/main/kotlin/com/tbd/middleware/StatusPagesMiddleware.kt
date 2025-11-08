@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import com.tbd.middleware.captureException
 
 fun Application.statusPages() {
     install(StatusPages) {
@@ -36,6 +37,12 @@ fun Application.statusPages() {
         }
         
         exception<Exception> { call, cause ->
+            // Capture exception to Sentry
+            captureException(cause, mapOf(
+                "endpoint" to call.request.path(),
+                "method" to call.request.httpMethod.value
+            ))
+            
             call.respond(
                 HttpStatusCode.InternalServerError,
                 ErrorResponse(

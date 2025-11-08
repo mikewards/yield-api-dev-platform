@@ -3,6 +3,8 @@ package com.tbd.integration.morpho
 import com.tbd.service.Web3Service
 import com.tbd.service.WalletService
 import com.tbd.service.TokenApprovalService
+import com.tbd.util.retryWithBackoff
+import com.tbd.util.RetryConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -23,6 +25,8 @@ import org.web3j.tx.TransactionManager
 import org.web3j.utils.Convert
 import java.math.BigInteger
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 data class MorphoGraphQLRequest(
@@ -72,36 +76,43 @@ class MorphoClient {
      * Get current APY for a currency on Morpho
      */
     suspend fun getCurrentRate(currency: String): Double {
-        try {
-            val query = """
-                query GetMarkets {
-                    markets {
-                        id
-                        loanToken
-                        collateralToken
-                        lltv
-                        apy
-                        totalSupplyAssets
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 3,
+                initialDelay = 500.milliseconds
+            )
+        ) {
+            try {
+                val query = """
+                    query GetMarkets {
+                        markets {
+                            id
+                            loanToken
+                            collateralToken
+                            lltv
+                            apy
+                            totalSupplyAssets
+                        }
                     }
+                """.trimIndent()
+                
+                val request = MorphoGraphQLRequest(query = query)
+                val response: MorphoGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
+                
+                // Find market matching currency (USDC, USDT, etc.)
+                val market = response.data?.markets?.firstOrNull { market ->
+                    market.loanToken?.contains(currency, ignoreCase = true) == true ||
+                    market.id?.contains(currency, ignoreCase = true) == true
                 }
-            """.trimIndent()
-            
-            val request = MorphoGraphQLRequest(query = query)
-            val response: MorphoGraphQLResponse = client.post(graphqlUrl) {
-                contentType(ContentType.Application.Json)
-                setBody(request)
-            }.body()
-            
-            // Find market matching currency (USDC, USDT, etc.)
-            val market = response.data?.markets?.firstOrNull { market ->
-                market.loanToken?.contains(currency, ignoreCase = true) == true ||
-                market.id?.contains(currency, ignoreCase = true) == true
+                
+                market?.apy?.toDoubleOrNull()?.div(100.0) ?: 0.06 // Default 6% if not found
+            } catch (e: Exception) {
+                println("⚠️ Morpho API error: ${e.message}")
+                0.06 // Default 6% if all retries fail
             }
-            
-            return market?.apy?.toDoubleOrNull()?.div(100.0) ?: 0.06 // Default 6% if not found
-        } catch (e: Exception) {
-            // Fallback to default rate on error
-            return 0.06
         }
     }
     
@@ -116,43 +127,50 @@ class MorphoClient {
         amount: BigInteger,
         onBehalf: String
     ): TransactionReceipt {
-        val walletService = WalletService()
-        val credentials = walletService.getCredentials(walletId)
-        val web3j = web3Service.getWeb3j(environment)
-        val morphoAddress = web3Service.getMorphoAddress(environment)
-        val gasProvider = web3Service.getGasProvider()
-        
-        // Ensure token approval before supply
-        val approvalService = TokenApprovalService(web3j, credentials, gasProvider)
-        val needsApproval = approvalService.ensureAllowance(
-            tokenAddress = marketParams.loanToken,
-            spenderAddress = morphoAddress,
-            requiredAmount = amount
-        )
-        
-        if (needsApproval) {
-            val approveTx = approvalService.approve(
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2, // Fewer retries for transactions
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val morphoAddress = web3Service.getMorphoAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            // Ensure token approval before supply
+            val approvalService = TokenApprovalService(web3j, credentials, gasProvider)
+            val needsApproval = approvalService.ensureAllowance(
                 tokenAddress = marketParams.loanToken,
                 spenderAddress = morphoAddress,
-                amount = BigInteger("115792089237316195423570985008687907853269984665640564039457") // Max
+                requiredAmount = amount
             )
-            approvalService.waitForReceipt(approveTx.transactionHash)
+            
+            if (needsApproval) {
+                val approveTx = approvalService.approve(
+                    tokenAddress = marketParams.loanToken,
+                    spenderAddress = morphoAddress,
+                    amount = BigInteger("115792089237316195423570985008687907853269984665640564039457") // Max
+                )
+                approvalService.waitForReceipt(approveTx.transactionHash)
+            }
+            
+            val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
+            
+            // Supply with shares = 0 (let Morpho calculate)
+            val txResponse = wrapper.supply(
+                marketParams = marketParams,
+                assets = amount,
+                shares = BigInteger.ZERO,
+                onBehalf = onBehalf,
+                data = ByteArray(0)
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
         }
-        
-        val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
-        
-        // Supply with shares = 0 (let Morpho calculate)
-        val txResponse = wrapper.supply(
-            marketParams = marketParams,
-            assets = amount,
-            shares = BigInteger.ZERO,
-            onBehalf = onBehalf,
-            data = ByteArray(0)
-        )
-        
-        // Wait for transaction receipt
-        val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
-        return receipt.transactionReceipt.get()
     }
     
     /**
@@ -166,26 +184,33 @@ class MorphoClient {
         shares: BigInteger,
         receiver: String
     ): TransactionReceipt {
-        val walletService = WalletService()
-        val credentials = walletService.getCredentials(walletId)
-        val web3j = web3Service.getWeb3j(environment)
-        val morphoAddress = web3Service.getMorphoAddress(environment)
-        val gasProvider = web3Service.getGasProvider()
-        
-        val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
-        
-        val txResponse = wrapper.withdraw(
-            marketParams = marketParams,
-            assets = assets,
-            shares = shares,
-            onBehalf = receiver,
-            receiver = receiver,
-            data = ByteArray(0)
-        )
-        
-        // Wait for transaction receipt
-        val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
-        return receipt.transactionReceipt.get()
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2,
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val morphoAddress = web3Service.getMorphoAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
+            
+            val txResponse = wrapper.withdraw(
+                marketParams = marketParams,
+                assets = assets,
+                shares = shares,
+                onBehalf = receiver,
+                receiver = receiver,
+                data = ByteArray(0)
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
+        }
     }
     
     /**

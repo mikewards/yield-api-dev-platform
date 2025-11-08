@@ -2,6 +2,7 @@ package com.tbd.api.routes
 
 import com.tbd.dto.*
 import com.tbd.service.ApplicationService
+import com.tbd.service.SandboxService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -165,6 +166,20 @@ fun Application.applicationRoutes() {
                             )
                         }
                     }
+                }
+                
+                // Sandbox initialization endpoint
+                post("/sandbox/initialize") {
+                    val principal = call.principal<UserIdPrincipal>()!!
+                    val accountId = UUID.fromString(principal.name)
+                    
+                    val sandboxService = SandboxService()
+                    sandboxService.initializeSandbox(accountId)
+                    
+                    call.respond(HttpStatusCode.OK, mapOf(
+                        "message" to "Sandbox initialized with test data",
+                        "account_id" to accountId.toString()
+                    ))
                 }
             }
         }
