@@ -1,0 +1,9 @@
+# Cloudflare Pages static site configuration
+# This tells Wrangler to deploy static assets from the root directory
+
+name = "tbd-platform"
+compatibility_date = "2025-11-29"
+
+[site]
+bucket = "."
+
