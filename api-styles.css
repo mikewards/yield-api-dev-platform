@@ -95,7 +95,7 @@
 }
 
 .sidebar-section {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 
 .sidebar-section:last-child {
@@ -103,10 +103,10 @@
 }
 
 .sidebar-section h3 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -118,16 +118,17 @@
 }
 
 .sidebar-list li {
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .sidebar-list a {
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     display: block;
-    padding: 6px 0;
+    padding: 4px 0;
     transition: color 0.2s;
+    line-height: 1.4;
 }
 
 .sidebar-list a:hover {
@@ -291,7 +292,9 @@
 .getting-started-sidebar {
     position: sticky;
     top: 80px;
-    height: fit-content;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
 .getting-started-main {
