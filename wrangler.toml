@@ -4,6 +4,6 @@
 name = "tbd-platform"
 compatibility_date = "2025-11-29"
 
-[site]
-bucket = "."
+[assets]
+directory = "."
 
