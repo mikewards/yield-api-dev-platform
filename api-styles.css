@@ -721,9 +721,40 @@
 }
 
 @media (max-width: 768px) {
+    .api-content {
+        padding: 24px 0;
+    }
+    
+    .api-header {
+        padding: 32px 0;
+    }
+    
+    .api-header-content {
+        padding: 0 16px;
+    }
+    
+    .api-header-content h1 {
+        font-size: 32px;
+    }
+    
+    .api-layout {
+        padding: 0 16px;
+        gap: 24px;
+    }
+    
+    .api-main {
+        padding: 24px 16px !important;
+        overflow-x: auto;
+    }
+    
+    .api-sidebar {
+        padding: 20px;
+    }
+    
     .getting-started-layout {
         grid-template-columns: 1fr;
         gap: 24px;
+        padding: 0 16px;
     }
     
     .getting-started-sidebar {
@@ -738,7 +769,8 @@
     
     .getting-started-main {
         order: 1;
-        padding: 24px 16px;
+        padding: 24px 16px !important;
+        overflow-x: auto;
     }
     
     .guides-container {
@@ -772,6 +804,7 @@
     
     .flow-diagram {
         padding: 20px;
+        overflow-x: auto;
     }
     
     .flow-step-card {
@@ -784,6 +817,20 @@
     
     .scenario-header h3 {
         font-size: 20px;
+    }
+    
+    /* Fix code blocks and tables on mobile */
+    .code-content,
+    pre,
+    code {
+        overflow-x: auto;
+        word-wrap: break-word;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 }
 
