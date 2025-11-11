@@ -39,7 +39,7 @@ fun Application.statusPages() {
         exception<Exception> { call, cause ->
             // Capture exception to Sentry
             captureException(cause, mapOf(
-                "endpoint" to call.request.path(),
+                "endpoint" to call.request.uri.path,
                 "method" to call.request.httpMethod.value
             ))
             
