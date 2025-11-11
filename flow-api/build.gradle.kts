@@ -59,6 +59,9 @@ dependencies {
     // Configuration
     implementation("com.typesafe:config:1.4.3")
     
+    // Error Tracking
+    implementation("io.sentry:sentry:6.34.0")
+    
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -3,6 +3,8 @@ package com.tbd.integration.aave
 import com.tbd.service.Web3Service
 import com.tbd.service.WalletService
 import com.tbd.service.TokenApprovalService
+import com.tbd.util.retryWithBackoff
+import com.tbd.util.RetryConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -16,6 +18,8 @@ import kotlinx.serialization.json.Json
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import java.math.BigInteger
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 data class AaveReserveData(
@@ -49,29 +53,36 @@ class AaveClient {
      * Get current APY for a currency on Aave
      */
     suspend fun getCurrentRate(currency: String): Double {
-        try {
-            // Aave API endpoint for reserve data
-            // Note: This is a simplified version - actual Aave API may require different endpoints
-            val response: Map<String, AaveReserveData> = client.get("$apiUrl/reserves") {
-                contentType(ContentType.Application.Json)
-            }.body()
-            
-            // Find reserve matching currency
-            val reserve = response.values.firstOrNull { 
-                it.symbol?.equals(currency, ignoreCase = true) == true 
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 3,
+                initialDelay = 500.milliseconds
+            )
+        ) {
+            try {
+                // Aave API endpoint for reserve data
+                // Note: This is a simplified version - actual Aave API may require different endpoints
+                val response: Map<String, AaveReserveData> = client.get("$apiUrl/reserves") {
+                    contentType(ContentType.Application.Json)
+                }.body()
+                
+                // Find reserve matching currency
+                val reserve = response.values.firstOrNull { 
+                    it.symbol?.equals(currency, ignoreCase = true) == true 
+                }
+                
+                // Convert liquidity rate from Ray (27 decimals) to percentage
+                val liquidityRate = reserve?.liquidityRate?.toBigIntegerOrNull()
+                if (liquidityRate != null) {
+                    // Aave rates are in Ray (1e27), convert to percentage
+                    liquidityRate.toDouble() / 1e27 * 100.0
+                } else {
+                    0.06 // Default 6% if not found
+                }
+            } catch (e: Exception) {
+                println("⚠️ Aave API error: ${e.message}")
+                0.06 // Default 6% if all retries fail
             }
-            
-            // Convert liquidity rate from Ray (27 decimals) to percentage
-            val liquidityRate = reserve?.liquidityRate?.toBigIntegerOrNull()
-            return if (liquidityRate != null) {
-                // Aave rates are in Ray (1e27), convert to percentage
-                liquidityRate.toDouble() / 1e27 * 100.0
-            } else {
-                0.06 // Default 6% if not found
-            }
-        } catch (e: Exception) {
-            // Fallback to default rate on error
-            return 0.06
         }
     }
     
@@ -86,41 +97,48 @@ class AaveClient {
         amount: BigInteger,
         onBehalf: String
     ): TransactionReceipt {
-        val walletService = WalletService()
-        val credentials = walletService.getCredentials(walletId)
-        val web3j = web3Service.getWeb3j(environment)
-        val aaveAddress = web3Service.getAaveAddress(environment)
-        val gasProvider = web3Service.getGasProvider()
-        
-        // Ensure token approval before supply
-        val approvalService = TokenApprovalService(web3j, credentials, gasProvider)
-        val needsApproval = approvalService.ensureAllowance(
-            tokenAddress = asset,
-            spenderAddress = aaveAddress,
-            requiredAmount = amount
-        )
-        
-        if (needsApproval) {
-            val approveTx = approvalService.approve(
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2, // Fewer retries for transactions
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val aaveAddress = web3Service.getAaveAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            // Ensure token approval before supply
+            val approvalService = TokenApprovalService(web3j, credentials, gasProvider)
+            val needsApproval = approvalService.ensureAllowance(
                 tokenAddress = asset,
                 spenderAddress = aaveAddress,
-                amount = BigInteger("115792089237316195423570985008687907853269984665640564039457") // Max
+                requiredAmount = amount
             )
-            approvalService.waitForReceipt(approveTx.transactionHash)
+            
+            if (needsApproval) {
+                val approveTx = approvalService.approve(
+                    tokenAddress = asset,
+                    spenderAddress = aaveAddress,
+                    amount = BigInteger("115792089237316195423570985008687907853269984665640564039457") // Max
+                )
+                approvalService.waitForReceipt(approveTx.transactionHash)
+            }
+            
+            val wrapper = AaveContractWrapper(web3j, credentials, aaveAddress, gasProvider)
+            
+            val txResponse = wrapper.supply(
+                asset = asset,
+                amount = amount,
+                onBehalfOf = onBehalf,
+                referralCode = 0
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
         }
-        
-        val wrapper = AaveContractWrapper(web3j, credentials, aaveAddress, gasProvider)
-        
-        val txResponse = wrapper.supply(
-            asset = asset,
-            amount = amount,
-            onBehalfOf = onBehalf,
-            referralCode = 0
-        )
-        
-        // Wait for transaction receipt
-        val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
-        return receipt.transactionReceipt.get()
     }
     
     /**
@@ -133,23 +151,30 @@ class AaveClient {
         amount: BigInteger,
         to: String
     ): TransactionReceipt {
-        val walletService = WalletService()
-        val credentials = walletService.getCredentials(walletId)
-        val web3j = web3Service.getWeb3j(environment)
-        val aaveAddress = web3Service.getAaveAddress(environment)
-        val gasProvider = web3Service.getGasProvider()
-        
-        val wrapper = AaveContractWrapper(web3j, credentials, aaveAddress, gasProvider)
-        
-        val txResponse = wrapper.withdraw(
-            asset = asset,
-            amount = amount,
-            to = to
-        )
-        
-        // Wait for transaction receipt
-        val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
-        return receipt.transactionReceipt.get()
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2,
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val aaveAddress = web3Service.getAaveAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            val wrapper = AaveContractWrapper(web3j, credentials, aaveAddress, gasProvider)
+            
+            val txResponse = wrapper.withdraw(
+                asset = asset,
+                amount = amount,
+                to = to
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
+        }
     }
     
     /**

@@ -5,6 +5,7 @@ import com.tbd.database.DatabaseFactory
 import com.tbd.middleware.auth
 import com.tbd.middleware.cors
 import com.tbd.middleware.logging
+import com.tbd.middleware.sentry
 import com.tbd.middleware.statusPages
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -16,6 +17,9 @@ import kotlinx.serialization.json.Json
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
+    // Initialize Sentry (if DSN is provided)
+    sentry()
+    
     // Initialize database
     DatabaseFactory.init()
     
