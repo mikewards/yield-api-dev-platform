@@ -66,9 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.getElementById('navLinks');
     const menuIcon = document.getElementById('menuIcon');
     const closeIcon = document.getElementById('closeIcon');
+    const navbar = document.querySelector('.navbar');
     
     if (mobileMenuToggle && navLinks) {
-        mobileMenuToggle.addEventListener('click', function() {
+        mobileMenuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
             navLinks.classList.toggle('mobile-open');
             if (navLinks.classList.contains('mobile-open')) {
                 if (menuIcon) menuIcon.style.display = 'none';
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Close menu when clicking on a link
-        navLinks.querySelectorAll('a').forEach(link => {
+        navLinks.querySelectorAll('a, button').forEach(link => {
             link.addEventListener('click', function() {
                 navLinks.classList.remove('mobile-open');
                 if (menuIcon) menuIcon.style.display = 'block';
@@ -89,12 +91,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!navbar.contains(event.target) && navLinks.classList.contains('mobile-open')) {
-                navLinks.classList.remove('mobile-open');
-                if (menuIcon) menuIcon.style.display = 'block';
-                if (closeIcon) closeIcon.style.display = 'none';
-            }
-        });
+        if (navbar) {
+            document.addEventListener('click', function(event) {
+                if (!navbar.contains(event.target) && navLinks.classList.contains('mobile-open')) {
+                    navLinks.classList.remove('mobile-open');
+                    if (menuIcon) menuIcon.style.display = 'block';
+                    if (closeIcon) closeIcon.style.display = 'none';
+                }
+            });
+        }
     }
 });

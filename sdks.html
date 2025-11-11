@@ -393,10 +393,32 @@
             text-decoration: none;
             font-weight: 600;
             transition: all 0.2s;
+            display: inline-block;
+            white-space: nowrap;
         }
         .btn-outline:hover {
             background: var(--primary);
             color: white;
+        }
+        @media (max-width: 768px) {
+            .btn-outline {
+                padding: 10px 16px;
+                font-size: 13px;
+                width: 100%;
+                text-align: center;
+                white-space: normal;
+            }
+            
+            .sdk-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .btn-outline {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -615,9 +637,9 @@
                     </div>
                 </div>
                 <div class="sdk-actions">
-                    <a href="https://github.com/tbd-platform/sdk-wallets" class="btn-outline" target="_blank">View Repository</a>
-                    <a href="https://docs.tbd.com/sdks/wallets" class="btn-outline" target="_blank">Documentation</a>
-                    <a href="https://examples.tbd.com/wallets" class="btn-outline" target="_blank">Example Apps</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">View Repository</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">Documentation</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">Example Apps</a>
                 </div>
             </div>
 
@@ -698,9 +720,9 @@
                     </div>
                 </div>
                 <div class="sdk-actions">
-                    <a href="https://github.com/tbd-platform/sdk-yield-accounts" class="btn-outline" target="_blank">View Repository</a>
-                    <a href="https://docs.tbd.com/sdks/yield-accounts" class="btn-outline" target="_blank">Documentation</a>
-                    <a href="https://examples.tbd.com/yield-accounts" class="btn-outline" target="_blank">Example Apps</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">View Repository</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">Documentation</a>
+                    <a href="#" class="btn-outline" data-tooltip="No content yet!">Example Apps</a>
                 </div>
             </div>
         </div>
