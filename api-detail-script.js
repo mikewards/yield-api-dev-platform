@@ -7,7 +7,7 @@ const apiData = {
             method: 'POST',
             path: '/v1/yield/accounts',
             title: 'Create yield account',
-            summary: 'Create a new yield account to start earning interest on cryptocurrency deposits. Flow automatically routes funds to the best available protocol (Morpho or Aave) to ensure 6% yield.',
+            summary: 'Create a new yield account to start earning interest on cryptocurrency deposits. TBD automatically routes funds to the best available protocol (Morpho or Aave) to ensure 6% yield.',
             description: 'Creates a yield account using the provided parameters.',
             permissions: 'YIELD_WRITE',
             requestBody: [
@@ -51,7 +51,7 @@ const apiData = {
                     name: 'protocol_preference',
                     type: 'string',
                     required: false,
-                    description: 'Preferred DeFi protocol for this account. Use "auto" to let Flow automatically select the best protocol based on current rates and availability. Specify "morpho" or "aave" to force a specific protocol.',
+                    description: 'Preferred DeFi protocol for this account. Use "auto" to let TBD automatically select the best protocol based on current rates and availability. Specify "morpho" or "aave" to force a specific protocol.',
                     constraints: [
                         { type: 'enum', values: ['auto', 'morpho', 'aave'] },
                         { type: 'default', value: 'auto' }
@@ -121,7 +121,7 @@ const apiData = {
                     name: 'source_address',
                     type: 'string',
                     required: false,
-                    description: 'Optional source wallet address for the deposit. If not provided, Flow will use the default deposit address for your account.',
+                    description: 'Optional source wallet address for the deposit. If not provided, TBD will use the default deposit address for your account.',
                     constraints: [
                         { type: 'pattern', value: '^0x[a-fA-F0-9]{40}$' }
                     ]
@@ -234,7 +234,7 @@ const apiData = {
                     name: 'username',
                     type: 'string',
                     required: true,
-                    description: 'Your Flow account username. This is the username you used when creating your account.',
+                    description: 'Your TBD account username. This is the username you used when creating your account.',
                     constraints: [
                         { type: 'min_length', value: 3 },
                         { type: 'max_length', value: 50 },
@@ -245,7 +245,7 @@ const apiData = {
                     name: 'password',
                     type: 'string',
                     required: true,
-                    description: 'Your Flow account password. Must be at least 8 characters long.',
+                    description: 'Your TBD account password. Must be at least 8 characters long.',
                     constraints: [
                         { type: 'min_length', value: 8 }
                     ]
