@@ -26,6 +26,8 @@
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid #E2E8F0;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         .sdk-title {
             font-size: 24px;
@@ -42,6 +44,7 @@
             cursor: pointer;
             font-size: 14px;
             transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
         }
         .btn-primary:hover {
             transform: translateY(-1px);
@@ -89,6 +92,8 @@
             padding: 24px;
             transition: all 0.2s;
             cursor: pointer;
+            overflow: hidden;
+            word-wrap: break-word;
         }
         .account-card:hover {
             border-color: #6366F1;
