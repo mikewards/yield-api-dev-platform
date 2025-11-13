@@ -97,7 +97,8 @@ body {
     padding: 8px;
     color: var(--primary);
     flex-shrink: 0;
-    z-index: 1001;
+    z-index: 1002;
+    position: relative;
     position: relative;
 }
 
