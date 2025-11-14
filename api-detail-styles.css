@@ -414,17 +414,190 @@
 }
 
 @media (max-width: 768px) {
+    .api-detail-content {
+        padding: 24px 0;
+    }
+    
+    .container {
+        padding: 0 16px;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .detail-header {
+        padding: 0 16px;
+        margin-bottom: 32px;
+    }
+    
+    .detail-title-section {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
     .detail-title-section h1 {
-        font-size: 28px;
+        font-size: 24px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .detail-description {
+        font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     .endpoint-info {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .endpoint-path-inline {
+        font-size: 14px;
+        word-break: break-all;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        display: block;
+    }
+    
+    .permissions-badge {
+        font-size: 13px;
+        word-wrap: break-word;
+    }
+
+    .detail-split-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 0 16px;
+    }
+
+    .detail-left,
+    .detail-right {
+        padding: 20px 16px !important;
+        overflow-x: hidden;
+        word-wrap: break-word;
+    }
+    
+    .summary-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+    }
+    
+    .summary-section h2 {
+        font-size: 20px;
+    }
+    
+    .summary-section p {
+        font-size: 15px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .request-section h2 {
+        font-size: 20px;
+    }
+    
+    .params-container {
+        gap: 20px;
+    }
+    
+    .param-item {
+        padding-bottom: 20px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     .param-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .param-name {
+        font-size: 14px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+    
+    .param-description {
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+    
+    .param-constraints {
+        font-size: 13px;
+        word-wrap: break-word;
+    }
+    
+    .constraint-item {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .code-example-box {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .code-example-box pre {
+        font-size: 12px;
+        padding: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+    }
+    
+    .example-section h2 {
+        font-size: 20px;
+    }
+    
+    .response-section-right h2 {
+        font-size: 20px;
+    }
+    
+    .tab-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-title-section h1 {
+        font-size: 20px;
+    }
+    
+    .detail-description {
+        font-size: 14px;
+    }
+    
+    .detail-left,
+    .detail-right {
+        padding: 16px 12px !important;
+    }
+    
+    .param-name {
+        font-size: 13px;
+    }
+    
+    .param-description {
+        font-size: 13px;
+    }
+    
+    .code-example-box pre {
+        font-size: 11px;
+        padding: 12px;
     }
 }
