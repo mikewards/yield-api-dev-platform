@@ -285,6 +285,9 @@
     color: var(--text-primary);
     font-weight: 600;
     margin-bottom: 4px;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .action-desc {
