@@ -837,6 +837,12 @@
         order: 1;
         padding: 24px 16px !important;
         overflow-x: auto;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .getting-started-layout {
+        display: block !important;
     }
     
     .guides-container {
