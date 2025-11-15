@@ -1602,6 +1602,7 @@ console.log(<span class="string">`Earning ${position.yield_rate}% APY`</span>);<
         </div>
     </section>
 
+    <script src="script.js"></script>
     <script src="nav-auth.js"></script>
     <script src="tooltip.js"></script>
     <script>
@@ -1611,7 +1612,8 @@ console.log(<span class="string">`Earning ${position.yield_rate}% APY`</span>);<
             const mobileSidebar = document.getElementById('guidesMobileSidebar');
             
             if (navToggle && mobileSidebar) {
-                navToggle.addEventListener('click', function() {
+                navToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     navToggle.classList.toggle('active');
                     mobileSidebar.classList.toggle('active');
                 });
