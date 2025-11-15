@@ -1,0 +1,10 @@
+# Cloudflare Pages redirects
+# Ensure all HTML files are served correctly
+
+/signin /signin.html 200
+/account /account.html 200
+/dashboard /dashboard.html 200
+
+# API proxy (if needed)
+# /api/* https://flow-platform-production.up.railway.app/:splat 200
+
