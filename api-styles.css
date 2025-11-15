@@ -408,9 +408,40 @@
     padding-left: 60px;
 }
 
+.guide-section ul {
+    margin: 16px 0;
+    padding-left: 24px;
+    list-style-type: disc;
+}
+
+.guide-section li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.guide-section li code {
+    background: var(--bg-gray-dark);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 14px;
+    color: var(--primary);
+}
+
 @media (max-width: 768px) {
     .guide-section {
         padding-left: 0;
+    }
+    
+    .guide-section ul {
+        padding-left: 20px;
+        margin-left: 0;
+    }
+    
+    .guide-section li {
+        padding-left: 0;
+        margin-left: 0;
     }
 }
 
