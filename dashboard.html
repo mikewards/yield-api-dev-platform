@@ -700,10 +700,13 @@
                     openModal('tokenCreatedModal');
                     this.reset();
                 } else {
-                    alert(data.error?.message || 'Failed to create key');
+                    console.error('Token creation failed:', response.status, data);
+                    const errorMsg = data.error?.message || data.message || `Failed to create key (Status: ${response.status})`;
+                    alert(errorMsg);
                 }
             } catch (error) {
-                alert('Failed to create key');
+                console.error('Token creation error:', error);
+                alert('Failed to create key: ' + (error.message || 'Unknown error. Check console for details.'));
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Key';
