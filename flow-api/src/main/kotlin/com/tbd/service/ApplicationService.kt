@@ -14,6 +14,7 @@ import java.util.*
 
 class ApplicationService {
     private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true }
     private val walletService = WalletService()
     
     fun createApplication(accountId: UUID, request: CreateApplicationRequest): ApplicationResponse {
