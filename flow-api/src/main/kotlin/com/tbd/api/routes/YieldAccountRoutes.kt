@@ -9,6 +9,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
+import kotlinx.coroutines.runBlocking
 
 fun Application.yieldAccountRoutes() {
     val yieldService = YieldService()
