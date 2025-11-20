@@ -22,40 +22,64 @@ fun Application.yieldAccountRoutes() {
                     val currency = call.request.queryParameters["currency"]
                     val protocolFilter = call.request.queryParameters["protocol"]
                     
+                    val currencies = if (currency != null) {
+                        listOf(currency.uppercase())
+                    } else {
+                        listOf("USDC", "USDT", "DAI", "ETH", "WBTC")
+                    }
+                    
                     try {
-                        val currencies = if (currency != null) {
-                            listOf(currency.uppercase())
-                        } else {
-                            listOf("USDC", "USDT", "DAI", "ETH", "WBTC")
-                        }
-                        
                         val rates = mutableListOf<Map<String, Any>>()
                         
                         for (curr in currencies) {
                             if (protocolFilter == null || protocolFilter == "morpho") {
-                                val morphoRate = kotlinx.coroutines.runBlocking {
-                                    protocolService.getMorphoRates(curr)
+                                try {
+                                    val morphoRate = runBlocking {
+                                        protocolService.getMorphoRates(curr)
+                                    }
+                                    rates.add(mapOf(
+                                        "currency" to curr,
+                                        "protocol" to "morpho",
+                                        "annual_yield_rate" to 0.06,
+                                        "apy" to morphoRate,
+                                        "updated_at" to java.time.Instant.now().toString()
+                                    ))
+                                } catch (e: Exception) {
+                                    println("⚠️ Morpho rate fetch failed for $curr: ${e.message}")
+                                    rates.add(mapOf(
+                                        "currency" to curr,
+                                        "protocol" to "morpho",
+                                        "annual_yield_rate" to 0.06,
+                                        "apy" to 0.06,
+                                        "updated_at" to java.time.Instant.now().toString(),
+                                        "note" to "Using default rate (Morpho API error)"
+                                    ))
                                 }
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "morpho",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to morphoRate,
-                                    "updated_at" to java.time.Instant.now().toString()
-                                ))
                             }
                             
                             if (protocolFilter == null || protocolFilter == "aave") {
-                                val aaveRate = kotlinx.coroutines.runBlocking {
-                                    protocolService.getAaveRates(curr)
+                                try {
+                                    val aaveRate = runBlocking {
+                                        protocolService.getAaveRates(curr)
+                                    }
+                                    rates.add(mapOf(
+                                        "currency" to curr,
+                                        "protocol" to "aave",
+                                        "annual_yield_rate" to 0.06,
+                                        "apy" to aaveRate,
+                                        "updated_at" to java.time.Instant.now().toString()
+                                    ))
+                                } catch (e: Exception) {
+                                    println("⚠️ Aave rate fetch failed for $curr: ${e.message}")
+                                    rates.add(mapOf(
+                                        "currency" to curr,
+                                        "protocol" to "aave",
+                                        "annual_yield_rate" to 0.06,
+                                        "apy" to 0.06,
+                                        "updated_at" to java.time.Instant.now().toString(),
+                                        "note" to "Using default rate (Aave API error)"
+                                    ))
                                 }
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "aave",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to aaveRate,
-                                    "updated_at" to java.time.Instant.now().toString()
-                                ))
                             }
                         }
                         
