@@ -60,25 +60,23 @@ class AaveClient {
             )
         ) {
             try {
-                // Aave API endpoint for reserve data
-                // Note: This is a simplified version - actual Aave API may require different endpoints
-                val response: Map<String, AaveReserveData> = client.get("$apiUrl/reserves") {
-                    contentType(ContentType.Application.Json)
-                }.body()
+                // Aave V3 GraphQL API endpoint
+                // Note: Aave doesn't have a simple REST endpoint for reserves
+                // We'll use a default rate for now and can implement on-chain queries later
+                // For production, we should query the Aave Pool contract directly via Web3
                 
-                // Find reserve matching currency
-                val reserve = response.values.firstOrNull { 
-                    it.symbol?.equals(currency, ignoreCase = true) == true 
-                }
+                // TODO: Implement proper Aave rate fetching via:
+                // 1. Query Aave Pool contract on-chain (getReserveData)
+                // 2. Or use Aave's subgraph/GraphQL API if available
+                // 3. Or use a third-party API like Aavescan
                 
-                // Convert liquidity rate from Ray (27 decimals) to percentage
-                val liquidityRate = reserve?.liquidityRate?.toBigIntegerOrNull()
-                if (liquidityRate != null) {
-                    // Aave rates are in Ray (1e27), convert to percentage
-                    liquidityRate.toDouble() / 1e27 * 100.0
-                } else {
-                    0.06 // Default 6% if not found
-                }
+                // For now, return a default rate
+                // In production, this should query the Aave Pool contract:
+                // val pool = AavePool.load(contractAddress, web3j, credentials, gasProvider)
+                // val reserveData = pool.getReserveData(tokenAddress).send()
+                // val liquidityRate = reserveData.liquidityRate.toDouble() / 1e27
+                
+                0.06 // Default 6% - will be replaced with actual on-chain query
             } catch (e: Exception) {
                 println("⚠️ Aave API error: ${e.message}")
                 0.06 // Default 6% if all retries fail
