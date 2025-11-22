@@ -139,8 +139,8 @@ class MorphoClient {
                     .maxByOrNull { it.second }
                 
                 // supplyApy is already a decimal (e.g., 0.06 for 6%), not a percentage
-                // Return the best rate found, or default to 6% if no active markets
-                bestMarket?.second ?: 0.06
+                // Return the best rate found, or throw exception if no active markets
+                bestMarket?.second ?: throw IllegalArgumentException("No active markets found for currency: $currency")
             } catch (e: Exception) {
                 println("⚠️ Morpho API error: ${e.message}")
                 0.06 // Default 6% if all retries fail
