@@ -22,24 +22,56 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Serializable
-data class AaveReserveData(
-    val symbol: String? = null,
-    val liquidityRate: String? = null,
-    val variableBorrowRate: String? = null,
-    val stableBorrowRate: String? = null,
-    val totalLiquidity: String? = null
+data class AaveGraphQLRequest(
+    val query: String,
+    val variables: Map<String, Any>? = null
+)
+
+@Serializable
+data class AaveGraphQLResponse(
+    val data: AaveGraphQLData? = null,
+    val errors: List<AaveGraphQLError>? = null
+)
+
+@Serializable
+data class AaveGraphQLData(
+    val markets: List<AaveMarket>? = null
 )
 
 @Serializable
 data class AaveMarket(
-    val currency: String,
-    val apy: Double,
-    val tvl: String
+    val reserves: List<AaveReserve>? = null
+)
+
+@Serializable
+data class AaveReserve(
+    val underlyingToken: AaveToken? = null,
+    val supplyInfo: AaveSupplyInfo? = null
+)
+
+@Serializable
+data class AaveToken(
+    val symbol: String? = null
+)
+
+@Serializable
+data class AaveSupplyInfo(
+    val apy: AavePercentValue? = null
+)
+
+@Serializable
+data class AavePercentValue(
+    val value: String? = null
+)
+
+@Serializable
+data class AaveGraphQLError(
+    val message: String
 )
 
 class AaveClient {
     private val config = ConfigFactory.load()
-    private val apiUrl = "https://aave-api-v2.aave.com"
+    private val graphqlUrl = "https://api.v3.aave.com/graphql"
     private val web3Service = Web3Service()
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -60,23 +92,48 @@ class AaveClient {
             )
         ) {
             try {
-                // Aave V3 GraphQL API endpoint
-                // Note: Aave doesn't have a simple REST endpoint for reserves
-                // We'll use a default rate for now and can implement on-chain queries later
-                // For production, we should query the Aave Pool contract directly via Web3
+                // Query Aave V3 GraphQL API for supply APY
+                // Chain ID 1 = Ethereum Mainnet
+                val query = """
+                    query GetReserves {
+                        markets(request: { chainIds: [1] }) {
+                            reserves {
+                                underlyingToken {
+                                    symbol
+                                }
+                                supplyInfo {
+                                    apy {
+                                        value
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
                 
-                // TODO: Implement proper Aave rate fetching via:
-                // 1. Query Aave Pool contract on-chain (getReserveData)
-                // 2. Or use Aave's subgraph/GraphQL API if available
-                // 3. Or use a third-party API like Aavescan
+                val request = AaveGraphQLRequest(query = query)
+                val response: AaveGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
                 
-                // For now, throw exception since we don't have a working implementation
-                // In production, this should query the Aave Pool contract:
-                // val pool = AavePool.load(contractAddress, web3j, credentials, gasProvider)
-                // val reserveData = pool.getReserveData(tokenAddress).send()
-                // val liquidityRate = reserveData.liquidityRate.toDouble() / 1e27
+                if (response.errors != null && response.errors.isNotEmpty()) {
+                    throw Exception("Aave GraphQL errors: ${response.errors.joinToString { it.message }}")
+                }
                 
-                throw IllegalArgumentException("Aave rate fetching not yet implemented - requires on-chain query")
+                // Find reserve matching currency (USDC, USDT, etc.)
+                val reserve = response.data?.markets?.flatMap { it.reserves ?: emptyList() }
+                    ?.firstOrNull { reserve ->
+                        reserve.underlyingToken?.symbol?.equals(currency, ignoreCase = true) == true
+                    }
+                
+                val apyValue = reserve?.supplyInfo?.apy?.value
+                if (apyValue != null) {
+                    // APY value is already in decimal format (e.g., 0.036 = 3.6%)
+                    apyValue.toDoubleOrNull() ?: throw IllegalArgumentException("No active markets found for currency: $currency")
+                } else {
+                    throw IllegalArgumentException("No active markets found for currency: $currency")
+                }
             } catch (e: IllegalArgumentException) {
                 // Re-throw IllegalArgumentException so route handler can handle it
                 throw e
