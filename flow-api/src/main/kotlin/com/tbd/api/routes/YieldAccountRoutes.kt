@@ -61,12 +61,31 @@ fun Application.yieldAccountRoutes() {
                         
                         call.respond(mapOf("rates" to rates))
                     } catch (e: Exception) {
-                        println("Error getting yield rates: ${e.message}")
+                        println("❌ Error getting yield rates: ${e.message}")
+                        println("Stack trace: ${e.stackTraceToString()}")
                         e.printStackTrace()
-                        call.respond(
-                            HttpStatusCode.InternalServerError,
-                            ErrorResponse(ErrorDetail("INTERNAL_ERROR", "Failed to fetch yield rates", "internal_error"))
-                        )
+                        // Return default rates even on error
+                        val defaultRates = currencies.flatMap { curr ->
+                            listOf(
+                                mapOf(
+                                    "currency" to curr,
+                                    "protocol" to "morpho",
+                                    "annual_yield_rate" to 0.06,
+                                    "apy" to 0.06,
+                                    "updated_at" to java.time.Instant.now().toString(),
+                                    "note" to "Using default rate due to API error"
+                                ),
+                                mapOf(
+                                    "currency" to curr,
+                                    "protocol" to "aave",
+                                    "annual_yield_rate" to 0.06,
+                                    "apy" to 0.06,
+                                    "updated_at" to java.time.Instant.now().toString(),
+                                    "note" to "Using default rate due to API error"
+                                )
+                            )
+                        }
+                        call.respond(mapOf("rates" to defaultRates))
                     }
                 }
             }
