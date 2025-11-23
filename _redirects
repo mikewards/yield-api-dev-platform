@@ -1,7 +1,0 @@
-# Cloudflare Pages redirects
-# Ensure all HTML files are served correctly
-
-/signin /signin.html
-/account /account.html
-/dashboard /dashboard.html
-
