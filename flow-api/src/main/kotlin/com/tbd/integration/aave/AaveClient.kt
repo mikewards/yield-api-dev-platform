@@ -77,9 +77,13 @@ class AaveClient {
                 // val liquidityRate = reserveData.liquidityRate.toDouble() / 1e27
                 
                 throw IllegalArgumentException("Aave rate fetching not yet implemented - requires on-chain query")
+            } catch (e: IllegalArgumentException) {
+                // Re-throw IllegalArgumentException so route handler can handle it
+                throw e
             } catch (e: Exception) {
+                // For other exceptions (network errors, etc.), throw as well
                 println("⚠️ Aave API error: ${e.message}")
-                0.06 // Default 6% if all retries fail
+                throw e
             }
         }
     }
