@@ -126,7 +126,8 @@ class MorphoClient {
                 }
                 
                 // supplyApy is already a decimal (e.g., 0.06 for 6%), not a percentage
-                market?.state?.supplyApy?.toDoubleOrNull() ?: 0.06 // Default 6% if not found
+                // It's already a Double?, so we just need to handle null
+                market?.state?.supplyApy ?: 0.06 // Default 6% if not found
             } catch (e: Exception) {
                 println("⚠️ Morpho API error: ${e.message}")
                 0.06 // Default 6% if all retries fail
