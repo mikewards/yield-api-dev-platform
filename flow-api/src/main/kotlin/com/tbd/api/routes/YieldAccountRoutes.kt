@@ -12,8 +12,65 @@ import java.util.*
 
 fun Application.yieldAccountRoutes() {
     val yieldService = YieldService()
+    val protocolService = com.tbd.integration.ProtocolService()
     
     routing {
+        route("/v1/yield/rates") {
+            authenticate("bearer-auth") {
+                get {
+                    val currency = call.request.queryParameters["currency"]
+                    val protocolFilter = call.request.queryParameters["protocol"]
+                    
+                    try {
+                        val currencies = if (currency != null) {
+                            listOf(currency.uppercase())
+                        } else {
+                            listOf("USDC", "USDT", "DAI", "ETH", "WBTC")
+                        }
+                        
+                        val rates = mutableListOf<Map<String, Any>>()
+                        
+                        for (curr in currencies) {
+                            if (protocolFilter == null || protocolFilter == "morpho") {
+                                val morphoRate = kotlinx.coroutines.runBlocking {
+                                    protocolService.getMorphoRates(curr)
+                                }
+                                rates.add(mapOf(
+                                    "currency" to curr,
+                                    "protocol" to "morpho",
+                                    "annual_yield_rate" to 0.06,
+                                    "apy" to morphoRate,
+                                    "updated_at" to java.time.Instant.now().toString()
+                                ))
+                            }
+                            
+                            if (protocolFilter == null || protocolFilter == "aave") {
+                                val aaveRate = kotlinx.coroutines.runBlocking {
+                                    protocolService.getAaveRates(curr)
+                                }
+                                rates.add(mapOf(
+                                    "currency" to curr,
+                                    "protocol" to "aave",
+                                    "annual_yield_rate" to 0.06,
+                                    "apy" to aaveRate,
+                                    "updated_at" to java.time.Instant.now().toString()
+                                ))
+                            }
+                        }
+                        
+                        call.respond(mapOf("rates" to rates))
+                    } catch (e: Exception) {
+                        println("Error getting yield rates: ${e.message}")
+                        e.printStackTrace()
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            ErrorResponse(ErrorDetail("INTERNAL_ERROR", "Failed to fetch yield rates", "internal_error"))
+                        )
+                    }
+                }
+            }
+        }
+        
         route("/v1/yield/accounts") {
             authenticate("bearer-auth") {
                 post {
