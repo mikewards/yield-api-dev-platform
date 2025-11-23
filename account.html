@@ -158,6 +158,11 @@
     <script src="config.js"></script>
     <script>
         // API_BASE_URL is now set by config.js
+        // Ensure it's available
+        if (typeof API_BASE_URL === 'undefined') {
+            console.error('API_BASE_URL is not defined! Check config.js');
+            alert('Configuration error: API URL not set. Please refresh the page.');
+        }
         
         document.getElementById('accountForm').addEventListener('submit', async function(e) {
             e.preventDefault();
