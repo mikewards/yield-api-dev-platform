@@ -23,8 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Serializable
 data class AaveGraphQLRequest(
-    val query: String,
-    val variables: Map<String, Any>? = null
+    val query: String
 )
 
 @Serializable
