@@ -164,11 +164,34 @@
         updateAllUrls(getCurrentEnvironment());
     }
     
+    // Map internal env names to user-facing labels
+    const envLabels = {
+        'production': 'Production',
+        'staging': 'Sandbox'
+    };
+    
+    // Update button text to show user-facing labels
+    function updateButtonLabels() {
+        const buttons = document.querySelectorAll('.env-toggle-btn');
+        buttons.forEach(btn => {
+            const env = btn.dataset.env;
+            if (envLabels[env]) {
+                btn.textContent = envLabels[env];
+            }
+        });
+    }
+    
     // Listen for environment changes
     window.addEventListener('apiEnvironmentChanged', function(event) {
         const env = event.detail;
         const buttons = document.querySelectorAll('.env-toggle-btn');
         buttons.forEach(btn => {
+            // Update button text
+            const btnEnv = btn.dataset.env;
+            if (envLabels[btnEnv]) {
+                btn.textContent = envLabels[btnEnv];
+            }
+            
             if (btn.dataset.env === env) {
                 btn.style.background = '#0f172a';
                 btn.style.color = 'white';
@@ -180,6 +203,13 @@
             }
         });
     });
+    
+    // Update labels on initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateButtonLabels);
+    } else {
+        updateButtonLabels();
+    }
     
     // Export for use in other scripts
     window.envToggle = {
