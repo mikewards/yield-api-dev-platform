@@ -774,6 +774,20 @@ function setupEnvironmentToggle() {
     
     const currentEnv = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     
+    // Map internal env names to user-facing labels
+    const envLabels = {
+        'production': 'Production',
+        'staging': 'Sandbox'
+    };
+    
+    // Update button text to show user-facing labels
+    envButtons.forEach(btn => {
+        const env = btn.dataset.env;
+        if (envLabels[env]) {
+            btn.textContent = envLabels[env];
+        }
+    });
+    
     // Set initial active state
     envButtons.forEach(btn => {
         if (btn.dataset.env === currentEnv) {
@@ -831,6 +845,12 @@ function setupEnvironmentToggle() {
     window.addEventListener('apiEnvironmentChanged', function(event) {
         const newEnv = event.detail;
         envButtons.forEach(btn => {
+            // Update button text to show user-facing label
+            const env = btn.dataset.env;
+            if (envLabels[env]) {
+                btn.textContent = envLabels[env];
+            }
+            
             if (btn.dataset.env === newEnv) {
                 btn.classList.add('active');
                 btn.style.background = '#0f172a';

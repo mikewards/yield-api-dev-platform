@@ -1,6 +1,6 @@
 // API Configuration
 // Automatically detects environment and sets API URL
-// Supports: localhost, staging, and production
+// Supports: localhost, sandbox (staging), and production
 (function() {
     'use strict';
     

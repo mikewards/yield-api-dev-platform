@@ -87,7 +87,7 @@ curl https://flow-platform-production.up.railway.app/v1/accounts \
 
 ### 3. Verify Environment Toggle in Documentation
 1. Go to your API documentation page
-2. Click the environment toggle (Production/Staging)
+2. Click the environment toggle (Production/Sandbox)
 3. Verify the curl examples update with the correct URLs
 
 ## 📊 Environment URLs
@@ -124,7 +124,7 @@ DATABASE_URL=<auto-set by Railway>
 - [ ] Staging deployment shows "Database tables created successfully"
 - [ ] Can create account on staging
 - [ ] Can create account on production
-- [ ] Environment toggle works in documentation
+- [ ] Environment toggle works in documentation (shows Production/Sandbox)
 - [ ] Staging uses `staging` branch
 - [ ] Production uses `main` branch
 
