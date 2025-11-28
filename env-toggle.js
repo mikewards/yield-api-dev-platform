@@ -96,7 +96,7 @@
         prodBtn.style.cssText = 'padding: 6px 16px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s; font-family: inherit;';
         
         const stagingBtn = document.createElement('button');
-        stagingBtn.textContent = 'Staging';
+        stagingBtn.textContent = 'Sandbox';
         stagingBtn.dataset.env = 'staging';
         stagingBtn.className = 'env-toggle-btn';
         stagingBtn.style.cssText = 'padding: 6px 16px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s; font-family: inherit;';
