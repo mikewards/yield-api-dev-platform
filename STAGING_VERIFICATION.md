@@ -131,7 +131,7 @@ DATABASE_URL=<auto-set by Railway>
 ## 🚀 You're All Set!
 
 Both environments are now configured and ready to use:
-- **Staging**: For testing new features before production
+- **Sandbox**: For testing new features before production
 - **Production**: For live users
 
 Remember:
