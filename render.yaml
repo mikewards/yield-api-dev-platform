@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: flow-api
+    env: docker
+    dockerfilePath: ./flow-api/Dockerfile
+    dockerContext: ./flow-api
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MASTER_ENCRYPTION_KEY
+        generateValue: true
+      - key: ETH_SANDBOX_RPC_URL
+        sync: false
+      - key: ETH_PRODUCTION_RPC_URL
+        sync: false
+    healthCheckPath: /health
+
+databases:
+  - name: flow-db
+    plan: free
+    databaseName: flow_api
+    user: flow_user
+

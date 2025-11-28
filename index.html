@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow - DeFi Platform for Developers</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Flow</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html">Get Started</a>
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>US-Based • Fully Compliant • Enterprise Ready</span>
+                </div>
+                <h1 class="hero-title">
+                    DeFi APIs for developers.<br/>
+                    <span class="gradient-text">6% yields</span> built in.
+                </h1>
+                <p class="hero-description">
+                    Flow provides APIs, SDKs, and developer tools that let you integrate DeFi yield generation 
+                    into your applications. We handle compliance, regulation, and foreign exchange complexity—you 
+                    focus on building.
+                </p>
+                <div class="hero-cta">
+                    <a href="account.html" class="btn-primary btn-large">Start Building</a>
+                    <a href="api-reference.html" class="btn-secondary btn-large">View Documentation</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">6%</div>
+                        <div class="stat-label">Guaranteed Yield</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Uptime SLA</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">&lt;100ms</div>
+                        <div class="stat-label">API Response</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="code-title">api.flow.com</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code><span class="code-keyword">curl</span> https://api.flow.com/v1/yield/start \
+  -u <span class="code-string">sk_live_...</span> \
+  -d <span class="code-string">"amount=1000"</span> \
+  -d <span class="code-string">"currency=USDC"</span> \
+  -d <span class="code-string">"yield_rate=0.06"</span>
+
+<span class="code-comment"># Response</span>
+{
+  <span class="code-key">"yield_account_id"</span>: <span class="code-string">"ya_1234..."</span>,
+  <span class="code-key">"annual_yield"</span>: <span class="code-number">0.06</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"active"</span>
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Section -->
+    <section class="trust">
+        <div class="container">
+            <p class="trust-text">Trusted by developers and enterprises worldwide</p>
+            <div class="trust-logos">
+                <div class="trust-logo">Startup</div>
+                <div class="trust-logo">Enterprise</div>
+                <div class="trust-logo">FinTech</div>
+                <div class="trust-logo">Crypto Exchange</div>
+                <div class="trust-logo">Banking</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything you need to build DeFi products</h2>
+                <p>Powerful APIs, comprehensive SDKs, and developer tools that scale from prototype to production</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                            <path d="M2 17L12 22L22 17"/>
+                            <path d="M2 12L12 17L22 12"/>
+                        </svg>
+                    </div>
+                    <h3>RESTful APIs</h3>
+                    <p>Clean, intuitive REST APIs with comprehensive documentation. Integrate yield generation, account management, and transaction tracking in minutes.</p>
+                    <a href="#" class="feature-link">View API Reference →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </div>
+                    <h3>Multi-Language SDKs</h3>
+                    <p>Official SDKs for Node.js, Python, Ruby, PHP, Go, and Java. Pre-built functions for common operations with type safety and error handling.</p>
+                    <a href="#" class="feature-link">Browse SDKs →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h3>Compliance Built-In</h3>
+                    <p>US-based company handling all regulatory requirements, KYC/AML, and foreign exchange compliance. Focus on building, not paperwork.</p>
+                    <a href="#" class="feature-link">Learn about compliance →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <h3>Guaranteed 6% Yield</h3>
+                    <p>Consistent 6% annual yield across supported cryptocurrencies. We manage DeFi protocol complexity and foreign exchange relationships behind the scenes.</p>
+                    <a href="#" class="feature-link">View yield details →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h3>Real-Time Webhooks</h3>
+                    <p>Get instant notifications for yield accruals, account updates, and transaction events. Build reactive applications with our webhook system.</p>
+                    <a href="#" class="feature-link">Webhook guide →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="9" y1="3" x2="9" y2="21"/>
+                            <line x1="15" y1="3" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>Developer Dashboard</h3>
+                    <p>Monitor API usage, view logs, manage API keys, and track yield performance from a single intuitive dashboard.</p>
+                    <a href="#" class="feature-link">Explore dashboard →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integration Section -->
+    <section class="integration">
+        <div class="container">
+            <div class="integration-content">
+                <div class="integration-text">
+                    <h2>Integrate in minutes, not months</h2>
+                    <p>Our APIs are designed for developers, by developers. Get up and running with our quickstart guides, code examples, and interactive documentation.</p>
+                    <div class="integration-features">
+                        <div class="integration-feature">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Comprehensive documentation</span>
+                        </div>
+                        <div class="integration-feature">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Code examples in 6+ languages</span>
+                        </div>
+                        <div class="integration-feature">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Sandbox environment for testing</span>
+                        </div>
+                        <div class="integration-feature">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>24/7 developer support</span>
+                        </div>
+                    </div>
+                    <div class="integration-cta">
+                        <a href="#" class="btn-primary">Get Started</a>
+                        <a href="#" class="btn-link">Read the docs →</a>
+                    </div>
+                </div>
+                <div class="integration-visual">
+                    <div class="tabs">
+                        <div class="tab active">Node.js</div>
+                        <div class="tab">Python</div>
+                        <div class="tab">Ruby</div>
+                    </div>
+                    <div class="code-block">
+                        <pre><code><span class="code-keyword">const</span> flow = <span class="code-function">require</span>(<span class="code-string">'@flow/api'</span>);
+
+flow.<span class="code-property">apiKey</span> = <span class="code-string">'sk_live_...'</span>;
+
+<span class="code-comment">// Start earning yield</span>
+<span class="code-keyword">const</span> account = <span class="code-keyword">await</span> flow.yield.<span class="code-function">create</span>({
+  amount: <span class="code-number">1000</span>,
+  currency: <span class="code-string">'USDC'</span>,
+  yieldRate: <span class="code-number">0.06</span>
+});
+
+<span class="code-function">console</span>.<span class="code-function">log</span>(account.<span class="code-property">id</span>);
+<span class="code-comment">// => 'ya_1234...'</span></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security">
+        <div class="container">
+            <div class="security-content">
+                <div class="security-badge">Security & Compliance</div>
+                <h2>Enterprise-grade security,<br/>without the complexity</h2>
+                <p>Flow is a US-based company that handles all regulatory requirements, foreign exchange relationships, and DeFi protocol complexity. Your users get secure, compliant yield generation—you get peace of mind.</p>
+                <div class="security-grid">
+                    <div class="security-item">
+                        <div class="security-icon">🔒</div>
+                        <h4>Bank-Level Security</h4>
+                        <p>256-bit encryption, SOC 2 Type II certified, and regular security audits</p>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">⚖️</div>
+                        <h4>Full Regulatory Compliance</h4>
+                        <p>KYC/AML, FinCEN registration, and compliance with all US financial regulations</p>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">🌍</div>
+                        <h4>Global Exchange Network</h4>
+                        <p>We manage relationships with foreign DeFi exchanges and protocols</p>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">📊</div>
+                        <h4>Transparent Reporting</h4>
+                        <p>Real-time yield tracking, detailed transaction logs, and audit trails</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to start building?</h2>
+                <p>Join thousands of developers using Flow to integrate DeFi yield generation into their applications.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn-primary btn-large">Create Account</a>
+                    <a href="#" class="btn-secondary btn-large">Contact Sales</a>
+                </div>
+                <p class="cta-note">No credit card required • Free tier available • Setup in minutes</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 2L30 8V16C30 23.732 23.732 30 16 30C8.268 30 2 23.732 2 16V8L16 2Z" fill="url(#gradient)" stroke="currentColor" stroke-width="2"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#6366F1"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Flow</span>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">SDKs</a></li>
+                        <li><a href="#">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Status</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Compliance</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Flow. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="nav-auth.js"></script>
+</body>
+</html>
