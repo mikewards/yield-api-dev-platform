@@ -54,6 +54,7 @@ data class MorphoMarketsResponse(
 data class MorphoMarket(
     val id: String? = null,
     val loanAsset: MorphoAsset? = null,
+    val collateralAsset: MorphoAsset? = null,
     val state: MorphoMarketState? = null
 )
 
@@ -148,6 +149,59 @@ class MorphoClient {
             } catch (e: Exception) {
                 // For other exceptions (network errors, etc.), throw as well
                 println("⚠️ Morpho API error: ${e.message}")
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * List all available markets from Morpho
+     */
+    suspend fun listMarkets(): List<MorphoMarket> {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 3,
+                initialDelay = 500.milliseconds
+            )
+        ) {
+            try {
+                val query = """
+                    query GetMarkets {
+                        markets {
+                            items {
+                                id
+                                loanAsset {
+                                    symbol
+                                    address
+                                }
+                                collateralAsset {
+                                    symbol
+                                    address
+                                }
+                                state {
+                                    supplyApy
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+                
+                val request = MorphoGraphQLRequest(query = query)
+                val response: MorphoGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
+                
+                if (response.errors != null && response.errors.isNotEmpty()) {
+                    throw Exception("Morpho GraphQL errors: ${response.errors.joinToString { it.message }}")
+                }
+                
+                // Return all markets with active APY
+                response.data?.markets?.items
+                    ?.filter { it.state?.supplyApy != null && it.state.supplyApy > 0.0 }
+                    ?: emptyList()
+            } catch (e: Exception) {
+                println("⚠️ Morpho API error listing markets: ${e.message}")
                 throw e
             }
         }

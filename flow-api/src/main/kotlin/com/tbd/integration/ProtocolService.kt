@@ -24,6 +24,20 @@ class ProtocolService {
         return aaveClient.getCurrentRate(currency)
     }
     
+    /**
+     * List all markets from Morpho
+     */
+    suspend fun listMorphoMarkets(): List<com.tbd.integration.morpho.MorphoMarket> {
+        return morphoClient.listMarkets()
+    }
+    
+    /**
+     * List all markets from Aave
+     */
+    suspend fun listAaveMarkets(): List<com.tbd.integration.aave.AaveReserve> {
+        return aaveClient.listMarkets()
+    }
+    
     // Synchronous wrapper for backwards compatibility
     fun selectBestProtocolSync(currency: String): String {
         return runBlocking { selectBestProtocol(currency) }
