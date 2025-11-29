@@ -88,6 +88,10 @@ fun Application.marketRoutes() {
                         }
                     }
                     
+                    // Always return a response, even if empty
+                    if (markets.isEmpty()) {
+                        println("⚠️ No markets found. Protocol filter: $protocolFilter, Currency filter: $currencyFilter")
+                    }
                     call.respond(MarketsResponse(markets = markets))
                 }
             }
