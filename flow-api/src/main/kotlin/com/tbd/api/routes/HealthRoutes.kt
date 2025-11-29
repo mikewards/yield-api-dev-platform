@@ -5,6 +5,8 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.select
 
 @Serializable
 data class HealthResponse(
@@ -53,8 +55,8 @@ fun Application.healthRoutes() {
         get("/health") {
             // Test database connection
             val dbStatus = try {
-                org.jetbrains.exposed.sql.transactions.transaction {
-                    org.jetbrains.exposed.sql.select(1).firstOrNull()
+                transaction {
+                    select(1).firstOrNull()
                 }
                 "connected"
             } catch (e: Exception) {
