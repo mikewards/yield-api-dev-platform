@@ -16,7 +16,7 @@ fun Application.statusPages() {
                 ErrorResponse(
                     ErrorDetail(
                         code = "NOT_FOUND",
-                        message = "Endpoint not found: ${call.request.path()}",
+                        message = "The requested endpoint was not found",
                         type = "not_found_error"
                     )
                 )
