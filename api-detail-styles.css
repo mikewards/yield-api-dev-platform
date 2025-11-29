@@ -245,11 +245,23 @@
 }
 
 /* Nested Object Support */
-.param-nested {
-    margin-top: 16px;
-    padding-left: 20px;
-    border-left: 3px solid var(--border);
-}
+    .param-nested {
+        margin-top: 16px;
+        padding-left: 20px;
+        border-left: 3px solid var(--border);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .param-nested-header {
+        flex-wrap: wrap;
+    }
+    
+    .param-nested-title {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
 
 .param-nested-header {
     display: flex;
@@ -599,5 +611,13 @@
     .code-example-box pre {
         font-size: 11px;
         padding: 12px;
+    }
+    
+    .param-nested {
+        padding-left: 12px;
+    }
+    
+    .param-nested-title {
+        font-size: 13px;
     }
 }
