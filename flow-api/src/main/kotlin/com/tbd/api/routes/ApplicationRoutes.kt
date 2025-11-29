@@ -126,15 +126,22 @@ fun Application.applicationRoutes() {
                         val principal = call.principal<UserIdPrincipal>()!!
                         val accountId = UUID.fromString(principal.name)
                         val applicationId = UUID.fromString(call.parameters["applicationId"])
-                        val request = call.receive<CreateAppTokenRequest>()
                         
                         try {
+                            val request = call.receive<CreateAppTokenRequest>()
                             val token = applicationService.createAppToken(accountId, applicationId, request)
                             call.respond(HttpStatusCode.Created, token)
                         } catch (e: IllegalArgumentException) {
                             call.respond(
                                 HttpStatusCode.NotFound,
                                 ErrorResponse(ErrorDetail("NOT_FOUND", e.message ?: "Application not found", "not_found_error"))
+                            )
+                        } catch (e: Exception) {
+                            println("Error creating app token: ${e.message}")
+                            e.printStackTrace()
+                            call.respond(
+                                HttpStatusCode.InternalServerError,
+                                ErrorResponse(ErrorDetail("INTERNAL_ERROR", e.message ?: "Failed to create token", "internal_error"))
                             )
                         }
                     }
