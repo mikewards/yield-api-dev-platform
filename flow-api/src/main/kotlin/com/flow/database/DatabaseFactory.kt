@@ -64,7 +64,7 @@ object DatabaseFactory {
         }
         
         println("🔍 DEBUG: Final jdbcUrl length = ${jdbcUrl.length}")
-        println("🔍 DEBUG: Final jdbcUrl = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(80)}..."}")
+        println("🔍 DEBUG: Final jdbcUrl (FULL) = $jdbcUrl")
         println("🔍 DEBUG: dbUser = $dbUser")
         println("🔍 DEBUG: dbPassword = ${if (dbPassword.isEmpty()) "EMPTY" else "***"}")
         
