@@ -28,7 +28,7 @@ fun Application.yieldAccountRoutes() {
                         listOf("USDC", "USDT", "DAI", "ETH", "WBTC")
                     }
                     
-                    val rates = mutableListOf<Map<String, Any>>()
+                    val rates = mutableListOf<YieldRate>()
                     
                     for (curr in currencies) {
                         if (protocolFilter == null || protocolFilter == "morpho") {
@@ -36,22 +36,22 @@ fun Application.yieldAccountRoutes() {
                                 val morphoRate = runBlocking {
                                     protocolService.getMorphoRates(curr)
                                 }
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "morpho",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to morphoRate,
-                                    "updated_at" to java.time.Instant.now().toString()
+                                rates.add(YieldRate(
+                                    currency = curr,
+                                    protocol = "morpho",
+                                    annual_yield_rate = 0.06,
+                                    apy = morphoRate,
+                                    updated_at = java.time.Instant.now().toString()
                                 ))
                             } catch (e: Exception) {
                                 println("⚠️ Morpho rate fetch failed for $curr: ${e.message}")
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "morpho",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to 0.06,
-                                    "updated_at" to java.time.Instant.now().toString(),
-                                    "note" to "Using default rate (Morpho API error)"
+                                rates.add(YieldRate(
+                                    currency = curr,
+                                    protocol = "morpho",
+                                    annual_yield_rate = 0.06,
+                                    apy = 0.06,
+                                    updated_at = java.time.Instant.now().toString(),
+                                    note = "Using default rate (Morpho API error)"
                                 ))
                             }
                         }
@@ -61,28 +61,28 @@ fun Application.yieldAccountRoutes() {
                                 val aaveRate = runBlocking {
                                     protocolService.getAaveRates(curr)
                                 }
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "aave",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to aaveRate,
-                                    "updated_at" to java.time.Instant.now().toString()
+                                rates.add(YieldRate(
+                                    currency = curr,
+                                    protocol = "aave",
+                                    annual_yield_rate = 0.06,
+                                    apy = aaveRate,
+                                    updated_at = java.time.Instant.now().toString()
                                 ))
                             } catch (e: Exception) {
                                 println("⚠️ Aave rate fetch failed for $curr: ${e.message}")
-                                rates.add(mapOf(
-                                    "currency" to curr,
-                                    "protocol" to "aave",
-                                    "annual_yield_rate" to 0.06,
-                                    "apy" to 0.06,
-                                    "updated_at" to java.time.Instant.now().toString(),
-                                    "note" to "Using default rate (Aave API error)"
+                                rates.add(YieldRate(
+                                    currency = curr,
+                                    protocol = "aave",
+                                    annual_yield_rate = 0.06,
+                                    apy = 0.06,
+                                    updated_at = java.time.Instant.now().toString(),
+                                    note = "Using default rate (Aave API error)"
                                 ))
                             }
                         }
                     }
                     
-                    call.respond(mapOf("rates" to rates))
+                    call.respond(YieldRatesResponse(rates = rates))
                 }
             }
         }

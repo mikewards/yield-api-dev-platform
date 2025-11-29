@@ -49,3 +49,18 @@ data class TransactionResponse(
     val created_at: String,
     val destination_address: String? = null
 )
+
+@Serializable
+data class YieldRate(
+    val currency: String,
+    val protocol: String,
+    val annual_yield_rate: Double,
+    val apy: Double,
+    val updated_at: String,
+    val note: String? = null
+)
+
+@Serializable
+data class YieldRatesResponse(
+    val rates: List<YieldRate>
+)
