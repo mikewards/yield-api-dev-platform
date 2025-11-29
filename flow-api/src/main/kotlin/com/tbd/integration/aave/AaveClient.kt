@@ -50,16 +50,17 @@ data class AaveReserve(
 
 @Serializable
 data class AaveToken(
-    val symbol: String? = null
+    val symbol: String? = null,
+    val address: String? = null
 )
 
 @Serializable
 data class AaveSupplyInfo(
-    val apy: AavePercentValue? = null
+    val apy: AaveAPY? = null
 )
 
 @Serializable
-data class AavePercentValue(
+data class AaveAPY(
     val value: String? = null
 )
 
@@ -139,6 +140,60 @@ class AaveClient {
             } catch (e: Exception) {
                 // For other exceptions (network errors, etc.), throw as well
                 println("⚠️ Aave API error: ${e.message}")
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * List all available reserves/markets from Aave
+     */
+    suspend fun listMarkets(): List<AaveReserve> {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 3,
+                initialDelay = 500.milliseconds
+            )
+        ) {
+            try {
+                val query = """
+                    query GetReserves {
+                        markets(request: { chainIds: [1] }) {
+                            reserves {
+                                underlyingToken {
+                                    symbol
+                                    address
+                                }
+                                supplyInfo {
+                                    apy {
+                                        value
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+                
+                val request = AaveGraphQLRequest(query = query)
+                val response: AaveGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
+                
+                if (response.errors != null && response.errors.isNotEmpty()) {
+                    throw Exception("Aave GraphQL errors: ${response.errors.joinToString { it.message }}")
+                }
+                
+                // Return all reserves with active APY
+                response.data?.markets
+                    ?.flatMap { it.reserves ?: emptyList() }
+                    ?.filter { 
+                        it.supplyInfo?.apy?.value != null && 
+                        it.supplyInfo.apy.value.toDoubleOrNull() ?: 0.0 > 0.0 
+                    }
+                    ?: emptyList()
+            } catch (e: Exception) {
+                println("⚠️ Aave API error listing markets: ${e.message}")
                 throw e
             }
         }
