@@ -607,8 +607,15 @@
                 <p class="api-subtitle">Complete documentation for building with TBD. Learn core concepts, explore domain guides, and discover common integration patterns.</p>
             </div>
             
-            <div class="getting-started-layout">
-                <aside class="getting-started-sidebar">
+            <!-- Mobile Navigation Toggle -->
+            <div class="guides-nav-toggle">
+                <button class="guides-nav-toggle-btn" id="guidesNavToggle">
+                    <span>Table of Contents</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </button>
+                <div class="guides-mobile-sidebar" id="guidesMobileSidebar">
                     <div class="sidebar-section">
                         <h3>Quick Start</h3>
                         <ul class="sidebar-list">
@@ -1597,6 +1604,28 @@ console.log(<span class="string">`Earning ${position.yield_rate}% APY`</span>);<
 
     <script src="nav-auth.js"></script>
     <script src="tooltip.js"></script>
+    <script>
+        // Mobile Guides Navigation Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('guidesNavToggle');
+            const mobileSidebar = document.getElementById('guidesMobileSidebar');
+            
+            if (navToggle && mobileSidebar) {
+                navToggle.addEventListener('click', function() {
+                    navToggle.classList.toggle('active');
+                    mobileSidebar.classList.toggle('active');
+                });
+                
+                // Close mobile sidebar when clicking on a link
+                mobileSidebar.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function() {
+                        navToggle.classList.remove('active');
+                        mobileSidebar.classList.remove('active');
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 
