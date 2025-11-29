@@ -944,6 +944,9 @@ function setupEnvironmentToggle() {
         if (endpoint && endpoint.curlExample) {
             updateCurlExample(endpoint.curlExample);
         }
+        
+        // Also update all CURL examples on the page
+        updateAllCurlExamples();
     });
 }
 
