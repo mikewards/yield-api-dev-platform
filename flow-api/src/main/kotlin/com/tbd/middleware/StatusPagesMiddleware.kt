@@ -10,6 +10,19 @@ import com.tbd.middleware.captureException
 
 fun Application.statusPages() {
     install(StatusPages) {
+        status(HttpStatusCode.NotFound) { call, status ->
+            call.respond(
+                status,
+                ErrorResponse(
+                    ErrorDetail(
+                        code = "NOT_FOUND",
+                        message = "Endpoint not found: ${call.request.path()}",
+                        type = "not_found_error"
+                    )
+                )
+            )
+        }
+        
         exception<IllegalArgumentException> { call, cause ->
             call.respond(
                 HttpStatusCode.BadRequest,
