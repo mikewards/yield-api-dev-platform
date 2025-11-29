@@ -1487,21 +1487,21 @@
 <span class="comment">// 4. Check position</span>
 <span class="function">const</span> position = <span class="function">await</span> getPosition(token, account.id);
 console.log(<span class="string">`Earning ${position.yield_rate}% APY`</span>);</code>
-                </div>
-            </div>
-            
-            <div class="pattern-box">
-                <div class="pattern-header">
-                    <div class="pattern-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v8H2zM6 8V6a2 2 0 012-2h8a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <h4>Pattern 2: Webhook-Driven Updates</h4>
-                </div>
-                <p style="color: var(--text-secondary); margin-bottom: 24px;">Event-driven architecture for real-time updates</p>
-                <div class="code-block">
-                    <code><span class="comment">// Your webhook endpoint</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pattern-box">
+                            <div class="pattern-header">
+                                <div class="pattern-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h4>Pattern 2: Webhook-Driven Updates</h4>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 24px;">Event-driven architecture for real-time updates</p>
+                            <div class="code-block">
+                                <code><span class="comment">// Your webhook endpoint</span>
 <span class="function">POST</span> /webhooks/tbd
 
 <span class="comment">// TBD sends events:</span>
