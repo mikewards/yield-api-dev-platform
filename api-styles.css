@@ -294,7 +294,26 @@
     top: 80px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 8px;
+}
+
+.getting-started-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.getting-started-sidebar::-webkit-scrollbar-track {
+    background: var(--bg-gray);
+    border-radius: 3px;
+}
+
+.getting-started-sidebar::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 3px;
+}
+
+.getting-started-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 
 .getting-started-main {
