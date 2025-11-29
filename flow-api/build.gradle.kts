@@ -7,7 +7,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-group = "com.flow"
+group = "com.tbd"
 version = "1.0.0"
 
 repositories {
@@ -66,7 +66,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.flow.ApplicationKt")
+    mainClass.set("com.tbd.ApplicationKt")
 }
 
 tasks.withType<KotlinCompile> {
@@ -79,12 +79,12 @@ tasks.test {
 
 // Configure Shadow JAR (fat JAR with all dependencies)
 tasks.shadowJar {
-    archiveBaseName.set("flow-api")
+    archiveBaseName.set("tbd-api")
     archiveClassifier.set("")
     archiveVersion.set("")
     
     manifest {
-        attributes(mapOf("Main-Class" to "com.flow.ApplicationKt"))
+        attributes(mapOf("Main-Class" to "com.tbd.ApplicationKt"))
     }
 }
 

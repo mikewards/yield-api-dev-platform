@@ -23,7 +23,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy the built shadow JAR (fat JAR with all dependencies)
-COPY --from=build /app/build/libs/flow-api.jar app.jar
+COPY --from=build /app/build/libs/tbd-api.jar app.jar
 
 # Expose port
 EXPOSE 8080
