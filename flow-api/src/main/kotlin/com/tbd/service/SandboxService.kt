@@ -109,14 +109,19 @@ class SandboxService {
             }.firstOrNull()?.let {
                 it[AccessTokens.token]
             } ?: run {
+                // Get accountId from application
+                val accountId = Applications.select { Applications.id eq applicationId }
+                    .firstOrNull()?.get(Applications.accountId)
+                    ?: throw IllegalStateException("Application not found")
+                
                 // Create a test token
                 val token = "tbd_${environment.substring(0, 4)}_${UUID.randomUUID().toString().replace("-", "")}"
                 AccessTokens.insert {
+                    it[AccessTokens.accountId] = accountId
                     it[AccessTokens.applicationId] = applicationId
                     it[AccessTokens.token] = token
                     it[AccessTokens.environment] = environment
                     it[AccessTokens.name] = "Sandbox Test Token"
-                    it[AccessTokens.status] = "active"
                     it[AccessTokens.createdAt] = Instant.now()
                     it[AccessTokens.expiresAt] = null // Never expires for test tokens
                 } get AccessTokens.token
