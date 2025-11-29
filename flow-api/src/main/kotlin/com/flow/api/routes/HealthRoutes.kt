@@ -13,21 +13,38 @@ data class HealthResponse(
     val version: String = "1.0.0"
 )
 
+@Serializable
+data class ApiInfoResponse(
+    val service: String,
+    val status: String,
+    val version: String,
+    val endpoints: EndpointsInfo
+)
+
+@Serializable
+data class EndpointsInfo(
+    val health: String,
+    val accounts: String,
+    val auth: String,
+    val applications: String,
+    val yield: String
+)
+
 fun Application.healthRoutes() {
     routing {
         get("/") {
             call.respond(
                 HttpStatusCode.OK,
-                mapOf(
-                    "service" to "Flow API Gateway",
-                    "status" to "running",
-                    "version" to "1.0.0",
-                    "endpoints" to mapOf(
-                        "health" to "/health",
-                        "accounts" to "/v1/accounts",
-                        "auth" to "/v1/auth",
-                        "applications" to "/v1/applications",
-                        "yield" to "/v1/yield"
+                ApiInfoResponse(
+                    service = "Flow API Gateway",
+                    status = "running",
+                    version = "1.0.0",
+                    endpoints = EndpointsInfo(
+                        health = "/health",
+                        accounts = "/v1/accounts",
+                        auth = "/v1/auth",
+                        applications = "/v1/applications",
+                        yield = "/v1/yield"
                     )
                 )
             )
