@@ -20,8 +20,14 @@ fun Application.module() {
     // Initialize Sentry (if DSN is provided)
     sentry()
     
-    // Initialize database
-    DatabaseFactory.init()
+    // Initialize database (with error handling - don't crash if DB fails)
+    try {
+        DatabaseFactory.init()
+    } catch (e: Exception) {
+        println("❌ CRITICAL: Database initialization failed: ${e.message}")
+        e.printStackTrace()
+        // Continue anyway - health check will show DB status
+    }
     
     // Configure content negotiation (JSON)
     install(ContentNegotiation) {
