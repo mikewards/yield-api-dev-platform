@@ -17,6 +17,7 @@ fun Application.marketRoutes() {
         route("/v1/markets") {
             authenticate("bearer-auth") {
                 get {
+                    println("🔐 /v1/markets endpoint called - authentication passed")
                     try {
                         val protocolFilter = call.request.queryParameters["protocol"]
                         val currencyFilter = call.request.queryParameters["currency"]
