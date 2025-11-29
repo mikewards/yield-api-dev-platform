@@ -678,7 +678,7 @@
             };
             
             try {
-                const response = await makeApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
