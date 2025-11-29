@@ -70,13 +70,13 @@ class AaveClient {
                 // 2. Or use Aave's subgraph/GraphQL API if available
                 // 3. Or use a third-party API like Aavescan
                 
-                // For now, return a default rate
+                // For now, throw exception since we don't have a working implementation
                 // In production, this should query the Aave Pool contract:
                 // val pool = AavePool.load(contractAddress, web3j, credentials, gasProvider)
                 // val reserveData = pool.getReserveData(tokenAddress).send()
                 // val liquidityRate = reserveData.liquidityRate.toDouble() / 1e27
                 
-                0.06 // Default 6% - will be replaced with actual on-chain query
+                throw IllegalArgumentException("Aave rate fetching not yet implemented - requires on-chain query")
             } catch (e: Exception) {
                 println("⚠️ Aave API error: ${e.message}")
                 0.06 // Default 6% if all retries fail

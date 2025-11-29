@@ -39,19 +39,30 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
-                                    annual_yield_rate = 0.06,
+                                    annual_yield_rate = morphoRate,
                                     apy = morphoRate,
                                     updated_at = java.time.Instant.now().toString()
                                 ))
-                            } catch (e: Exception) {
-                                println("⚠️ Morpho rate fetch failed for $curr: ${e.message}")
+                            } catch (e: IllegalArgumentException) {
+                                // No active markets found - include in response with note
+                                println("⚠️ No active Morpho markets found for $curr: ${e.message}")
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
-                                    annual_yield_rate = 0.06,
-                                    apy = 0.06,
+                                    annual_yield_rate = 0.0,
+                                    apy = 0.0,
                                     updated_at = java.time.Instant.now().toString(),
-                                    note = "Using default rate (Morpho API error)"
+                                    note = "No active markets found"
+                                ))
+                            } catch (e: Exception) {
+                                println("⚠️ Morpho API error for $curr: ${e.message}")
+                                rates.add(YieldRate(
+                                    currency = curr,
+                                    protocol = "morpho",
+                                    annual_yield_rate = 0.0,
+                                    apy = 0.0,
+                                    updated_at = java.time.Instant.now().toString(),
+                                    note = "API error: ${e.message}"
                                 ))
                             }
                         }
@@ -64,7 +75,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "aave",
-                                    annual_yield_rate = 0.06,
+                                    annual_yield_rate = aaveRate,
                                     apy = aaveRate,
                                     updated_at = java.time.Instant.now().toString()
                                 ))
@@ -73,10 +84,10 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "aave",
-                                    annual_yield_rate = 0.06,
-                                    apy = 0.06,
+                                    annual_yield_rate = 0.0,
+                                    apy = 0.0,
                                     updated_at = java.time.Instant.now().toString(),
-                                    note = "Using default rate (Aave API error)"
+                                    note = "API error: ${e.message}"
                                 ))
                             }
                         }
