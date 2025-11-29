@@ -723,11 +723,18 @@ body {
 
 @media (max-width: 768px) {
     .nav-links {
-        gap: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
     .nav-links a:not(.btn-primary):not(.btn-secondary) {
-        display: none;
+        font-size: 13px;
+        padding: 4px 8px;
+    }
+    
+    .nav-links .btn-secondary {
+        font-size: 13px;
+        padding: 8px 16px;
     }
 
     .hero-title {
