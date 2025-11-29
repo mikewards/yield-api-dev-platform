@@ -743,6 +743,126 @@ const apiData = {
     }
 };
 
+// Function to update curl example with current environment URL
+function updateCurlExample(curlExample) {
+    const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
+    const apiUrls = window.API_URLS || {
+        staging: 'https://flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
+    };
+    
+    const currentUrl = apiUrls[env] || apiUrls.production;
+    
+    // Replace placeholder with actual URL
+    let updatedExample = curlExample.replace(/\{\{API_URL\}\}/g, currentUrl);
+    
+    // Also replace any old hardcoded URLs as fallback
+    updatedExample = updatedExample
+        .replace(/https?:\/\/api\.(flow|tbd)\.com/g, currentUrl)
+        .replace(/https?:\/\/[^\s\/]+(?=\/v1)/g, currentUrl);
+    
+    const curlExampleEl = document.getElementById('curl-example');
+    if (curlExampleEl) {
+        curlExampleEl.textContent = updatedExample;
+    }
+}
+
+// Function to set up environment toggle
+function setupEnvironmentToggle() {
+    const envButtons = document.querySelectorAll('.env-btn');
+    if (envButtons.length === 0) return;
+    
+    const currentEnv = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
+    
+    // Set initial active state
+    envButtons.forEach(btn => {
+        if (btn.dataset.env === currentEnv) {
+            btn.classList.add('active');
+            btn.style.background = '#0f172a';
+            btn.style.color = 'white';
+            btn.style.fontWeight = '600';
+        } else {
+            btn.classList.remove('active');
+            btn.style.background = 'transparent';
+            btn.style.color = '#64748b';
+            btn.style.fontWeight = '500';
+        }
+    });
+    
+    // Add click handlers
+    envButtons.forEach(btn => {
+        // Remove any existing listeners by cloning
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const selectedEnv = this.dataset.env;
+            
+            // Update active state
+            document.querySelectorAll('.env-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = 'transparent';
+                b.style.color = '#64748b';
+                b.style.fontWeight = '500';
+            });
+            
+            this.classList.add('active');
+            this.style.background = '#0f172a';
+            this.style.color = 'white';
+            this.style.fontWeight = '600';
+            
+            // Update global environment
+            if (window.setApiEnvironment) {
+                window.setApiEnvironment(selectedEnv);
+            }
+            
+            // Update curl example
+            const endpoint = getCurrentEndpoint();
+            if (endpoint && endpoint.curlExample) {
+                updateCurlExample(endpoint.curlExample);
+            }
+        });
+    });
+    
+    // Listen for environment changes from other parts of the app
+    window.addEventListener('apiEnvironmentChanged', function(event) {
+        const newEnv = event.detail;
+        envButtons.forEach(btn => {
+            if (btn.dataset.env === newEnv) {
+                btn.classList.add('active');
+                btn.style.background = '#0f172a';
+                btn.style.color = 'white';
+                btn.style.fontWeight = '600';
+            } else {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = '#64748b';
+                btn.style.fontWeight = '500';
+            }
+        });
+        
+        const endpoint = getCurrentEndpoint();
+        if (endpoint && endpoint.curlExample) {
+            updateCurlExample(endpoint.curlExample);
+        }
+    });
+}
+
+// Helper function to get current endpoint data
+function getCurrentEndpoint() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resource = urlParams.get('resource');
+    const action = urlParams.get('action');
+    
+    if (resource && action && apiData[resource] && apiData[resource][action]) {
+        return apiData[resource][action];
+    }
+    return null;
+}
+
 // Initialize page based on URL parameters
 function initializePage() {
     const urlParams = new URLSearchParams(window.location.search);
