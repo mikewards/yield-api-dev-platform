@@ -418,67 +418,15 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <div id="applications-demo-container" class="demo-container" style="flex: 1; min-height: 500px; overflow-y: auto;">
-                            <div class="demo-header">
-                                <div class="demo-title">Applications</div>
-                                <button class="demo-btn-primary" onclick="createApplicationDemo()">+ Create Application</button>
-                            </div>
-                            <div class="demo-list" id="applications-demo-list">
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">My DeFi App</div>
-                                            <div class="demo-card-id">app_abc123def456</div>
-                                        </div>
-                                        <div class="demo-badge">Active</div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Environment</div>
-                                            <div class="demo-detail-value">Sandbox & Production</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">API Keys</div>
-                                            <div class="demo-detail-value">2 Active</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Created</div>
-                                            <div class="demo-detail-value">2 days ago</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Wallets</div>
-                                            <div class="demo-detail-value">3 Wallets</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">Production App</div>
-                                            <div class="demo-card-id">app_xyz789ghi012</div>
-                                        </div>
-                                        <div class="demo-badge">Active</div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Environment</div>
-                                            <div class="demo-detail-value">Production</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">API Keys</div>
-                                            <div class="demo-detail-value">1 Active</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Created</div>
-                                            <div class="demo-detail-value">1 week ago</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Wallets</div>
-                                            <div class="demo-detail-value">1 Wallet</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="applications-iframe"
+                                src="sdk-demos/applications-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
                         </div>
                     </div>
                 </div>
@@ -547,65 +495,15 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <div id="wallets-demo-container" class="demo-container" style="flex: 1; min-height: 500px; overflow-y: auto;">
-                            <div class="demo-header">
-                                <div class="demo-title">Wallets</div>
-                                <button class="demo-btn-primary" onclick="createWalletDemo()">+ Create Wallet</button>
-                            </div>
-                            <div class="demo-list" id="wallets-demo-list">
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">Main Wallet</div>
-                                            <div class="demo-card-id">0x742d35Cc6635C0532925a3b844Bc9e7595f0bEb</div>
-                                        </div>
-                                        <div class="wallet-balance">
-                                            <div class="balance-amount">$1,250.50</div>
-                                            <div class="balance-yield">+$12.50 yield</div>
-                                        </div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Balance</div>
-                                            <div class="demo-detail-value">1,250.50 USDC</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Transactions</div>
-                                            <div class="demo-detail-value">47</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Created</div>
-                                            <div class="demo-detail-value">5 days ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">Savings Wallet</div>
-                                            <div class="demo-card-id">0x8f3a12Bd4567890aBc123DeF4567890aBc123DeF</div>
-                                        </div>
-                                        <div class="wallet-balance">
-                                            <div class="balance-amount">$5,000.00</div>
-                                            <div class="balance-yield">+$50.00 yield</div>
-                                        </div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Balance</div>
-                                            <div class="demo-detail-value">5,000.00 USDC</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Transactions</div>
-                                            <div class="demo-detail-value">12</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Created</div>
-                                            <div class="demo-detail-value">2 weeks ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="wallets-iframe"
+                                src="sdk-demos/wallets-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
                         </div>
                     </div>
                 </div>
@@ -674,73 +572,15 @@
                             <h4>Live Preview</h4>
                             <div class="preview-badge">LIVE</div>
                         </div>
-                        <div id="yield-demo-container" class="demo-container" style="flex: 1; min-height: 500px; overflow-y: auto;">
-                            <div class="demo-header">
-                                <div class="demo-title">Yield Accounts</div>
-                                <button class="demo-btn-primary" onclick="createYieldAccountDemo()">+ Create Account</button>
-                            </div>
-                            <div class="demo-list" id="yield-demo-list">
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">USDC Yield Account</div>
-                                            <div style="font-size: 14px; color: #10B981; font-weight: 600;">6% APY</div>
-                                        </div>
-                                        <div class="wallet-balance">
-                                            <div class="yield-balance-main">$10,600.00</div>
-                                            <div class="yield-balance-earned">+$600.00 earned</div>
-                                        </div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Deposited</div>
-                                            <div class="demo-detail-value">$10,000.00</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Yield Earned</div>
-                                            <div class="demo-detail-value" style="color: #10B981;">+$600.00</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">APY</div>
-                                            <div class="demo-detail-value">6.00%</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Status</div>
-                                            <div class="demo-detail-value" style="color: #10B981;">Active</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="demo-card">
-                                    <div class="demo-card-header">
-                                        <div>
-                                            <div class="demo-card-name">ETH Yield Account</div>
-                                            <div style="font-size: 14px; color: #10B981; font-weight: 600;">6% APY</div>
-                                        </div>
-                                        <div class="wallet-balance">
-                                            <div class="yield-balance-main">2.65 ETH</div>
-                                            <div class="yield-balance-earned">+0.15 ETH earned</div>
-                                        </div>
-                                    </div>
-                                    <div class="demo-details">
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Deposited</div>
-                                            <div class="demo-detail-value">2.5 ETH</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Yield Earned</div>
-                                            <div class="demo-detail-value" style="color: #10B981;">+0.15 ETH</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">APY</div>
-                                            <div class="demo-detail-value">6.00%</div>
-                                        </div>
-                                        <div class="demo-detail-item">
-                                            <div class="demo-detail-label">Status</div>
-                                            <div class="demo-detail-value" style="color: #10B981;">Active</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div style="flex: 1; min-height: 500px; position: relative;">
+                            <iframe 
+                                id="yield-iframe"
+                                src="sdk-demos/yield-accounts-demo.html"
+                                style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+                                frameborder="0"
+                                allow="fullscreen"
+                                loading="eager"
+                            ></iframe>
                         </div>
                     </div>
                 </div>
@@ -849,46 +689,14 @@
   frameborder="0"
 ></iframe>`;
 
-        function createWalletDemo() {
-            const list = document.getElementById('wallets-demo-list');
-            const address = '0x' + Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-            const formattedAddress = address.substring(0, 10) + '...' + address.substring(36);
-            const balance = (Math.random() * 2000).toFixed(2);
-            const yieldAmount = (balance * 0.01).toFixed(2);
-            
-            const newWallet = document.createElement('div');
-            newWallet.className = 'demo-card new';
-            newWallet.innerHTML = `
-                <div class="demo-card-header">
-                    <div>
-                        <div class="demo-card-name">New Wallet</div>
-                        <div class="demo-card-id">${formattedAddress}</div>
-                    </div>
-                    <div class="wallet-balance">
-                        <div class="balance-amount">$${balance}</div>
-                        <div class="balance-yield">+$${yieldAmount} yield</div>
-                    </div>
-                </div>
-                <div class="demo-details">
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Balance</div>
-                        <div class="demo-detail-value">${balance} USDC</div>
-                    </div>
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Transactions</div>
-                        <div class="demo-detail-value">0</div>
-                    </div>
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Created</div>
-                        <div class="demo-detail-value">Just now</div>
-                    </div>
-                </div>
-            `;
-            list.insertBefore(newWallet, list.firstChild);
-        }
-        
         function runWalletsCode() {
-            // Demo is already embedded, just refresh if needed
+            const iframe = document.getElementById('wallets-iframe');
+            // Force reload the demo page
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = 'sdk-demos/wallets-demo.html';
+            }, 10);
         }
 
         function resetWalletsCode() {
@@ -912,57 +720,14 @@
   frameborder="0"
 ></iframe>`;
 
-        function createYieldAccountDemo() {
-            const list = document.getElementById('yield-demo-list');
-            const currencies = ['USDC', 'ETH', 'DAI', 'USDT'];
-            const currency = currencies[Math.floor(Math.random() * currencies.length)];
-            const deposited = currency === 'ETH' 
-                ? (Math.random() * 5 + 1).toFixed(2) + ' ETH'
-                : '$' + (Math.random() * 10000 + 1000).toFixed(2);
-            const earned = currency === 'ETH'
-                ? '+' + (parseFloat(deposited) * 0.06).toFixed(2) + ' ETH'
-                : '+$' + (parseFloat(deposited.replace('$', '')) * 0.06).toFixed(2);
-            const total = currency === 'ETH'
-                ? (parseFloat(deposited) * 1.06).toFixed(2) + ' ETH'
-                : '$' + (parseFloat(deposited.replace('$', '')) * 1.06).toFixed(2);
-            
-            const newAccount = document.createElement('div');
-            newAccount.className = 'demo-card new';
-            newAccount.innerHTML = `
-                <div class="demo-card-header">
-                    <div>
-                        <div class="demo-card-name">${currency} Yield Account</div>
-                        <div style="font-size: 14px; color: #10B981; font-weight: 600;">6% APY</div>
-                    </div>
-                    <div class="wallet-balance">
-                        <div class="yield-balance-main">${total}</div>
-                        <div class="yield-balance-earned">${earned} earned</div>
-                    </div>
-                </div>
-                <div class="demo-details">
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Deposited</div>
-                        <div class="demo-detail-value">${deposited}</div>
-                    </div>
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Yield Earned</div>
-                        <div class="demo-detail-value" style="color: #10B981;">${earned}</div>
-                    </div>
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">APY</div>
-                        <div class="demo-detail-value">6.00%</div>
-                    </div>
-                    <div class="demo-detail-item">
-                        <div class="demo-detail-label">Status</div>
-                        <div class="demo-detail-value" style="color: #10B981;">Active</div>
-                    </div>
-                </div>
-            `;
-            list.insertBefore(newAccount, list.firstChild);
-        }
-        
         function runYieldCode() {
-            // Demo is already embedded, just refresh if needed
+            const iframe = document.getElementById('yield-iframe');
+            // Force reload the demo page
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = 'sdk-demos/yield-accounts-demo.html';
+            }, 10);
         }
 
         function resetYieldCode() {
@@ -979,7 +744,8 @@
 
         // Auto-update preview as you type (debounced)
         document.addEventListener('DOMContentLoaded', function() {
-            // Demos are already embedded, no need to load anything
+            // Iframes already have src set, they'll load automatically
+            // Only update when code changes
             
             // Auto-update preview as you type (debounced)
             let updateTimeout;
