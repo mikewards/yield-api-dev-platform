@@ -5,11 +5,11 @@
     'use strict';
     
     // API URLs for different environments
-    // These can be customized or use custom domains (e.g., api.tbd.com)
+    // Using Railway URLs - can be easily switched to custom domains later
     const API_URLS = {
         local: 'http://localhost:8080',
-        staging: 'https://api-sandbox.tbd.com', // Replace with your sandbox domain
-        production: 'https://api.tbd.com' // Replace with your production domain
+        staging: 'https://flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
     };
     
     // Detect environment from hostname
