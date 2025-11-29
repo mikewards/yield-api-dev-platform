@@ -51,10 +51,20 @@ fun Application.healthRoutes() {
         }
         
         get("/health") {
+            // Test database connection
+            val dbStatus = try {
+                org.jetbrains.exposed.sql.transactions.transaction {
+                    org.jetbrains.exposed.sql.select(1).firstOrNull()
+                }
+                "connected"
+            } catch (e: Exception) {
+                "disconnected: ${e.message?.take(50)}"
+            }
+            
             call.respond(
                 HttpStatusCode.OK,
                 HealthResponse(
-                    status = "healthy",
+                    status = if (dbStatus == "connected") "healthy" else "degraded",
                     timestamp = System.currentTimeMillis().toString()
                 )
             )
