@@ -12,6 +12,7 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 val ktorVersion = "2.3.5"
