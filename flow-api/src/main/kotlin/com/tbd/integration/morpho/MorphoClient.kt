@@ -126,12 +126,12 @@ class MorphoClient {
                 } ?: emptyList()
                 
                 // Find the market with the highest APY (best rate for users)
-                // Filter out null/zero rates and unrealistic APYs (>100% = 1.0)
+                // Filter out null/zero rates only
                 // APY values are in decimal format (0.06 = 6%, 1.0 = 100%)
                 val bestMarket = matchingMarkets
                     .mapNotNull { market ->
                         val apy = market.state?.supplyApy
-                        if (apy != null && apy > 0.0 && apy <= 1.0) {
+                        if (apy != null && apy > 0.0) {
                             Pair(market, apy)
                         } else {
                             null
@@ -142,9 +142,13 @@ class MorphoClient {
                 // supplyApy is already a decimal (e.g., 0.06 for 6%), not a percentage
                 // Return the best rate found, or throw exception if no active markets
                 bestMarket?.second ?: throw IllegalArgumentException("No active markets found for currency: $currency")
+            } catch (e: IllegalArgumentException) {
+                // Re-throw IllegalArgumentException (no markets found) so route handler can handle it
+                throw e
             } catch (e: Exception) {
+                // For other exceptions (network errors, etc.), throw as well
                 println("⚠️ Morpho API error: ${e.message}")
-                0.06 // Default 6% if all retries fail
+                throw e
             }
         }
     }
