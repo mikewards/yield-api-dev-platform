@@ -756,15 +756,59 @@ function updateCurlExample(curlExample) {
     // Replace placeholder with actual URL
     let updatedExample = curlExample.replace(/\{\{API_URL\}\}/g, currentUrl);
     
-    // Also replace any old hardcoded URLs as fallback
-    updatedExample = updatedExample
-        .replace(/https?:\/\/api\.(flow|tbd)\.com/g, currentUrl)
-        .replace(/https?:\/\/[^\s\/]+(?=\/v1)/g, currentUrl);
+    // Replace any hardcoded URLs (including Railway URLs, api.tbd.com, api.flow.com, etc.)
+    const urlPatterns = [
+        /https?:\/\/api\.(flow|tbd)\.com/g,
+        /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
+        /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
+        /https?:\/\/flow-platform-production\.up\.railway\.app/g,
+        /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+        /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g  // Any Railway URL before /v1
+    ];
+    
+    urlPatterns.forEach(pattern => {
+        updatedExample = updatedExample.replace(pattern, currentUrl);
+    });
     
     const curlExampleEl = document.getElementById('curl-example');
     if (curlExampleEl) {
         curlExampleEl.textContent = updatedExample;
     }
+}
+
+// Function to update all CURL examples on the page (for when environment changes)
+function updateAllCurlExamples() {
+    const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
+    const apiUrls = window.API_URLS || {
+        staging: 'https://flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
+    };
+    
+    const currentUrl = apiUrls[env] || apiUrls.production;
+    
+    // Find all code blocks that contain curl commands
+    document.querySelectorAll('code, pre').forEach(el => {
+        let text = el.textContent;
+        if (text.includes('curl ') && text.includes('/v1/')) {
+            const urlPatterns = [
+                /https?:\/\/api\.(flow|tbd)\.com/g,
+                /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
+                /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
+                /https?:\/\/flow-platform-production\.up\.railway\.app/g,
+                /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+                /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g
+            ];
+            
+            let updated = text;
+            urlPatterns.forEach(pattern => {
+                updated = updated.replace(pattern, currentUrl);
+            });
+            
+            if (updated !== text) {
+                el.textContent = updated;
+            }
+        }
+    });
 }
 
 // Function to set up environment toggle
@@ -838,7 +882,39 @@ function setupEnvironmentToggle() {
             if (endpoint && endpoint.curlExample) {
                 updateCurlExample(endpoint.curlExample);
             }
+            
+            // Also update all CURL examples on the page
+            updateAllCurlExamples();
         });
+    });
+    
+    // Listen for environment changes from other sources (like env-toggle.js)
+    window.addEventListener('apiEnvironmentChanged', function(event) {
+        const env = event.detail;
+        
+        // Update button states
+        document.querySelectorAll('.env-btn').forEach(btn => {
+            if (btn.dataset.env === env) {
+                btn.classList.add('active');
+                btn.style.background = '#0f172a';
+                btn.style.color = 'white';
+                btn.style.fontWeight = '600';
+            } else {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = '#64748b';
+                btn.style.fontWeight = '500';
+            }
+        });
+        
+        // Update curl example
+        const endpoint = getCurrentEndpoint();
+        if (endpoint && endpoint.curlExample) {
+            updateCurlExample(endpoint.curlExample);
+        }
+        
+        // Also update all CURL examples on the page
+        updateAllCurlExamples();
     });
     
     // Listen for environment changes from other parts of the app
