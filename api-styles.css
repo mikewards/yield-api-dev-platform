@@ -140,6 +140,17 @@
     font-weight: 600;
 }
 
+.sidebar-list a[style*="padding-left"] {
+    color: var(--text-tertiary);
+    font-size: 12px !important;
+    padding-left: 16px !important;
+    font-weight: 400;
+}
+
+.sidebar-list a[style*="padding-left"]:hover {
+    color: var(--primary);
+}
+
 /* Main Content */
 .api-main {
     background: var(--bg-white);
