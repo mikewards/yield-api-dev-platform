@@ -18,30 +18,35 @@
                        hostname === '127.0.0.1' ||
                        hostname === '';
     
-    // Check if we're on a staging domain (you can customize this)
-    const isStaging = hostname.includes('staging') || 
-                     hostname.includes('stage') ||
-                     localStorage.getItem('api_environment') === 'staging';
+    // Check if we're on a staging domain (only check hostname, not localStorage)
+    const isStagingDomain = hostname.includes('staging') || hostname.includes('stage');
     
-    // Check if user has manually selected an environment
+    // Check if user has manually selected an environment (only for API docs, not user pages)
+    // For user-facing pages (sign-in, dashboard), always use production unless on staging domain
     const manualEnvironment = localStorage.getItem('api_environment');
+    const isUserPage = window.location.pathname.includes('signin') || 
+                       window.location.pathname.includes('account') ||
+                       window.location.pathname.includes('dashboard');
     
     // Determine API URL
     let API_BASE_URL;
     if (isLocalhost) {
         API_BASE_URL = API_URLS.local;
-    } else if (manualEnvironment && API_URLS[manualEnvironment]) {
-        API_BASE_URL = API_URLS[manualEnvironment];
-    } else if (isStaging) {
+    } else if (isStagingDomain) {
+        // If on staging domain, use staging API
         API_BASE_URL = API_URLS.staging;
+    } else if (manualEnvironment && API_URLS[manualEnvironment] && !isUserPage) {
+        // Manual override only for API docs, not user pages
+        API_BASE_URL = API_URLS[manualEnvironment];
     } else {
+        // Default to production for all user-facing pages
         API_BASE_URL = API_URLS.production;
     }
     
     // Make it globally available
     window.API_BASE_URL = API_BASE_URL;
     window.API_URLS = API_URLS;
-    window.API_ENVIRONMENT = isLocalhost ? 'local' : (manualEnvironment || (isStaging ? 'staging' : 'production'));
+    window.API_ENVIRONMENT = isLocalhost ? 'local' : (isStagingDomain ? 'staging' : (manualEnvironment && !isUserPage ? manualEnvironment : 'production'));
     
     // Function to switch environment (for documentation toggles)
     window.setApiEnvironment = function(env) {
