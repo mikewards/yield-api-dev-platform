@@ -427,6 +427,11 @@
   height="600"
   frameborder="0"
   allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Applications SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 &gt;&lt;/iframe&gt;</textarea>
                     </div>
                 </div>
@@ -504,6 +509,12 @@
   width="100%"
   height="600"
   frameborder="0"
+  allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Wallets SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 &gt;&lt;/iframe&gt;</textarea>
                     </div>
                 </div>
@@ -581,6 +592,12 @@
   width="100%"
   height="700"
   frameborder="0"
+  allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Yield Accounts SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 &gt;&lt;/iframe&gt;</textarea>
                     </div>
                 </div>
@@ -648,6 +665,120 @@
 
     <script src="nav-auth.js"></script>
     <script>
+        // Comprehensive iframe attribute parser
+        function parseIframeAttributes(code) {
+            const attributes = {};
+            
+            // Parse all standard attributes
+            const attrPatterns = {
+                width: /width=["']([^"']+)["']/i,
+                height: /height=["']([^"']+)["']/i,
+                src: /src=["']([^"']+)["']/i,
+                frameborder: /frameborder=["']([^"']+)["']/i,
+                allowtransparency: /allowtransparency=["']([^"']+)["']/i,
+                scrolling: /scrolling=["']([^"']+)["']/i,
+                allow: /allow=["']([^"']+)["']/i,
+                sandbox: /sandbox=["']([^"']+)["']/i,
+                loading: /loading=["']([^"']+)["']/i,
+                referrerpolicy: /referrerpolicy=["']([^"']+)["']/i,
+                title: /title=["']([^"']+)["']/i,
+                name: /name=["']([^"']+)["']/i,
+                id: /id=["']([^"']+)["']/i,
+                class: /class=["']([^"']+)["']/i
+            };
+            
+            for (const [attr, pattern] of Object.entries(attrPatterns)) {
+                const match = code.match(pattern);
+                if (match) {
+                    attributes[attr] = match[1];
+                }
+            }
+            
+            // Parse inline style attribute
+            const styleMatch = code.match(/style=["']([^"']+)["']/i);
+            if (styleMatch) {
+                attributes.style = styleMatch[1];
+            }
+            
+            return attributes;
+        }
+        
+        function applyIframeAttributes(iframe, attributes) {
+            // Apply width and height (with proper unit handling)
+            if (attributes.width) {
+                const width = attributes.width;
+                if (width.includes('%') || width.includes('px') || width.includes('em') || width.includes('rem') || width.includes('vw')) {
+                    iframe.style.width = width;
+                } else {
+                    iframe.style.width = width + 'px';
+                }
+            }
+            
+            if (attributes.height) {
+                const height = attributes.height;
+                if (height.includes('%') || height.includes('px') || height.includes('em') || height.includes('rem') || height.includes('vh')) {
+                    iframe.style.height = height;
+                } else {
+                    iframe.style.height = height + 'px';
+                }
+            }
+            
+            // Apply frameborder (convert to CSS border)
+            if (attributes.frameborder !== undefined) {
+                const frameborder = attributes.frameborder;
+                if (frameborder === '0' || frameborder === 'no') {
+                    iframe.style.border = 'none';
+                } else {
+                    const borderWidth = frameborder || '1px';
+                    iframe.style.border = `${borderWidth} solid #E2E8F0`;
+                }
+                iframe.setAttribute('frameborder', frameborder);
+            }
+            
+            // Apply allowtransparency (convert to CSS background)
+            if (attributes.allowtransparency !== undefined) {
+                if (attributes.allowtransparency === 'true' || attributes.allowtransparency === '1') {
+                    iframe.style.background = 'transparent';
+                } else {
+                    iframe.style.background = '';
+                }
+                iframe.setAttribute('allowtransparency', attributes.allowtransparency);
+            }
+            
+            // Apply scrolling (convert to CSS overflow)
+            if (attributes.scrolling) {
+                iframe.setAttribute('scrolling', attributes.scrolling);
+                if (attributes.scrolling === 'no' || attributes.scrolling === '0') {
+                    iframe.style.overflow = 'hidden';
+                } else if (attributes.scrolling === 'yes' || attributes.scrolling === 'auto') {
+                    iframe.style.overflow = 'auto';
+                }
+            }
+            
+            // Apply standard attributes
+            const standardAttrs = ['src', 'allow', 'sandbox', 'loading', 'referrerpolicy', 'title', 'name', 'id', 'class'];
+            standardAttrs.forEach(attr => {
+                if (attributes[attr] !== undefined) {
+                    if (attr === 'src' && !attributes[attr].includes('sdk-demos')) {
+                        // Keep demo src for preview unless it's a demo file
+                        return;
+                    }
+                    iframe.setAttribute(attr, attributes[attr]);
+                }
+            });
+            
+            // Apply inline style (merge with existing styles)
+            if (attributes.style) {
+                const stylePairs = attributes.style.split(';').filter(s => s.trim());
+                stylePairs.forEach(pair => {
+                    const [prop, value] = pair.split(':').map(s => s.trim());
+                    if (prop && value) {
+                        iframe.style[prop.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = value;
+                    }
+                });
+            }
+        }
+
         // Applications SDK Playground
         const applicationsDefaultCode = `<!-- Embed Applications SDK -->
 <iframe
@@ -656,46 +787,26 @@
   height="600"
   frameborder="0"
   allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Applications SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runApplicationsCode() {
             const code = document.getElementById('applications-code').value;
             const iframe = document.getElementById('applications-iframe');
+            const attributes = parseIframeAttributes(code);
             
-            // Parse iframe attributes from code
-            const heightMatch = code.match(/height=["']([^"']+)["']/i);
-            const widthMatch = code.match(/width=["']([^"']+)["']/i);
-            const srcMatch = code.match(/src=["']([^"']+)["']/i);
-            const frameborderMatch = code.match(/frameborder=["']([^"']+)["']/i);
-            
-            // Update iframe attributes
-            if (heightMatch) {
-                const height = heightMatch[1];
-                if (height.includes('%')) {
-                    iframe.style.height = height;
-                } else if (height.includes('px')) {
-                    iframe.style.height = height;
-                } else {
-                    iframe.style.height = height + 'px';
-                }
-            }
-            
-            if (widthMatch) {
-                const width = widthMatch[1];
-                iframe.style.width = width;
-            }
-            
-            // Keep demo src, but could update if src is to demo file
-            if (srcMatch && srcMatch[1].includes('sdk-demos')) {
-                iframe.src = srcMatch[1];
-            } else {
-                // Keep demo src for preview
+            // Keep demo src for preview
+            if (!attributes.src || !attributes.src.includes('sdk-demos')) {
                 iframe.src = 'sdk-demos/applications-demo.html';
+            } else {
+                iframe.src = attributes.src;
             }
             
-            if (frameborderMatch) {
-                iframe.setAttribute('frameborder', frameborderMatch[1]);
-            }
+            applyIframeAttributes(iframe, attributes);
         }
 
         function resetApplicationsCode() {
@@ -717,46 +828,27 @@
   width="100%"
   height="600"
   frameborder="0"
+  allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Wallets SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runWalletsCode() {
             const code = document.getElementById('wallets-code').value;
             const iframe = document.getElementById('wallets-iframe');
+            const attributes = parseIframeAttributes(code);
             
-            // Parse iframe attributes from code
-            const heightMatch = code.match(/height=["']([^"']+)["']/i);
-            const widthMatch = code.match(/width=["']([^"']+)["']/i);
-            const srcMatch = code.match(/src=["']([^"']+)["']/i);
-            const frameborderMatch = code.match(/frameborder=["']([^"']+)["']/i);
-            
-            // Update iframe attributes
-            if (heightMatch) {
-                const height = heightMatch[1];
-                if (height.includes('%')) {
-                    iframe.style.height = height;
-                } else if (height.includes('px')) {
-                    iframe.style.height = height;
-                } else {
-                    iframe.style.height = height + 'px';
-                }
-            }
-            
-            if (widthMatch) {
-                const width = widthMatch[1];
-                iframe.style.width = width;
-            }
-            
-            // Keep demo src, but could update if src is to demo file
-            if (srcMatch && srcMatch[1].includes('sdk-demos')) {
-                iframe.src = srcMatch[1];
-            } else {
-                // Keep demo src for preview
+            // Keep demo src for preview
+            if (!attributes.src || !attributes.src.includes('sdk-demos')) {
                 iframe.src = 'sdk-demos/wallets-demo.html';
+            } else {
+                iframe.src = attributes.src;
             }
             
-            if (frameborderMatch) {
-                iframe.setAttribute('frameborder', frameborderMatch[1]);
-            }
+            applyIframeAttributes(iframe, attributes);
         }
 
         function resetWalletsCode() {
@@ -778,46 +870,27 @@
   width="100%"
   height="700"
   frameborder="0"
+  allowtransparency="true"
+  scrolling="auto"
+  allow="fullscreen"
+  loading="eager"
+  title="Flow Yield Accounts SDK"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runYieldCode() {
             const code = document.getElementById('yield-code').value;
             const iframe = document.getElementById('yield-iframe');
+            const attributes = parseIframeAttributes(code);
             
-            // Parse iframe attributes from code
-            const heightMatch = code.match(/height=["']([^"']+)["']/i);
-            const widthMatch = code.match(/width=["']([^"']+)["']/i);
-            const srcMatch = code.match(/src=["']([^"']+)["']/i);
-            const frameborderMatch = code.match(/frameborder=["']([^"']+)["']/i);
-            
-            // Update iframe attributes
-            if (heightMatch) {
-                const height = heightMatch[1];
-                if (height.includes('%')) {
-                    iframe.style.height = height;
-                } else if (height.includes('px')) {
-                    iframe.style.height = height;
-                } else {
-                    iframe.style.height = height + 'px';
-                }
-            }
-            
-            if (widthMatch) {
-                const width = widthMatch[1];
-                iframe.style.width = width;
-            }
-            
-            // Keep demo src, but could update if src is to demo file
-            if (srcMatch && srcMatch[1].includes('sdk-demos')) {
-                iframe.src = srcMatch[1];
-            } else {
-                // Keep demo src for preview
+            // Keep demo src for preview
+            if (!attributes.src || !attributes.src.includes('sdk-demos')) {
                 iframe.src = 'sdk-demos/yield-accounts-demo.html';
+            } else {
+                iframe.src = attributes.src;
             }
             
-            if (frameborderMatch) {
-                iframe.setAttribute('frameborder', frameborderMatch[1]);
-            }
+            applyIframeAttributes(iframe, attributes);
         }
 
         function resetYieldCode() {
