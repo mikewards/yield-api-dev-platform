@@ -9,6 +9,227 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Guides-style layout for API Reference */
+        .api-reference-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 64px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+            background: var(--bg-white);
+        }
+        
+        .api-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .api-main {
+            max-width: 800px;
+        }
+        
+        .api-page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        
+        .api-page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+        
+        .api-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 100px;
+        }
+        
+        .api-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        
+        .section-description {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .api-resource {
+            margin-bottom: 32px;
+            scroll-margin-top: 100px;
+        }
+        
+        .resource-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .resource-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .resource-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-link {
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            gap: 16px;
+            padding: 12px 16px;
+            background: var(--bg-gray);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.15s;
+            align-items: start;
+        }
+        
+        .action-link:hover {
+            background: var(--bg-gray-dark);
+        }
+        
+        .action-method {
+            display: inline-block;
+            padding: 4px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: fit-content;
+        }
+        
+        .action-method.post { background: #10B981; }
+        .action-method.get { background: #006aff; }
+        .action-method.put, .action-method.patch { background: #F59E0B; }
+        .action-method.delete { background: #EF4444; }
+        
+        .action-path {
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .action-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Sidebar styling to match Guides */
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            margin-top: 0;
+        }
+        
+        .sidebar-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-list li {
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-list a {
+            display: block;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        
+        .sidebar-list a:hover {
+            color: var(--text-primary);
+            background: var(--bg-gray);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 900px) {
+            .api-reference-layout {
+                display: block;
+                padding: 24px 16px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .api-sidebar {
+                display: none;
+            }
+            
+            .api-main {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .api-page-title {
+                font-size: 28px;
+            }
+            
+            .api-page-subtitle {
+                font-size: 16px;
+            }
+            
+            .api-section h2 {
+                font-size: 20px;
+            }
+            
+            .action-link {
+                grid-template-columns: 60px 1fr;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .action-method {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            
+            .action-path {
+                font-size: 13px;
+                word-break: break-all;
+            }
+            
+            .action-desc {
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -73,32 +294,10 @@
         </div>
     </nav>
 
-    <!-- API Reference Header -->
-    <section class="api-header">
-        <div class="container">
-            <div class="api-header-content">
-                <h1>API Reference</h1>
-                <p class="api-subtitle">
-                    TBD API guides provide all the information you need to build DeFi applications. 
-                    Our REST APIs wrap Morpho and Aave protocols, giving you a unified interface for yield generation.
-                </p>
-                <div class="api-version">
-                    <span>API version</span>
-                    <select class="version-select">
-                        <option>2025-01-15</option>
-                    </select>
-                    <a href="#" class="version-link">All versions →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- API Reference Content -->
-    <section class="api-content">
-        <div class="container">
-            <div class="api-layout">
-                <!-- Sidebar -->
-                <aside class="api-sidebar">
+    <!-- API Reference Content - Guides-style layout -->
+    <div class="api-reference-layout">
+        <!-- Sidebar -->
+        <aside class="api-sidebar">
                     <div class="sidebar-section">
                         <h3>Dev Essentials</h3>
                         <ul class="sidebar-list">
@@ -146,14 +345,15 @@
 
                 <!-- Main Content -->
                 <main class="api-main">
+                    <h1 class="api-page-title">API Reference</h1>
+                    <p class="api-page-subtitle">Complete API documentation for TBD's DeFi yield platform. Our REST APIs wrap Morpho and Aave protocols for a unified interface.</p>
+                    
                     <!-- Dev Essentials Section -->
                     <section id="dev-essentials" class="api-section">
-                        <div class="section-header">
-                            <h2>Dev Essentials</h2>
-                            <p class="section-description">
-                                Authenticate your app, manage accounts, create access tokens, and subscribe to webhooks.
-                            </p>
-                        </div>
+                        <h2>Dev Essentials</h2>
+                        <p class="section-description">
+                            Authenticate your app, manage accounts, create access tokens, and subscribe to webhooks.
+                        </p>
 
                         <!-- Authentication Resource -->
                         <div class="api-resource" id="authentication">
@@ -348,13 +548,11 @@
 
                     <!-- Yield Section -->
                     <section id="yield" class="api-section">
-                        <div class="section-header">
-                            <h2>Yield</h2>
-                            <p class="section-description">
-                                Create yield accounts, manage positions, and track yield generation across supported cryptocurrencies. 
-                                TBD wraps Morpho and Aave protocols to provide a unified 6% yield interface.
-                            </p>
-                        </div>
+                        <h2>Yield</h2>
+                        <p class="section-description">
+                            Create yield accounts, manage positions, and track yield generation across supported cryptocurrencies. 
+                            TBD wraps Morpho and Aave protocols to provide a unified 6% yield interface.
+                        </p>
 
                         <!-- Yield Accounts Resource -->
                         <div class="api-resource" id="yield-accounts">
@@ -448,13 +646,11 @@
                     </section>
 
                     <!-- Markets Section -->
-                    <section id="markets" class="api-section">
-                        <div class="section-header">
-                            <h2>Markets</h2>
-                            <p class="section-description">
-                                Explore available markets and protocols. TBD aggregates data from Morpho and Aave to show you all available yield opportunities.
-                            </p>
-                        </div>
+                    <section id="markets-section" class="api-section">
+                        <h2>Markets</h2>
+                        <p class="section-description">
+                            Explore available markets and protocols. TBD aggregates data from Morpho and Aave to show you all available yield opportunities.
+                        </p>
 
                         <div class="api-resource" id="markets">
                             <div class="resource-header">
@@ -477,13 +673,11 @@
                     </section>
 
                     <!-- Transactions Section -->
-                    <section id="transactions" class="api-section">
-                        <div class="section-header">
-                            <h2>Transactions</h2>
-                            <p class="section-description">
-                                Track all transactions including deposits, withdrawals, and yield accruals across your accounts.
-                            </p>
-                        </div>
+                    <section id="transactions-section" class="api-section">
+                        <h2>Transactions</h2>
+                        <p class="section-description">
+                            Track all transactions including deposits, withdrawals, and yield accruals across your accounts.
+                        </p>
 
                         <div class="api-resource" id="transactions">
                             <div class="resource-header">
@@ -505,9 +699,8 @@
                         </div>
                     </section>
                 </main>
-            </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

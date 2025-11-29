@@ -75,7 +75,7 @@
 /* API Content Layout */
 .api-content {
     padding: 48px 0;
-    background: var(--bg-gray);
+    background: var(--bg-white);
     min-height: calc(100vh - 200px);
 }
 
