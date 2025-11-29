@@ -460,9 +460,43 @@
         // Check authentication
         const token = localStorage.getItem('tbd_token');
         const username = localStorage.getItem('tbd_username');
+        const tokenExpires = localStorage.getItem('tbd_token_expires');
         
+        // Check if token exists and is not expired
         if (!token) {
             window.location.href = 'signin.html';
+        } else if (tokenExpires && parseInt(tokenExpires) < Date.now()) {
+            // Token expired, clear and redirect
+            localStorage.removeItem('tbd_token');
+            localStorage.removeItem('tbd_token_expires');
+            localStorage.removeItem('tbd_account_id');
+            localStorage.removeItem('tbd_username');
+            alert('Your session has expired. Please sign in again.');
+            window.location.href = 'signin.html';
+        }
+        
+        // Helper function to handle 401 errors (token expired)
+        async function handleApiCall(url, options = {}) {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.status === 401) {
+                // Token expired or invalid
+                localStorage.removeItem('tbd_token');
+                localStorage.removeItem('tbd_token_expires');
+                localStorage.removeItem('tbd_account_id');
+                localStorage.removeItem('tbd_username');
+                alert('Your session has expired. Please sign in again.');
+                window.location.href = 'signin.html';
+                return null;
+            }
+            
+            return response;
         }
         
         document.getElementById('userInfo').textContent = username || 'Account';
@@ -644,14 +678,15 @@
             };
             
             try {
-                const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
+                const response = await makeApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(body)
                 });
+                
+                if (!response) return; // Redirected to sign-in
                 
                 const data = await response.json();
                 
