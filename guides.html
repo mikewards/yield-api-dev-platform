@@ -170,8 +170,11 @@
         /* Mobile responsiveness */
         @media (max-width: 900px) {
             .guides-layout {
-                grid-template-columns: 1fr;
+                display: block;
                 padding: 24px 16px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .guides-sidebar {
@@ -179,11 +182,19 @@
             }
             
             .guides-main {
+                width: 100%;
                 max-width: 100%;
+                overflow-x: hidden;
             }
             
             .guides-main h1 {
                 font-size: 28px;
+            }
+            
+            .guide-section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
             }
             
             .guide-section h2 {
@@ -192,12 +203,28 @@
             
             .api-table {
                 display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .api-table td,
+            .api-table th {
+                font-size: 14px;
+                padding: 10px 8px;
+            }
+            
+            .code-block {
+                width: 100%;
+                max-width: 100%;
                 overflow-x: auto;
             }
             
             .code-block pre {
                 font-size: 12px;
                 padding: 16px;
+                width: max-content;
+                min-width: 100%;
             }
             
             .step-list li {
@@ -208,6 +235,17 @@
                 width: 28px;
                 height: 28px;
                 font-size: 12px;
+            }
+            
+            .method-badge {
+                font-size: 10px;
+                padding: 2px 6px;
+                margin-right: 4px;
+            }
+            
+            .endpoint-text {
+                font-size: 12px;
+                word-break: break-all;
             }
         }
         
@@ -281,7 +319,7 @@
             text-align: left;
             padding: 12px;
             border-bottom: 1px solid var(--border);
-            font-size: 14px;
+            font-size: 16px;
         }
         
         .api-table th {
@@ -294,17 +332,32 @@
         }
         
         .api-table code {
-            font-size: 12px;
+            font-size: 14px;
         }
         
-        @media (max-width: 900px) {
-            .guides-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .guides-sidebar {
-                display: none;
-            }
+        /* API Method badges with colors */
+        .method-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .method-badge.post { background: #10B981; }
+        .method-badge.get { background: #006aff; }
+        .method-badge.put, .method-badge.patch { background: #F59E0B; }
+        .method-badge.delete { background: #EF4444; }
+        
+        .endpoint-text {
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
         }
     </style>
 </head>
@@ -484,15 +537,15 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/accounts</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/accounts</span></td>
                         <td>Create a new account</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/accounts/{id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/accounts/{id}</span></td>
                         <td>Get account details</td>
                     </tr>
                     <tr>
-                        <td><code>PATCH /v1/accounts/{id}</code></td>
+                        <td><span class="method-badge patch">PATCH</span><span class="endpoint-text">/v1/accounts/{id}</span></td>
                         <td>Update account</td>
                     </tr>
                 </table>
@@ -509,19 +562,19 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/applications</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications</span></td>
                         <td>Create application</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/applications</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications</span></td>
                         <td>List applications</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/applications/{id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}</span></td>
                         <td>Get application</td>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/applications/{id}/tokens</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications/{id}/tokens</span></td>
                         <td>Create API key</td>
                     </tr>
                 </table>
@@ -538,15 +591,15 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/applications/{id}/wallets</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications/{id}/wallets</span></td>
                         <td>Create additional wallet</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/applications/{id}/wallets</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}/wallets</span></td>
                         <td>List wallets</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/applications/{id}/wallets/{wallet_id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}/wallets/{wallet_id}</span></td>
                         <td>Get wallet details</td>
                     </tr>
                 </table>
@@ -569,23 +622,23 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/yield/accounts</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts</span></td>
                         <td>Create yield account</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/yield/accounts</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/accounts</span></td>
                         <td>List yield accounts</td>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/yield/accounts/{id}/deposit</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts/{id}/deposit</span></td>
                         <td>Deposit funds</td>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/yield/accounts/{id}/withdraw</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts/{id}/withdraw</span></td>
                         <td>Withdraw funds</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/yield/rates</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/rates</span></td>
                         <td>Get current rates</td>
                     </tr>
                 </table>
@@ -602,11 +655,11 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/markets</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/markets</span></td>
                         <td>List all markets</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/markets/{id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/markets/{id}</span></td>
                         <td>Get market details</td>
                     </tr>
                 </table>
@@ -623,11 +676,11 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/yield/positions</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/positions</span></td>
                         <td>List all positions</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/yield/positions/{id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/positions/{id}</span></td>
                         <td>Get position details</td>
                     </tr>
                 </table>
@@ -644,11 +697,11 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/transactions</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/transactions</span></td>
                         <td>List transactions</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/transactions/{id}</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/transactions/{id}</span></td>
                         <td>Get transaction</td>
                     </tr>
                 </table>
@@ -673,15 +726,15 @@
                         <th>Description</th>
                     </tr>
                     <tr>
-                        <td><code>POST /v1/webhooks</code></td>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/webhooks</span></td>
                         <td>Create webhook</td>
                     </tr>
                     <tr>
-                        <td><code>GET /v1/webhooks</code></td>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/webhooks</span></td>
                         <td>List webhooks</td>
                     </tr>
                     <tr>
-                        <td><code>DELETE /v1/webhooks/{id}</code></td>
+                        <td><span class="method-badge delete">DELETE</span><span class="endpoint-text">/v1/webhooks/{id}</span></td>
                         <td>Delete webhook</td>
                     </tr>
                 </table>

@@ -990,7 +990,9 @@ function populatePage(endpoint) {
     methodBadge.className = `method-badge ${endpoint.method.toLowerCase()}`;
     
     // Update endpoint info
-    document.getElementById('endpoint-method-badge').textContent = endpoint.method;
+    const endpointMethodBadge = document.getElementById('endpoint-method-badge');
+    endpointMethodBadge.textContent = endpoint.method;
+    endpointMethodBadge.className = `endpoint-method-badge ${endpoint.method.toLowerCase()}`;
     document.getElementById('endpoint-path-inline').textContent = endpoint.path;
     document.getElementById('permissions-inline').textContent = endpoint.permissions;
     

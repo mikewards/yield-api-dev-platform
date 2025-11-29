@@ -44,18 +44,23 @@
     letter-spacing: 0.05em;
 }
 
-.method-badge.get {
+/* POST - Green (Create) */
+.method-badge.post {
     background: #10B981;
 }
 
-.method-badge.post {
-    background: var(--primary);
+/* GET - Blue (Read) */
+.method-badge.get {
+    background: #006aff;
 }
 
-.method-badge.patch {
+/* PUT/PATCH - Yellow (Update) */
+.method-badge.patch,
+.method-badge.put {
     background: #F59E0B;
 }
 
+/* DELETE - Red (Delete) */
 .method-badge.delete {
     background: #EF4444;
 }
@@ -91,6 +96,27 @@
     border-radius: 4px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+/* POST - Green (Create) */
+.endpoint-method-badge.post {
+    background: #10B981;
+}
+
+/* GET - Blue (Read) */
+.endpoint-method-badge.get {
+    background: #006aff;
+}
+
+/* PUT/PATCH - Yellow (Update) */
+.endpoint-method-badge.patch,
+.endpoint-method-badge.put {
+    background: #F59E0B;
+}
+
+/* DELETE - Red (Delete) */
+.endpoint-method-badge.delete {
+    background: #EF4444;
 }
 
 .endpoint-path-inline {
