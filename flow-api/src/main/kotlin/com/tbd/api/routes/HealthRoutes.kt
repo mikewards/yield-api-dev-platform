@@ -59,6 +59,22 @@ fun Application.healthRoutes() {
                 )
             )
         }
+        
+        // Test endpoint for Sentry (remove in production)
+        get("/test-sentry") {
+            try {
+                throw Exception("This is a test error to verify Sentry integration")
+            } catch (e: Exception) {
+                io.sentry.Sentry.captureException(e)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    mapOf(
+                        "message" to "Test error sent to Sentry",
+                        "error" to e.message
+                    )
+                )
+            }
+        }
     }
 }
 
