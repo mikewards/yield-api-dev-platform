@@ -42,17 +42,30 @@ data class MorphoGraphQLResponse(
 
 @Serializable
 data class MorphoData(
-    val markets: List<MorphoMarket>? = null
+    val markets: MorphoMarketsResponse? = null
+)
+
+@Serializable
+data class MorphoMarketsResponse(
+    val items: List<MorphoMarket>? = null
 )
 
 @Serializable
 data class MorphoMarket(
     val id: String? = null,
-    val loanToken: String? = null,
-    val collateralToken: String? = null,
-    val lltv: String? = null,
-    val apy: String? = null,
-    val totalSupplyAssets: String? = null
+    val loanAsset: MorphoAsset? = null,
+    val state: MorphoMarketState? = null
+)
+
+@Serializable
+data class MorphoAsset(
+    val symbol: String? = null,
+    val address: String? = null
+)
+
+@Serializable
+data class MorphoMarketState(
+    val supplyApy: Double? = null
 )
 
 @Serializable
@@ -86,12 +99,16 @@ class MorphoClient {
                 val query = """
                     query GetMarkets {
                         markets {
-                            id
-                            loanToken
-                            collateralToken
-                            lltv
-                            apy
-                            totalSupplyAssets
+                            items {
+                                id
+                                loanAsset {
+                                    symbol
+                                    address
+                                }
+                                state {
+                                    supplyApy
+                                }
+                            }
                         }
                     }
                 """.trimIndent()
@@ -103,12 +120,13 @@ class MorphoClient {
                 }.body()
                 
                 // Find market matching currency (USDC, USDT, etc.)
-                val market = response.data?.markets?.firstOrNull { market ->
-                    market.loanToken?.contains(currency, ignoreCase = true) == true ||
-                    market.id?.contains(currency, ignoreCase = true) == true
+                val market = response.data?.markets?.items?.firstOrNull { market ->
+                    market.loanAsset?.symbol?.equals(currency, ignoreCase = true) == true ||
+                    market.loanAsset?.address?.contains(currency, ignoreCase = true) == true
                 }
                 
-                market?.apy?.toDoubleOrNull()?.div(100.0) ?: 0.06 // Default 6% if not found
+                // supplyApy is already a decimal (e.g., 0.06 for 6%), not a percentage
+                market?.state?.supplyApy?.toDoubleOrNull() ?: 0.06 // Default 6% if not found
             } catch (e: Exception) {
                 println("⚠️ Morpho API error: ${e.message}")
                 0.06 // Default 6% if all retries fail
