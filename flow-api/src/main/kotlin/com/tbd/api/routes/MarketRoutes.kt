@@ -17,10 +17,13 @@ fun Application.marketRoutes() {
         route("/v1/markets") {
             authenticate("bearer-auth") {
                 get {
-                    val protocolFilter = call.request.queryParameters["protocol"]
-                    val currencyFilter = call.request.queryParameters["currency"]
-                    
-                    val markets = mutableListOf<Market>()
+                    try {
+                        val protocolFilter = call.request.queryParameters["protocol"]
+                        val currencyFilter = call.request.queryParameters["currency"]
+                        
+                        println("📊 Fetching markets - Protocol: $protocolFilter, Currency: $currencyFilter")
+                        
+                        val markets = mutableListOf<Market>()
                     
                     // Fetch Morpho markets
                     if (protocolFilter == null || protocolFilter == "morpho") {
@@ -88,11 +91,27 @@ fun Application.marketRoutes() {
                         }
                     }
                     
-                    // Always return a response, even if empty
-                    if (markets.isEmpty()) {
-                        println("⚠️ No markets found. Protocol filter: $protocolFilter, Currency filter: $currencyFilter")
+                        // Always return a response, even if empty
+                        if (markets.isEmpty()) {
+                            println("⚠️ No markets found. Protocol filter: $protocolFilter, Currency filter: $currencyFilter")
+                        } else {
+                            println("✅ Found ${markets.size} markets")
+                        }
+                        call.respond(MarketsResponse(markets = markets))
+                    } catch (e: Exception) {
+                        println("❌ Error in /v1/markets: ${e.message}")
+                        e.printStackTrace()
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            ErrorResponse(
+                                ErrorDetail(
+                                    code = "MARKET_FETCH_ERROR",
+                                    message = "Failed to fetch markets: ${e.message}",
+                                    type = "server_error"
+                                )
+                            )
+                        )
                     }
-                    call.respond(MarketsResponse(markets = markets))
                 }
             }
         }
