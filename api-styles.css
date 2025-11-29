@@ -946,12 +946,23 @@
     }
 
     .action-link {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: 60px 1fr;
+        gap: 12px;
+        padding: 12px;
+        overflow-x: auto;
+        word-wrap: break-word;
+    }
+    
+    .action-path {
+        font-size: 12px;
+        word-break: break-all;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        display: block;
     }
 
     .action-desc {
-        grid-column: 1;
+        grid-column: 2;
     }
 
     .guide-section {
