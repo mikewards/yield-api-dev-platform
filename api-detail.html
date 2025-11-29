@@ -115,7 +115,16 @@
                 <div class="detail-right">
                     <!-- CURL Example -->
                     <div class="example-section" id="example-section">
-                        <h2>Example request</h2>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin: 0;">Example request</h2>
+                            <div class="env-toggle" style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 14px; color: #64748b;">Environment:</span>
+                                <div class="toggle-switch" style="display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px;">
+                                    <button class="env-btn active" data-env="production" style="padding: 6px 12px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s;">Production</button>
+                                    <button class="env-btn" data-env="staging" style="padding: 6px 12px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s;">Staging</button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="code-example-box">
                             <div class="code-header-bar">
                                 <span class="code-lang">cURL</span>
@@ -199,6 +208,7 @@
         </div>
     </footer>
 
+    <script src="config.js"></script>
     <script src="script.js"></script>
     <script src="api-detail-script.js"></script>
     <script src="nav-auth.js"></script>

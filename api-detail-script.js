@@ -77,7 +77,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/yield/accounts \\
+            curlExample: `curl {{API_URL}}/v1/yield/accounts \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -144,7 +144,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/yield/accounts/ya_1234567890abcdef/deposit \\
+            curlExample: `curl {{API_URL}}/v1/yield/accounts/ya_1234567890abcdef/deposit \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -210,7 +210,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/yield/accounts/ya_1234567890abcdef/withdraw \\
+            curlExample: `curl {{API_URL}}/v1/yield/accounts/ya_1234567890abcdef/withdraw \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -264,7 +264,7 @@ const apiData = {
                     type: 'authentication_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/auth/authenticate \\
+            curlExample: `curl {{API_URL}}/v1/auth/authenticate \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -326,7 +326,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/accounts \\
+            curlExample: `curl {{API_URL}}/v1/accounts \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -380,7 +380,7 @@ const apiData = {
                     type: 'authentication_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/access-tokens \\
+            curlExample: `curl {{API_URL}}/v1/access-tokens \\
   -X POST \\
   -H "Authorization: Bearer sk_live_temp_..." \\
   -H "Content-Type: application/json" \\
@@ -511,7 +511,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/applications \\
+            curlExample: `curl {{API_URL}}/v1/applications \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -552,7 +552,7 @@ const apiData = {
                     type: 'authentication_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/applications \\
+            curlExample: `curl {{API_URL}}/v1/applications \\
   -X GET \\
   -H "Authorization: Bearer sk_live_1234567890abcdef"`
         }
@@ -602,7 +602,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/applications/app_1234567890abcdef/wallets \\
+            curlExample: `curl {{API_URL}}/v1/applications/app_1234567890abcdef/wallets \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -639,7 +639,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/applications/app_1234567890abcdef/wallets \\
+            curlExample: `curl {{API_URL}}/v1/applications/app_1234567890abcdef/wallets \\
   -X GET \\
   -H "Authorization: Bearer sk_live_1234567890abcdef"`
         }
@@ -692,7 +692,7 @@ const apiData = {
                     type: 'invalid_request_error'
                 }
             },
-            curlExample: `curl https://api.flow.com/v1/applications/app_1234567890abcdef/tokens \\
+            curlExample: `curl {{API_URL}}/v1/applications/app_1234567890abcdef/tokens \\
   -X POST \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json" \\
@@ -700,6 +700,45 @@ const apiData = {
     "name": "Production Server Key",
     "expires_in": 31536000
   }'`
+        }
+    },
+    'rates': {
+        get: {
+            method: 'GET',
+            path: '/v1/yield/rates',
+            title: 'Get yield rates',
+            summary: 'Get current yield rates for all supported cryptocurrencies and protocols. Returns rates from both Morpho and Aave protocols.',
+            description: 'Retrieves current yield rates (APY) for supported currencies across both Morpho and Aave protocols.',
+            permissions: 'YIELD_READ',
+            requestBody: [],
+            successResponse: {
+                rates: [
+                    {
+                        currency: 'USDC',
+                        protocol: 'morpho',
+                        annual_yield_rate: 0.044,
+                        apy: 0.044,
+                        updated_at: '2025-01-15T10:30:00Z'
+                    },
+                    {
+                        currency: 'USDC',
+                        protocol: 'aave',
+                        annual_yield_rate: 0.036,
+                        apy: 0.036,
+                        updated_at: '2025-01-15T10:30:00Z'
+                    }
+                ]
+            },
+            errorResponse: {
+                error: {
+                    code: 'UNAUTHORIZED',
+                    message: 'Invalid or missing authentication token',
+                    type: 'authentication_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/yield/rates \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \\
+  -H "Content-Type: application/json"`
         }
     }
 };
@@ -754,7 +793,11 @@ function populatePage(endpoint) {
     document.getElementById('error-response').textContent = JSON.stringify(endpoint.errorResponse, null, 2);
     
     // Populate CURL example
-    document.getElementById('curl-example').textContent = endpoint.curlExample;
+    // Update curl example with current environment URL
+    updateCurlExample(endpoint.curlExample);
+    
+    // Set up environment toggle
+    setupEnvironmentToggle();
 }
 
 function createParamElement(param) {
