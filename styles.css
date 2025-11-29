@@ -814,7 +814,7 @@ body {
         opacity: 0;
         visibility: hidden;
         transition: all 0.3s ease;
-        z-index: 999;
+        z-index: 1001;
         max-height: calc(100vh - 73px);
         overflow-y: auto;
     }
