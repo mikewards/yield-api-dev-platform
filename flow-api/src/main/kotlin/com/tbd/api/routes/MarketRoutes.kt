@@ -28,9 +28,11 @@ fun Application.marketRoutes() {
                     // Fetch Morpho markets
                     if (protocolFilter == null || protocolFilter == "morpho") {
                         try {
+                            println("🔄 Fetching Morpho markets...")
                             val morphoMarkets = runBlocking {
                                 protocolService.listMorphoMarkets()
                             }
+                            println("✅ Morpho markets fetched: ${morphoMarkets.size} markets")
                             
                             morphoMarkets.forEach { morphoMarket ->
                                 val symbol = morphoMarket.loanAsset?.symbol
@@ -54,6 +56,7 @@ fun Application.marketRoutes() {
                             }
                         } catch (e: Exception) {
                             println("⚠️ Failed to fetch Morpho markets: ${e.message}")
+                            e.printStackTrace()
                             // Continue with Aave markets even if Morpho fails
                         }
                     }
@@ -61,9 +64,11 @@ fun Application.marketRoutes() {
                     // Fetch Aave markets
                     if (protocolFilter == null || protocolFilter == "aave") {
                         try {
+                            println("🔄 Fetching Aave markets...")
                             val aaveMarkets = runBlocking {
                                 protocolService.listAaveMarkets()
                             }
+                            println("✅ Aave markets fetched: ${aaveMarkets.size} markets")
                             
                             aaveMarkets.forEach { aaveReserve ->
                                 val symbol = aaveReserve.underlyingToken?.symbol
@@ -87,17 +92,23 @@ fun Application.marketRoutes() {
                             }
                         } catch (e: Exception) {
                             println("⚠️ Failed to fetch Aave markets: ${e.message}")
+                            e.printStackTrace()
                             // Return whatever we have from Morpho
                         }
                     }
                     
                         // Always return a response, even if empty
+                        println("📦 Total markets collected: ${markets.size}")
                         if (markets.isEmpty()) {
                             println("⚠️ No markets found. Protocol filter: $protocolFilter, Currency filter: $currencyFilter")
                         } else {
-                            println("✅ Found ${markets.size} markets")
+                            println("✅ Returning ${markets.size} markets")
                         }
-                        call.respond(MarketsResponse(markets = markets))
+                        
+                        // Ensure we always send a response
+                        val response = MarketsResponse(markets = markets)
+                        println("📤 Sending response: ${response.markets.size} markets")
+                        call.respond(response)
                     } catch (e: Exception) {
                         println("❌ Error in /v1/markets: ${e.message}")
                         e.printStackTrace()
