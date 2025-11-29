@@ -23,14 +23,20 @@ object DatabaseFactory {
         requireNotNull(dbUrl) { "DATABASE_URL environment variable or database.url config is required" }
         
         // Convert Railway's postgresql:// format to jdbc:postgresql:// if needed
-        if (dbUrl.startsWith("postgresql://")) {
-            dbUrl = dbUrl.replace("postgresql://", "jdbc:postgresql://")
-        } else if (!dbUrl.startsWith("jdbc:postgresql://")) {
-            throw IllegalArgumentException("DATABASE_URL must be in format 'postgresql://...' or 'jdbc:postgresql://...'")
+        var jdbcUrl = dbUrl.trim()
+        if (jdbcUrl.startsWith("postgresql://")) {
+            jdbcUrl = jdbcUrl.replace("postgresql://", "jdbc:postgresql://")
+        } else if (!jdbcUrl.startsWith("jdbc:postgresql://")) {
+            throw IllegalArgumentException("DATABASE_URL must be in format 'postgresql://...' or 'jdbc:postgresql://...'. Got: ${jdbcUrl.take(50)}...")
+        }
+        
+        // Validate URL format
+        if (!jdbcUrl.contains("@") || !jdbcUrl.contains(":")) {
+            throw IllegalArgumentException("DATABASE_URL appears malformed. Expected format: postgresql://user:password@host:port/database. Got: ${jdbcUrl.take(100)}")
         }
         
         val hikariConfig = HikariConfig().apply {
-            jdbcUrl = dbUrl
+            jdbcUrl = jdbcUrl
             username = dbUser
             password = dbPassword
             driverClassName = "org.postgresql.Driver"
