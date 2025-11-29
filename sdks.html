@@ -9,59 +9,69 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .sdks-hero {
-            background: var(--primary);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .sdks-hero h1 {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        .sdks-hero p {
-            font-size: 20px;
-            opacity: 0.9;
-            max-width: 600px;
+        /* Guides-style layout for SDKs page */
+        .sdks-layout {
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 48px 24px;
+            background: var(--bg-white);
         }
+        
+        .sdks-page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        
+        .sdks-page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+        
         .sdk-section {
-            padding: 80px 0;
+            margin-bottom: 56px;
+            scroll-margin-top: 100px;
         }
+        
         .sdk-card {
             background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 0;
+            margin-bottom: 56px;
         }
         .sdk-header {
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
         .sdk-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
+            font-size: 20px;
         }
         .sdk-header h2 {
-            font-size: 32px;
+            font-size: 24px;
+            font-weight: 600;
             margin: 0;
+            color: var(--text-primary);
         }
         .sdk-description {
             color: var(--text-secondary);
-            font-size: 18px;
-            margin-bottom: 32px;
-            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 24px;
+            line-height: 1.7;
         }
         .playground-container {
             display: grid;
@@ -244,6 +254,23 @@
             font-weight: 600;
         }
         @media (max-width: 968px) {
+            .sdks-layout {
+                padding: 24px 16px;
+            }
+            
+            .sdks-page-title {
+                font-size: 28px;
+            }
+            
+            .sdks-page-subtitle {
+                font-size: 16px;
+                margin-bottom: 32px;
+            }
+            
+            .sdk-header h2 {
+                font-size: 20px;
+            }
+            
             .playground-container {
                 grid-template-columns: 1fr;
                 gap: 16px;
@@ -471,17 +498,12 @@
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="sdks-hero">
-        <div class="container">
-            <h1>Embeddable SDKs</h1>
-            <p>Fully customizable, embeddable UI components that integrate seamlessly into your application</p>
-        </div>
-    </section>
-
-    <!-- SDKs Section -->
-    <section class="sdk-section">
-        <div class="container">
+    <!-- SDKs Content - Guides-style layout -->
+    <div class="sdks-layout">
+        <h1 class="sdks-page-title">Embeddable SDKs</h1>
+        <p class="sdks-page-subtitle">Fully customizable, embeddable UI components that integrate seamlessly into your application.</p>
+        
+        <div class="sdk-section">
             <!-- Applications SDK -->
             <div class="sdk-card">
                 <div class="sdk-header">
@@ -740,7 +762,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

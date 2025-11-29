@@ -786,23 +786,27 @@ function updateAllCurlExamples() {
     
     const currentUrl = apiUrls[env] || apiUrls.production;
     
+    // Also specifically update the #curl-example element
+    const curlExampleEl = document.getElementById('curl-example');
+    if (curlExampleEl) {
+        let text = curlExampleEl.textContent;
+        // Match any URL pattern before /v1/
+        const urlPattern = /https?:\/\/[^\s\/]+(?=\/v1\/)/g;
+        const updated = text.replace(urlPattern, currentUrl);
+        if (updated !== text) {
+            curlExampleEl.textContent = updated;
+        }
+    }
+    
     // Find all code blocks that contain curl commands
     document.querySelectorAll('code, pre').forEach(el => {
+        if (el.id === 'curl-example') return; // Already handled
+        
         let text = el.textContent;
         if (text.includes('curl ') && text.includes('/v1/')) {
-            const urlPatterns = [
-                /https?:\/\/api\.(flow|tbd)\.com/g,
-                /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
-                /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
-                /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
-                /https?:\/\/flow-platform-production\.up\.railway\.app/g,
-                /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g
-            ];
-            
-            let updated = text;
-            urlPatterns.forEach(pattern => {
-                updated = updated.replace(pattern, currentUrl);
-            });
+            // Match any URL pattern before /v1/
+            const urlPattern = /https?:\/\/[^\s\/]+(?=\/v1\/)/g;
+            const updated = text.replace(urlPattern, currentUrl);
             
             if (updated !== text) {
                 el.textContent = updated;
