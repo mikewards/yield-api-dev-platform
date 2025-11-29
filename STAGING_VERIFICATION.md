@@ -20,10 +20,11 @@ Run the test script:
 
 ### Manual Testing
 
-#### Test Staging:
+#### Test Sandbox:
 ```bash
-curl https://flow-platform-staging.up.railway.app/health
+curl {{SANDBOX_API_URL}}/health
 ```
+(Replace `{{SANDBOX_API_URL}}` with your sandbox API URL from `config.js`)
 
 Expected response:
 ```json
@@ -35,8 +36,9 @@ Expected response:
 
 #### Test Production:
 ```bash
-curl https://flow-platform-production.up.railway.app/health
+curl {{PRODUCTION_API_URL}}/health
 ```
+(Replace `{{PRODUCTION_API_URL}}` with your production API URL from `config.js`)
 
 Expected response:
 ```json
@@ -61,21 +63,22 @@ Expected response:
 
 ## 🎯 Next Steps
 
-### 1. Test Account Creation on Staging
+### 1. Test Account Creation on Sandbox
 ```bash
-curl https://flow-platform-staging.up.railway.app/v1/accounts \
+curl {{SANDBOX_API_URL}}/v1/accounts \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "test_staging",
+    "username": "test_sandbox",
     "password": "test123",
     "email": "test@example.com"
   }'
 ```
+(Replace `{{SANDBOX_API_URL}}` with your sandbox API URL)
 
 ### 2. Test Account Creation on Production
 ```bash
-curl https://flow-platform-production.up.railway.app/v1/accounts \
+curl {{PRODUCTION_API_URL}}/v1/accounts \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{
@@ -84,6 +87,7 @@ curl https://flow-platform-production.up.railway.app/v1/accounts \
     "email": "test@example.com"
   }'
 ```
+(Replace `{{PRODUCTION_API_URL}}` with your production API URL)
 
 ### 3. Verify Environment Toggle in Documentation
 1. Go to your API documentation page
@@ -92,7 +96,12 @@ curl https://flow-platform-production.up.railway.app/v1/accounts \
 
 ## 📊 Environment URLs
 
-- **Staging**: `https://flow-platform-staging.up.railway.app`
+Configure these in `config.js`:
+- **Sandbox**: `https://api-sandbox.tbd.com` (or your custom domain)
+- **Production**: `https://api.tbd.com` (or your custom domain)
+
+Or use Railway URLs:
+- **Sandbox**: `https://flow-platform-staging.up.railway.app`
 - **Production**: `https://flow-platform-production.up.railway.app`
 
 ## 🔐 Environment Variables Summary

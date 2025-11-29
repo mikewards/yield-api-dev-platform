@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# Test both staging and production environments
+# Test both sandbox and production environments
+# Configure URLs by setting environment variables or editing this script
+
+# Default URLs (can be overridden with environment variables)
+SANDBOX_URL="${SANDBOX_API_URL:-https://api-sandbox.tbd.com}"
+PRODUCTION_URL="${PRODUCTION_API_URL:-https://api.tbd.com}"
 
 echo "🧪 Testing TBD API Environments"
 echo "================================"
@@ -12,19 +17,19 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Test Staging
-echo "📦 Testing STAGING environment..."
-echo "URL: https://flow-platform-staging.up.railway.app/health"
-STAGING_RESPONSE=$(curl -s -w "\n%{http_code}" https://flow-platform-staging.up.railway.app/health)
-STAGING_BODY=$(echo "$STAGING_RESPONSE" | head -n -1)
-STAGING_CODE=$(echo "$STAGING_RESPONSE" | tail -n 1)
+# Test Sandbox
+echo "📦 Testing SANDBOX environment..."
+echo "URL: $SANDBOX_URL/health"
+SANDBOX_RESPONSE=$(curl -s -w "\n%{http_code}" "$SANDBOX_URL/health")
+SANDBOX_BODY=$(echo "$SANDBOX_RESPONSE" | head -n -1)
+SANDBOX_CODE=$(echo "$SANDBOX_RESPONSE" | tail -n 1)
 
-if [ "$STAGING_CODE" = "200" ]; then
-    echo -e "${GREEN}✅ Staging: OK (HTTP $STAGING_CODE)${NC}"
-    echo "$STAGING_BODY" | jq '.' 2>/dev/null || echo "$STAGING_BODY"
+if [ "$SANDBOX_CODE" = "200" ]; then
+    echo -e "${GREEN}✅ Sandbox: OK (HTTP $SANDBOX_CODE)${NC}"
+    echo "$SANDBOX_BODY" | jq '.' 2>/dev/null || echo "$SANDBOX_BODY"
 else
-    echo -e "${RED}❌ Staging: FAILED (HTTP $STAGING_CODE)${NC}"
-    echo "$STAGING_BODY"
+    echo -e "${RED}❌ Sandbox: FAILED (HTTP $SANDBOX_CODE)${NC}"
+    echo "$SANDBOX_BODY"
 fi
 
 echo ""
@@ -33,8 +38,8 @@ echo ""
 
 # Test Production
 echo "🚀 Testing PRODUCTION environment..."
-echo "URL: https://flow-platform-production.up.railway.app/health"
-PROD_RESPONSE=$(curl -s -w "\n%{http_code}" https://flow-platform-production.up.railway.app/health)
+echo "URL: $PRODUCTION_URL/health"
+PROD_RESPONSE=$(curl -s -w "\n%{http_code}" "$PRODUCTION_URL/health")
 PROD_BODY=$(echo "$PROD_RESPONSE" | head -n -1)
 PROD_CODE=$(echo "$PROD_RESPONSE" | tail -n 1)
 
@@ -50,7 +55,7 @@ echo ""
 echo "================================"
 
 # Summary
-if [ "$STAGING_CODE" = "200" ] && [ "$PROD_CODE" = "200" ]; then
+if [ "$SANDBOX_CODE" = "200" ] && [ "$PROD_CODE" = "200" ]; then
     echo -e "${GREEN}🎉 Both environments are working!${NC}"
     exit 0
 else

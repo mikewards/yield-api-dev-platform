@@ -2,13 +2,13 @@
 
 ## ✅ Your API is Live!
 
-Your API is running at: `https://flow-platform-production.up.railway.app`
+Your API is running at: `{{API_URL}}` (configured in `config.js`)
 
 ## Quick Tests
 
 ### 1. Health Check
 ```bash
-curl https://flow-platform-production.up.railway.app/health
+curl {{API_URL}}/health
 ```
 
 Expected response:
@@ -22,7 +22,7 @@ Expected response:
 
 ### 2. Create Account
 ```bash
-curl -X POST https://flow-platform-production.up.railway.app/v1/accounts \
+curl -X POST {{API_URL}}/v1/accounts \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -42,7 +42,7 @@ Expected response:
 
 ### 3. Sign In
 ```bash
-curl -X POST https://flow-platform-production.up.railway.app/v1/auth/authenticate \
+curl -X POST {{API_URL}}/v1/auth/authenticate \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -86,15 +86,15 @@ All examples above use cURL. Make sure to:
 - Include `Authorization: Bearer <token>` header for authenticated requests
 
 ### With Frontend
-Update your frontend code to use:
-```javascript
-const API_URL = 'https://flow-platform-production.up.railway.app';
-```
+The frontend automatically uses the correct API URL from `config.js`:
+- Local development: `http://localhost:8080`
+- Production: `https://api.tbd.com` (or your custom domain)
+- Sandbox: `https://api-sandbox.tbd.com` (or your custom domain)
 
 ### With Postman/Insomnia
 1. Create a new request
 2. Set method (GET/POST)
-3. Enter URL: `https://flow-platform-production.up.railway.app/v1/...`
+3. Enter URL: `{{API_URL}}/v1/...` (replace `{{API_URL}}` with your actual API URL)
 4. Add headers as needed
 5. Add body (JSON) for POST requests
 

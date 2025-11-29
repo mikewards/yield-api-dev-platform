@@ -5,9 +5,10 @@
     'use strict';
     
     // API URLs for different environments
-    const API_URLS = {
-        staging: 'https://flow-platform-staging.up.railway.app',
-        production: 'https://flow-platform-production.up.railway.app'
+    // These should match config.js - use custom domains or Railway URLs
+    const API_URLS = window.API_URLS || {
+        staging: 'https://api-sandbox.tbd.com',
+        production: 'https://api.tbd.com'
     };
     
     // Get current environment from localStorage or default to production
@@ -30,6 +31,7 @@
         const oldUrls = [
             'https://api.tbd.com',
             'https://api.flow.com',
+            'https://api-sandbox.tbd.com',
             'https://flow-platform-staging.up.railway.app',
             'https://flow-platform-production.up.railway.app'
         ];
