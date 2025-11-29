@@ -47,8 +47,35 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
-        .btn-primary:active {
-            transform: translateY(0);
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #0F172A;
+            border: 1px solid #E2E8F0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-secondary:hover {
+            background: #E2E8F0;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
         }
         .applications-list {
             display: flex;
@@ -117,24 +144,273 @@
             color: #0F172A;
             font-weight: 500;
         }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1001;
+        }
+        .modal-content.large {
+            max-width: 900px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #64748B;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        .modal-close:hover {
+            background: #F1F5F9;
+            color: #0F172A;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
             color: #64748B;
         }
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px;
+            border-top: 1px solid #E2E8F0;
+        }
+        .info-box {
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .info-box svg {
+            color: #0284C7;
+            flex-shrink: 0;
+        }
+        .info-box p {
+            font-size: 13px;
+            color: #0C4A6E;
+            line-height: 1.5;
+        }
+        .info-box strong {
+            font-weight: 600;
+        }
+        
+        /* Edit Modal Styles */
+        .edit-section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .edit-section:last-child {
+            border-bottom: none;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 16px;
-            opacity: 0.5;
         }
-        .empty-state h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: #475569;
+        .section-header h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0F172A;
         }
-        .empty-state p {
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        .meta-label {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+        }
+        .meta-value {
+            font-size: 13px;
+            color: #0F172A;
+            font-weight: 500;
+            font-family: 'Monaco', monospace;
+        }
+        .rpc-edit-form {
+            margin-top: 16px;
+        }
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+            cursor: help;
+            color: #64748B;
+        }
+        .tooltip-trigger:hover {
+            color: #6366F1;
+        }
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 16px;
+            max-width: 400px;
+            z-index: 10;
+            margin-top: 8px;
+        }
+        .tooltip-trigger:hover .tooltip-content {
+            display: block;
+        }
+        .tooltip-header h5 {
             font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0F172A;
+        }
+        .tooltip-body {
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .tooltip-body ol {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .tooltip-body li {
+            margin-bottom: 6px;
+        }
+        .tooltip-body code {
+            background: #F1F5F9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Monaco', monospace;
+        }
+        .keys-section {
+            margin-top: 24px;
+        }
+        .keys-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .keys-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .key-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .key-info {
+            flex: 1;
+        }
+        .key-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+        .key-value {
+            font-size: 11px;
+            color: #64748B;
+            font-family: 'Monaco', monospace;
+        }
+        .key-actions {
+            display: flex;
+            gap: 8px;
         }
         @keyframes slideIn {
             from {
@@ -155,10 +431,10 @@
     <div class="sdk-container">
         <div class="sdk-header">
             <div class="sdk-title">Applications</div>
-            <button class="btn-primary" onclick="createApplication()">+ Create Application</button>
+            <button class="btn-primary" onclick="openCreateModal()">+ Create Application</button>
         </div>
         <div class="applications-list" id="applications-list">
-            <div class="app-card">
+            <div class="app-card" onclick="openEditModal('app_abc123def456', 'My DeFi App')">
                 <div class="app-header">
                     <div>
                         <div class="app-name">My DeFi App</div>
@@ -185,7 +461,7 @@
                     </div>
                 </div>
             </div>
-            <div class="app-card">
+            <div class="app-card" onclick="openEditModal('app_xyz789ghi012', 'Production App')">
                 <div class="app-header">
                     <div>
                         <div class="app-name">Production App</div>
@@ -215,19 +491,321 @@
         </div>
     </div>
 
+    <!-- Create Application Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-backdrop" onclick="closeModal('createModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Application</h3>
+                <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <form id="createForm" onsubmit="handleCreate(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="appName">Application Name *</label>
+                        <input type="text" id="appName" name="appName" required placeholder="My Application">
+                        <small>A unique name for your application</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="appDescription">Description</label>
+                        <textarea id="appDescription" name="appDescription" rows="2" placeholder="Brief description of your application"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="appWebhook">Webhook URL</label>
+                        <input type="url" id="appWebhook" name="appWebhook" placeholder="https://your-server.com/webhooks/flow">
+                        <small>Receive real-time notifications for deposits, withdrawals, and yield events</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="appOrigins">Allowed Origins (CORS)</label>
+                        <input type="text" id="appOrigins" name="appOrigins" placeholder="https://your-app.com, https://staging.your-app.com">
+                        <small>Comma-separated list of domains that can make API calls from browsers</small>
+                    </div>
+                    <div class="info-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <p><strong>Note:</strong> Applications support both sandbox (testnet) and production (mainnet) environments. You can configure RPC URLs and create environment-specific API keys after creating the application.</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Application Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-backdrop" onclick="closeModal('editModal')"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="editAppTitle">Application Details</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Basic Info Section -->
+                <div class="edit-section">
+                    <div class="section-header">
+                        <h4>Application Information</h4>
+                        <button class="btn-secondary btn-small" onclick="toggleEditMode('basic')" id="editBasicBtn">Edit</button>
+                    </div>
+                    <div id="basicDisplayMode">
+                        <div class="meta-item">
+                            <span class="meta-label">Application Name</span>
+                            <span class="meta-value" id="displayAppName">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Description</span>
+                            <span class="meta-value" id="displayAppDesc">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Webhook URL</span>
+                            <span class="meta-value" id="displayWebhook">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Allowed Origins</span>
+                            <span class="meta-value" id="displayOrigins">-</span>
+                        </div>
+                    </div>
+                    <form id="editBasicForm" style="display: none;" onsubmit="handleUpdateBasic(event)">
+                        <div class="form-group">
+                            <label for="editAppName">Application Name *</label>
+                            <input type="text" id="editAppName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAppDesc">Description</label>
+                            <textarea id="editAppDesc" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="editWebhook">Webhook URL</label>
+                            <input type="url" id="editWebhook">
+                        </div>
+                        <div class="form-group">
+                            <label for="editOrigins">Allowed Origins (CORS)</label>
+                            <input type="text" id="editOrigins" placeholder="Comma-separated URLs">
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 16px;">
+                            <button type="button" class="btn-secondary btn-small" onclick="cancelBasicEdit()">Cancel</button>
+                            <button type="submit" class="btn-primary btn-small">Save</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- RPC Configuration Section -->
+                <div class="edit-section">
+                    <div class="section-header">
+                        <h4>Ethereum RPC Configuration</h4>
+                        <button class="btn-secondary btn-small" onclick="toggleEditMode('rpc')" id="editRpcBtn">Edit</button>
+                    </div>
+                    <div id="rpcDisplayMode">
+                        <div class="meta-item">
+                            <span class="meta-label">Sandbox RPC URL</span>
+                            <span class="meta-value" id="displaySandboxRpc">Not configured</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Production RPC URL</span>
+                            <span class="meta-value" id="displayProductionRpc">Not configured</span>
+                        </div>
+                    </div>
+                    <form id="editRpcForm" class="rpc-edit-form" style="display: none;" onsubmit="handleUpdateRpc(event)">
+                        <div class="form-group">
+                            <label for="editSandboxRpc">
+                                Sandbox RPC URL (Testnet)
+                                <span class="tooltip-trigger">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-header">
+                                            <h5>How to get a Sandbox RPC URL</h5>
+                                        </div>
+                                        <div class="tooltip-body">
+                                            <p><strong>Option 1: Infura (Free)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
+                                                <li>Create a new project</li>
+                                                <li>Select "Sepolia" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://sepolia.infura.io/v3/YOUR_KEY</code></li>
+                                            </ol>
+                                            <p><strong>Option 2: Alchemy (Free)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
+                                                <li>Create a new app</li>
+                                                <li>Select "Ethereum" → "Sepolia" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY</code></li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="url" id="editSandboxRpc" placeholder="https://sepolia.infura.io/v3/YOUR_KEY">
+                            <small>For Sepolia testnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductionRpc">
+                                Production RPC URL (Mainnet)
+                                <span class="tooltip-trigger">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-header">
+                                            <h5>How to get a Production RPC URL</h5>
+                                        </div>
+                                        <div class="tooltip-body">
+                                            <p><strong>Option 1: Infura (Free tier available)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
+                                                <li>Create a new project</li>
+                                                <li>Select "Ethereum Mainnet" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://mainnet.infura.io/v3/YOUR_KEY</code></li>
+                                            </ol>
+                                            <p><strong>Option 2: Alchemy (Free tier available)</strong></p>
+                                            <ol>
+                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
+                                                <li>Create a new app</li>
+                                                <li>Select "Ethereum" → "Ethereum Mainnet" network</li>
+                                                <li>Copy your API key</li>
+                                                <li>Use: <code>https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY</code></li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </span>
+                            </label>
+                            <input type="url" id="editProductionRpc" placeholder="https://mainnet.infura.io/v3/YOUR_KEY">
+                            <small>For Ethereum mainnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 16px;">
+                            <button type="button" class="btn-secondary btn-small" onclick="cancelRpcEdit()">Cancel</button>
+                            <button type="submit" class="btn-primary btn-small">Save RPC URLs</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- API Keys Section -->
+                <div class="edit-section keys-section">
+                    <div class="keys-header">
+                        <h4>API Keys</h4>
+                        <button class="btn-primary btn-small" onclick="openCreateKeyModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Create Key
+                        </button>
+                    </div>
+                    <div class="keys-list" id="keysList">
+                        <div class="key-item">
+                            <div class="key-info">
+                                <div class="key-name">Production Server</div>
+                                <div class="key-value">sk_live_abc123...xyz789</div>
+                            </div>
+                            <div class="key-actions">
+                                <button class="btn-secondary btn-small" onclick="copyKey('sk_live_abc123...xyz789')">Copy</button>
+                                <button class="btn-danger btn-small" onclick="deleteKey('key1')">Delete</button>
+                            </div>
+                        </div>
+                        <div class="key-item">
+                            <div class="key-info">
+                                <div class="key-name">Development</div>
+                                <div class="key-value">sk_sandbox_def456...uvw012</div>
+                            </div>
+                            <div class="key-actions">
+                                <button class="btn-secondary btn-small" onclick="copyKey('sk_sandbox_def456...uvw012')">Copy</button>
+                                <button class="btn-danger btn-small" onclick="deleteKey('key2')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-danger" onclick="deleteApplication()">Delete Application</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create API Key Modal -->
+    <div class="modal" id="createKeyModal">
+        <div class="modal-backdrop" onclick="closeModal('createKeyModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create API Key</h3>
+                <button class="modal-close" onclick="closeModal('createKeyModal')">&times;</button>
+            </div>
+            <form id="createKeyForm" onsubmit="handleCreateKey(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="keyName">Key Name *</label>
+                        <input type="text" id="keyName" name="keyName" required placeholder="e.g., Production Server">
+                        <small>A descriptive name to identify this key</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="keyEnvironment">Environment *</label>
+                        <select id="keyEnvironment" name="keyEnvironment" required style="width: 100%; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px;">
+                            <option value="sandbox">Sandbox (Testnet)</option>
+                            <option value="production">Production (Mainnet)</option>
+                        </select>
+                        <small>Choose the environment this key will be used in</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="keyExpiration">Expiration</label>
+                        <select id="keyExpiration" name="keyExpiration" style="width: 100%; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px;">
+                            <option value="never">Never</option>
+                            <option value="30">30 days</option>
+                            <option value="90">90 days</option>
+                            <option value="365">1 year</option>
+                        </select>
+                        <small>When this key should expire (optional)</small>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createKeyModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create API Key</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function createApplication() {
+        let currentAppId = null;
+        let currentAppData = {};
+
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function handleCreate(event) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('appName').value,
+                description: document.getElementById('appDescription').value || undefined,
+                webhook_url: document.getElementById('appWebhook').value || undefined,
+                allowed_origins: document.getElementById('appOrigins').value ? 
+                    document.getElementById('appOrigins').value.split(',').map(s => s.trim()) : undefined
+            };
+
+            // Create new app card
             const list = document.getElementById('applications-list');
-            const names = ['Trading Bot', 'Yield Optimizer', 'DeFi Dashboard', 'Crypto Wallet', 'Staking Platform'];
-            const name = names[Math.floor(Math.random() * names.length)];
             const appId = 'app_' + Math.random().toString(36).substr(2, 12);
             
             const newApp = document.createElement('div');
             newApp.className = 'app-card new';
+            newApp.setAttribute('onclick', `openEditModal('${appId}', '${formData.name}')`);
             newApp.innerHTML = `
                 <div class="app-header">
                     <div>
-                        <div class="app-name">${name}</div>
+                        <div class="app-name">${formData.name}</div>
                         <div class="app-id">${appId}</div>
                     </div>
                     <div class="app-badge">Active</div>
@@ -253,16 +831,175 @@
             `;
             
             list.insertBefore(newApp, list.firstChild);
-            
-            // Notify parent window
-            if (window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'application.created',
-                    application: { name, id: appId }
-                }, '*');
+            closeModal('createModal');
+            document.getElementById('createForm').reset();
+        }
+
+        function openEditModal(appId, appName) {
+            currentAppId = appId;
+            currentAppData = {
+                name: appName,
+                description: 'A DeFi application for yield generation',
+                webhook_url: 'https://example.com/webhooks',
+                allowed_origins: 'https://myapp.com, https://staging.myapp.com',
+                sandbox_rpc_url: 'https://sepolia.infura.io/v3/abc123',
+                production_rpc_url: 'https://mainnet.infura.io/v3/xyz789'
+            };
+
+            // Populate display
+            document.getElementById('editAppTitle').textContent = appName;
+            document.getElementById('displayAppName').textContent = currentAppData.name;
+            document.getElementById('displayAppDesc').textContent = currentAppData.description || 'No description';
+            document.getElementById('displayWebhook').textContent = currentAppData.webhook_url || 'Not configured';
+            document.getElementById('displayOrigins').textContent = currentAppData.allowed_origins || 'Not configured';
+            document.getElementById('displaySandboxRpc').textContent = currentAppData.sandbox_rpc_url || 'Not configured';
+            document.getElementById('displayProductionRpc').textContent = currentAppData.production_rpc_url || 'Not configured';
+
+            // Populate edit forms
+            document.getElementById('editAppName').value = currentAppData.name;
+            document.getElementById('editAppDesc').value = currentAppData.description || '';
+            document.getElementById('editWebhook').value = currentAppData.webhook_url || '';
+            document.getElementById('editOrigins').value = currentAppData.allowed_origins || '';
+            document.getElementById('editSandboxRpc').value = currentAppData.sandbox_rpc_url || '';
+            document.getElementById('editProductionRpc').value = currentAppData.production_rpc_url || '';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function toggleEditMode(section) {
+            if (section === 'basic') {
+                const display = document.getElementById('basicDisplayMode');
+                const form = document.getElementById('editBasicForm');
+                const btn = document.getElementById('editBasicBtn');
+                
+                if (display.style.display === 'none') {
+                    display.style.display = 'block';
+                    form.style.display = 'none';
+                    btn.textContent = 'Edit';
+                } else {
+                    display.style.display = 'none';
+                    form.style.display = 'block';
+                    btn.textContent = 'Cancel';
+                }
+            } else if (section === 'rpc') {
+                const display = document.getElementById('rpcDisplayMode');
+                const form = document.getElementById('editRpcForm');
+                const btn = document.getElementById('editRpcBtn');
+                
+                if (display.style.display === 'none') {
+                    display.style.display = 'block';
+                    form.style.display = 'none';
+                    btn.textContent = 'Edit';
+                } else {
+                    display.style.display = 'none';
+                    form.style.display = 'block';
+                    btn.textContent = 'Cancel';
+                }
             }
         }
+
+        function cancelBasicEdit() {
+            document.getElementById('basicDisplayMode').style.display = 'block';
+            document.getElementById('editBasicForm').style.display = 'none';
+            document.getElementById('editBasicBtn').textContent = 'Edit';
+        }
+
+        function cancelRpcEdit() {
+            document.getElementById('rpcDisplayMode').style.display = 'block';
+            document.getElementById('editRpcForm').style.display = 'none';
+            document.getElementById('editRpcBtn').textContent = 'Edit';
+        }
+
+        function handleUpdateBasic(event) {
+            event.preventDefault();
+            currentAppData.name = document.getElementById('editAppName').value;
+            currentAppData.description = document.getElementById('editAppDesc').value;
+            currentAppData.webhook_url = document.getElementById('editWebhook').value;
+            currentAppData.allowed_origins = document.getElementById('editOrigins').value;
+
+            // Update display
+            document.getElementById('displayAppName').textContent = currentAppData.name;
+            document.getElementById('displayAppDesc').textContent = currentAppData.description || 'No description';
+            document.getElementById('displayWebhook').textContent = currentAppData.webhook_url || 'Not configured';
+            document.getElementById('displayOrigins').textContent = currentAppData.allowed_origins || 'Not configured';
+
+            cancelBasicEdit();
+        }
+
+        function handleUpdateRpc(event) {
+            event.preventDefault();
+            currentAppData.sandbox_rpc_url = document.getElementById('editSandboxRpc').value;
+            currentAppData.production_rpc_url = document.getElementById('editProductionRpc').value;
+
+            // Update display
+            document.getElementById('displaySandboxRpc').textContent = currentAppData.sandbox_rpc_url || 'Not configured';
+            document.getElementById('displayProductionRpc').textContent = currentAppData.production_rpc_url || 'Not configured';
+
+            cancelRpcEdit();
+        }
+
+        function openCreateKeyModal() {
+            document.getElementById('createKeyModal').classList.add('active');
+        }
+
+        function handleCreateKey(event) {
+            event.preventDefault();
+            const keyName = document.getElementById('keyName').value;
+            const environment = document.getElementById('keyEnvironment').value;
+            const keyPrefix = environment === 'production' ? 'sk_live_' : 'sk_sandbox_';
+            const keyValue = keyPrefix + Math.random().toString(36).substr(2, 20) + '...' + Math.random().toString(36).substr(2, 6);
+
+            const keysList = document.getElementById('keysList');
+            const newKey = document.createElement('div');
+            newKey.className = 'key-item';
+            newKey.innerHTML = `
+                <div class="key-info">
+                    <div class="key-name">${keyName}</div>
+                    <div class="key-value">${keyValue}</div>
+                </div>
+                <div class="key-actions">
+                    <button class="btn-secondary btn-small" onclick="copyKey('${keyValue}')">Copy</button>
+                    <button class="btn-danger btn-small" onclick="deleteKey(this)">Delete</button>
+                </div>
+            `;
+            keysList.appendChild(newKey);
+            closeModal('createKeyModal');
+            document.getElementById('createKeyForm').reset();
+        }
+
+        function copyKey(keyValue) {
+            navigator.clipboard.writeText(keyValue).then(() => {
+                alert('API key copied to clipboard!');
+            });
+        }
+
+        function deleteKey(button) {
+            if (confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+                button.closest('.key-item').remove();
+            }
+        }
+
+        function deleteApplication() {
+            if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
+                // Remove from list
+                const cards = document.querySelectorAll('.app-card');
+                cards.forEach(card => {
+                    if (card.getAttribute('onclick').includes(currentAppId)) {
+                        card.remove();
+                    }
+                });
+                closeModal('editModal');
+            }
+        }
+
+        // Close modals on backdrop click
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.closest('.modal').classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
-
