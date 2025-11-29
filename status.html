@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status - TBD</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .status-page {
+            padding: 120px 0 80px;
+            background: var(--bg-white);
+        }
+        .status-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .status-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .status-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        .status-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .status-card {
+            background: var(--bg-gray);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        .status-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.operational {
+            background: var(--success);
+        }
+        .status-dot.degraded {
+            background: #F59E0B;
+        }
+        .status-dot.down {
+            background: #EF4444;
+        }
+        .status-uptime {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .status-incidents {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .status-incidents h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+        .incident-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .incident-item:last-child {
+            border-bottom: none;
+        }
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .incident-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .incident-date {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+        .incident-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .no-incidents {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="4" fill="#0F172A"/>
+                        <circle cx="16" cy="16" r="6" fill="none" stroke="#0F172A" stroke-width="1.5" opacity="0.6"/>
+                        <circle cx="16" cy="16" r="9" fill="none" stroke="#0F172A" stroke-width="1.5" opacity="0.4"/>
+                        <circle cx="16" cy="6" r="1.5" fill="#0F172A"/>
+                        <circle cx="16" cy="26" r="1.5" fill="#0F172A"/>
+                        <circle cx="6" cy="16" r="1.5" fill="#0F172A"/>
+                        <circle cx="26" cy="16" r="1.5" fill="#0F172A"/>
+                        <circle cx="10.5" cy="10.5" r="1.5" fill="#0F172A"/>
+                        <circle cx="21.5" cy="10.5" r="1.5" fill="#0F172A"/>
+                        <circle cx="10.5" cy="21.5" r="1.5" fill="#0F172A"/>
+                        <circle cx="21.5" cy="21.5" r="1.5" fill="#0F172A"/>
+                    </svg>
+                    <span class="logo-text">TBD</span>
+                </a>
+                <div class="nav-links">
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="signin.html" class="btn-secondary">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Status Content -->
+    <section class="status-page">
+        <div class="container">
+            <div class="status-container">
+                <div class="status-header">
+                    <h1>Service Status</h1>
+                    <p style="color: var(--text-secondary);">Real-time status of TBD services</p>
+                </div>
+
+                <div class="status-overview">
+                    <div class="status-card">
+                        <h3>API Gateway</h3>
+                        <div class="status-indicator">
+                            <span class="status-dot operational"></span>
+                            <span>Operational</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h3>Database</h3>
+                        <div class="status-indicator">
+                            <span class="status-dot operational"></span>
+                            <span>Operational</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h3>Morpho Integration</h3>
+                        <div class="status-indicator">
+                            <span class="status-dot operational"></span>
+                            <span>Operational</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h3>Aave Integration</h3>
+                        <div class="status-indicator">
+                            <span class="status-dot operational"></span>
+                            <span>Operational</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h3>Uptime (30 days)</h3>
+                        <div class="status-uptime">99.9%</div>
+                        <p style="color: var(--text-tertiary); font-size: 14px;">All systems operational</p>
+                    </div>
+                </div>
+
+                <div class="status-incidents">
+                    <h2>Recent Incidents</h2>
+                    <div id="incidents-list">
+                        <div class="no-incidents">
+                            <p>No incidents reported in the last 90 days.</p>
+                            <p style="margin-top: 8px; font-size: 14px;">All systems are operating normally.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span>TBD</span>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="status.html">Status</a></li>
+                        <li><a href="mailto:support@tbd.com">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TBD. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="nav-auth.js"></script>
+</body>
+</html>
+
