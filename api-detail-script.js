@@ -747,8 +747,8 @@ const apiData = {
 function updateCurlExample(curlExample) {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     const apiUrls = window.API_URLS || {
-        staging: 'https://api-sandbox.tbd.com',
-        production: 'https://api.tbd.com'
+        staging: 'https://flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
     };
     
     const currentUrl = apiUrls[env] || apiUrls.production;
