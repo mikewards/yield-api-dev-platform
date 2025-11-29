@@ -340,6 +340,12 @@
     padding-left: 60px;
 }
 
+@media (max-width: 768px) {
+    .guide-section {
+        padding-left: 0;
+    }
+}
+
 .guide-section:last-child {
     margin-bottom: 0;
 }
@@ -701,6 +707,7 @@
     .getting-started-sidebar {
         position: static;
         margin-bottom: 32px;
+        max-height: none;
     }
 
     .api-main,
@@ -710,6 +717,73 @@
 
     .next-steps-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .getting-started-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .getting-started-sidebar {
+        order: 2;
+        position: static;
+        max-height: none;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        background: var(--bg-white);
+    }
+    
+    .getting-started-main {
+        order: 1;
+        padding: 24px 16px;
+    }
+    
+    .guides-container {
+        padding: 24px 16px;
+    }
+    
+    .guides-header h1 {
+        font-size: 32px;
+    }
+    
+    .guides-header p {
+        font-size: 16px;
+    }
+    
+    .guide-section {
+        margin-bottom: 48px;
+    }
+    
+    .guide-section h2 {
+        font-size: 24px;
+    }
+    
+    .guide-section h3 {
+        font-size: 20px;
+    }
+    
+    .component-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .flow-diagram {
+        padding: 20px;
+    }
+    
+    .flow-step-card {
+        padding: 16px;
+    }
+    
+    .flow-scenario {
+        margin-bottom: 32px;
+    }
+    
+    .scenario-header h3 {
+        font-size: 20px;
     }
 }
 
