@@ -8,7 +8,7 @@
     // Using Railway URLs - can be easily switched to custom domains later
     const API_URLS = {
         local: 'http://localhost:8080',
-        staging: 'https://flow-platform-staging.up.railway.app',
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
         production: 'https://flow-platform-production.up.railway.app'
     };
     
@@ -18,11 +18,11 @@
                        hostname === '127.0.0.1' ||
                        hostname === '';
     
-    // Check if we're on a staging domain (only check hostname, not localStorage)
-    const isStagingDomain = hostname.includes('staging') || hostname.includes('stage');
+    // Check if we're on a sandbox domain (only check hostname, not localStorage)
+    const isSandboxDomain = hostname.includes('staging') || hostname.includes('stage') || hostname.includes('sandbox');
     
     // Check if user has manually selected an environment (only for API docs, not user pages)
-    // For user-facing pages (sign-in, dashboard), always use production unless on staging domain
+    // For user-facing pages (sign-in, dashboard), always use production unless on sandbox domain
     const manualEnvironment = localStorage.getItem('api_environment');
     const isUserPage = window.location.pathname.includes('signin') || 
                        window.location.pathname.includes('account') ||
@@ -32,9 +32,9 @@
     let API_BASE_URL;
     if (isLocalhost) {
         API_BASE_URL = API_URLS.local;
-    } else if (isStagingDomain) {
-        // If on staging domain, use staging API
-        API_BASE_URL = API_URLS.staging;
+    } else if (isSandboxDomain) {
+        // If on sandbox domain, use sandbox API
+        API_BASE_URL = API_URLS.sandbox;
     } else if (manualEnvironment && API_URLS[manualEnvironment] && !isUserPage) {
         // Manual override only for API docs, not user pages
         API_BASE_URL = API_URLS[manualEnvironment];
@@ -46,7 +46,7 @@
     // Make it globally available
     window.API_BASE_URL = API_BASE_URL;
     window.API_URLS = API_URLS;
-    window.API_ENVIRONMENT = isLocalhost ? 'local' : (isStagingDomain ? 'staging' : (manualEnvironment && !isUserPage ? manualEnvironment : 'production'));
+    window.API_ENVIRONMENT = isLocalhost ? 'local' : (isSandboxDomain ? 'sandbox' : (manualEnvironment && !isUserPage ? manualEnvironment : 'production'));
     
     // Function to switch environment (for documentation toggles)
     window.setApiEnvironment = function(env) {

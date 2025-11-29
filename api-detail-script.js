@@ -747,7 +747,7 @@ const apiData = {
 function updateCurlExample(curlExample) {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     const apiUrls = window.API_URLS || {
-        staging: 'https://flow-platform-staging.up.railway.app',
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
         production: 'https://flow-platform-production.up.railway.app'
     };
     
@@ -761,8 +761,8 @@ function updateCurlExample(curlExample) {
         /https?:\/\/api\.(flow|tbd)\.com/g,
         /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
         /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
-        /https?:\/\/flow-platform-production\.up\.railway\.app/g,
         /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+        /https?:\/\/flow-platform-production\.up\.railway\.app/g,
         /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g  // Any Railway URL before /v1
     ];
     
@@ -780,7 +780,7 @@ function updateCurlExample(curlExample) {
 function updateAllCurlExamples() {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     const apiUrls = window.API_URLS || {
-        staging: 'https://flow-platform-staging.up.railway.app',
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
         production: 'https://flow-platform-production.up.railway.app'
     };
     
@@ -794,8 +794,8 @@ function updateAllCurlExamples() {
                 /https?:\/\/api\.(flow|tbd)\.com/g,
                 /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
                 /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
-                /https?:\/\/flow-platform-production\.up\.railway\.app/g,
                 /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+                /https?:\/\/flow-platform-production\.up\.railway\.app/g,
                 /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g
             ];
             
@@ -821,7 +821,7 @@ function setupEnvironmentToggle() {
     // Map internal env names to user-facing labels
     const envLabels = {
         'production': 'Production',
-        'staging': 'Sandbox'
+        'sandbox': 'Sandbox'
     };
     
     // Update button text to show user-facing labels

@@ -7,7 +7,7 @@
     // API URLs for different environments
     // These should match config.js - using Railway URLs
     const API_URLS = window.API_URLS || {
-        staging: 'https://flow-platform-staging.up.railway.app',
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
         production: 'https://flow-platform-production.up.railway.app'
     };
     
@@ -33,6 +33,7 @@
             'https://api.flow.com',
             'https://api-sandbox.tbd.com',
             'https://flow-platform-staging.up.railway.app',
+            'https://flow-platform-flow-platform-staging.up.railway.app',
             'https://flow-platform-production.up.railway.app'
         ];
         
@@ -97,15 +98,15 @@
         prodBtn.className = 'env-toggle-btn';
         prodBtn.style.cssText = 'padding: 6px 16px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s; font-family: inherit;';
         
-        const stagingBtn = document.createElement('button');
-        stagingBtn.textContent = 'Sandbox';
-        stagingBtn.dataset.env = 'staging';
-        stagingBtn.className = 'env-toggle-btn';
-        stagingBtn.style.cssText = 'padding: 6px 16px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s; font-family: inherit;';
+        const sandboxBtn = document.createElement('button');
+        sandboxBtn.textContent = 'Sandbox';
+        sandboxBtn.dataset.env = 'sandbox';
+        sandboxBtn.className = 'env-toggle-btn';
+        sandboxBtn.style.cssText = 'padding: 6px 16px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s; font-family: inherit;';
         
         // Set active state
         function setActive(env) {
-            [prodBtn, stagingBtn].forEach(btn => {
+            [prodBtn, sandboxBtn].forEach(btn => {
                 if (btn.dataset.env === env) {
                     btn.style.background = '#0f172a';
                     btn.style.color = 'white';
@@ -126,13 +127,13 @@
             setActive('production');
         });
         
-        stagingBtn.addEventListener('click', () => {
-            setEnvironment('staging');
-            setActive('staging');
+        sandboxBtn.addEventListener('click', () => {
+            setEnvironment('sandbox');
+            setActive('sandbox');
         });
         
         toggleSwitch.appendChild(prodBtn);
-        toggleSwitch.appendChild(stagingBtn);
+        toggleSwitch.appendChild(sandboxBtn);
         
         container.appendChild(label);
         container.appendChild(toggleSwitch);
@@ -169,7 +170,7 @@
     // Map internal env names to user-facing labels
     const envLabels = {
         'production': 'Production',
-        'staging': 'Sandbox'
+        'sandbox': 'Sandbox'
     };
     
     // Update button text to show user-facing labels
