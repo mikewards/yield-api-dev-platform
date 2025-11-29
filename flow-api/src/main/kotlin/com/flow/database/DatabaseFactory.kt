@@ -63,21 +63,26 @@ object DatabaseFactory {
             )
         }
         
-        println("🔍 DEBUG: Final jdbcUrl = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(50)}..."}")
+        println("🔍 DEBUG: Final jdbcUrl length = ${jdbcUrl.length}")
+        println("🔍 DEBUG: Final jdbcUrl = ${if (jdbcUrl.isEmpty()) "EMPTY" else "${jdbcUrl.take(80)}..."}")
         println("🔍 DEBUG: dbUser = $dbUser")
         println("🔍 DEBUG: dbPassword = ${if (dbPassword.isEmpty()) "EMPTY" else "***"}")
         
-        val hikariConfig = HikariConfig().apply {
-            jdbcUrl = jdbcUrl
-            username = dbUser
-            password = dbPassword
-            driverClassName = "org.postgresql.Driver"
-            maximumPoolSize = maxPoolSize
-            isAutoCommit = false
-            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-            println("🔍 DEBUG: About to validate HikariConfig...")
-            validate()
-        }
+        // Create HikariConfig and set properties explicitly to avoid shadowing issues
+        val hikariConfig = HikariConfig()
+        hikariConfig.jdbcUrl = jdbcUrl
+        hikariConfig.username = dbUser
+        hikariConfig.password = dbPassword
+        hikariConfig.driverClassName = "org.postgresql.Driver"
+        hikariConfig.maximumPoolSize = maxPoolSize
+        hikariConfig.isAutoCommit = false
+        hikariConfig.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        
+        println("🔍 DEBUG: HikariConfig.jdbcUrl = ${if (hikariConfig.jdbcUrl.isNullOrEmpty()) "NULL/EMPTY" else "${hikariConfig.jdbcUrl.take(80)}..."}")
+        println("🔍 DEBUG: HikariConfig.driverClassName = ${hikariConfig.driverClassName}")
+        println("🔍 DEBUG: About to validate HikariConfig...")
+        
+        hikariConfig.validate()
         
         val dataSource = HikariDataSource(hikariConfig)
         Database.connect(dataSource)
