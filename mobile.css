@@ -230,8 +230,18 @@
    ============================================ */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 36px;
-        line-height: 1.1;
+        font-size: 32px;
+        line-height: 1.15;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .hero-badge {
+        justify-content: center;
+    }
+    
+    .hero-description {
+        text-align: center;
     }
     
     .section-header h2,
