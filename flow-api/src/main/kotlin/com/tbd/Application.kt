@@ -5,6 +5,7 @@ import com.tbd.database.DatabaseFactory
 import com.tbd.middleware.auth
 import com.tbd.middleware.cors
 import com.tbd.middleware.logging
+import com.tbd.middleware.rateLimit
 import com.tbd.middleware.sentry
 import com.tbd.middleware.statusPages
 import io.ktor.serialization.kotlinx.json.*
@@ -38,8 +39,9 @@ fun Application.module() {
         })
     }
     
-    // Configure middleware
+    // Configure middleware (order matters!)
     cors()
+    rateLimit()  // Rate limiting early in pipeline
     logging()
     statusPages()
     auth()

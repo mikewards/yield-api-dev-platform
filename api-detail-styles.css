@@ -139,6 +139,22 @@
     color: var(--text-primary);
 }
 
+.rate-limit-badge {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: var(--bg-gray);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+.rate-limit-badge span {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
 /* Split Layout */
 .detail-split-layout {
     display: grid;

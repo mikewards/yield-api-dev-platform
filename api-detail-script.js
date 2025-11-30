@@ -1,5 +1,34 @@
 // API Detail Page Script
 
+// Rate limit configuration (must match backend RateLimitConfig.kt)
+const rateLimits = {
+    // Reduced limits (75 req/min)
+    'GET /v1/markets': { limit: 75, window: '1 minute' },
+    'GET /v1/yield/rates': { limit: 75, window: '1 minute' },
+    
+    // Standard limits (100 req/min)
+    'POST /v1/auth/authenticate': { limit: 100, window: '1 minute' },
+    'POST /v1/accounts': { limit: 100, window: '1 minute' },
+    'GET /v1/yield/accounts': { limit: 100, window: '1 minute' },
+    'POST /v1/yield/accounts': { limit: 100, window: '1 minute' },
+    'GET /v1/yield/positions': { limit: 100, window: '1 minute' },
+    'GET /v1/transactions': { limit: 100, window: '1 minute' },
+    'POST /v1/applications': { limit: 100, window: '1 minute' },
+    'GET /v1/applications': { limit: 100, window: '1 minute' },
+    
+    // Higher limits
+    'GET /health': { limit: 300, window: '1 minute' },
+    
+    // Default for unlisted endpoints
+    'default': { limit: 100, window: '1 minute' }
+};
+
+// Get rate limit for an endpoint
+function getRateLimit(method, path) {
+    const key = `${method} ${path}`;
+    return rateLimits[key] || rateLimits['default'];
+}
+
 // Comprehensive API endpoint data with detailed request body definitions
 const apiData = {
     'yield-accounts': {
@@ -1066,6 +1095,13 @@ function populatePage(endpoint) {
     endpointMethodBadge.textContent = endpoint.method;
     endpointMethodBadge.className = `endpoint-method-badge ${endpoint.method.toLowerCase()}`;
     document.getElementById('endpoint-path-inline').textContent = endpoint.path;
+    
+    // Update rate limit info
+    const rateLimit = getRateLimit(endpoint.method, endpoint.path);
+    const rateLimitEl = document.getElementById('rate-limit-inline');
+    if (rateLimitEl) {
+        rateLimitEl.textContent = `${rateLimit.limit} req/min`;
+    }
     document.getElementById('permissions-inline').textContent = endpoint.permissions;
     
     // Populate request body

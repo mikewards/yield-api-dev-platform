@@ -450,6 +450,7 @@
             <h3>Going to Production</h3>
             <ul>
                 <li><a href="#environments">Environments</a></li>
+                <li><a href="#rate-limits">Rate Limits</a></li>
                 <li><a href="#best-practices">Best Practices</a></li>
             </ul>
         </aside>
@@ -768,6 +769,85 @@
                     <li>Use mainnet RPC URLs</li>
                     <li>Real cryptocurrency deposits</li>
                 </ul>
+            </section>
+
+            <!-- Rate Limits -->
+            <section id="rate-limits" class="guide-section">
+                <h2>Rate Limits</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px;">
+                    TBD enforces rate limits on all API endpoints to ensure fair usage and platform stability. 
+                    Limits are configured per-endpoint and may vary based on the resource intensity of each operation.
+                </p>
+                
+                <h3>Default Limits</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Most endpoints have a default rate limit of <strong>100 requests per minute</strong> per client.
+                </p>
+                
+                <h3>Endpoint-Specific Limits</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+                    <thead>
+                        <tr style="background: var(--bg-gray); text-align: left;">
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Endpoint</th>
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Limit</th>
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /v1/markets</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">75 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /v1/yield/rates</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">75 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>All other endpoints</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">100 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /health</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">300 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Rate Limit Headers</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    All API responses include rate limit information in the headers:
+                </p>
+                <ul style="font-size: 16px;">
+                    <li><code>X-RateLimit-Limit</code> — Maximum requests allowed per window</li>
+                    <li><code>X-RateLimit-Remaining</code> — Requests remaining in current window</li>
+                    <li><code>X-RateLimit-Reset</code> — Unix timestamp when the window resets</li>
+                </ul>
+                
+                <h3>Handling Rate Limits</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    When you exceed a rate limit, the API returns a <code>429 Too Many Requests</code> response:
+                </p>
+                <div class="code-block" style="background: #1E293B; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <pre style="margin: 0; color: #E2E8F0; font-size: 13px;"><code>{
+  "status": "error",
+  "code": 429,
+  "message": "Rate limit exceeded. Please retry after 45 seconds.",
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "You have exceeded the rate limit of 100 requests per minute for this endpoint.",
+    "type": "rate_limit_error",
+    "retry_after_seconds": 45
+  }
+}</code></pre>
+                </div>
+                <p style="font-size: 16px; color: var(--text-secondary);">
+                    The <code>Retry-After</code> header indicates how long to wait before retrying. 
+                    Implement exponential backoff in your code to gracefully handle rate limits.
+                </p>
             </section>
 
             <!-- Best Practices -->
