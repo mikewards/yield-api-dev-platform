@@ -262,7 +262,7 @@
 /* GET - Blue (Read) */
 .action-method.get,
 .action-method[data-method="GET"] {
-    background: #3B82F6;
+    background: #006aff;
 }
 
 /* PUT/PATCH - Yellow (Update) */
