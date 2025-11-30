@@ -16,7 +16,8 @@ object Schema {
                     YieldAccounts,
                     Positions,
                     Transactions,
-                    Webhooks
+                    Webhooks,
+                    RequestLogs
                 )
             } catch (e: Exception) {
                 // If createMissingTablesAndColumns fails, try create (for new databases)
@@ -29,7 +30,8 @@ object Schema {
                     YieldAccounts,
                     Positions,
                     Transactions,
-                    Webhooks
+                    Webhooks,
+                    RequestLogs
                 )
             }
         }
