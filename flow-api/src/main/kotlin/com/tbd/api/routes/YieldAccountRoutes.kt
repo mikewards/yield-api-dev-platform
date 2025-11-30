@@ -11,6 +11,16 @@ import io.ktor.server.routing.*
 import java.util.*
 import kotlinx.coroutines.runBlocking
 
+// Get network name based on environment
+fun getYieldNetworkName(): String {
+    val env = System.getenv("ENVIRONMENT") ?: "production"
+    return if (env == "sandbox" || env == "staging") {
+        "ethereum_sepolia"
+    } else {
+        "ethereum_mainnet"
+    }
+}
+
 fun Application.yieldAccountRoutes() {
     val yieldService = YieldService()
     val protocolService = com.tbd.integration.ProtocolService()
@@ -21,6 +31,7 @@ fun Application.yieldAccountRoutes() {
                 get {
                     val currency = call.request.queryParameters["currency"]
                     val protocolFilter = call.request.queryParameters["protocol"]
+                    val network = getYieldNetworkName()
                     
                     val currencies = if (currency != null) {
                         listOf(currency.uppercase())
@@ -39,6 +50,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
+                                    network = network,
                                     annual_yield_rate = morphoRate,
                                     apy = morphoRate,
                                     updated_at = java.time.Instant.now().toString()
@@ -49,6 +61,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
+                                    network = network,
                                     annual_yield_rate = 0.0,
                                     apy = 0.0,
                                     updated_at = java.time.Instant.now().toString(),
@@ -59,6 +72,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
+                                    network = network,
                                     annual_yield_rate = 0.0,
                                     apy = 0.0,
                                     updated_at = java.time.Instant.now().toString(),
@@ -75,6 +89,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "aave",
+                                    network = network,
                                     annual_yield_rate = aaveRate,
                                     apy = aaveRate,
                                     updated_at = java.time.Instant.now().toString()
@@ -84,6 +99,7 @@ fun Application.yieldAccountRoutes() {
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "aave",
+                                    network = network,
                                     annual_yield_rate = 0.0,
                                     apy = 0.0,
                                     updated_at = java.time.Instant.now().toString(),

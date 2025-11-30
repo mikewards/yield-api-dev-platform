@@ -8,6 +8,7 @@ data class Market(
     val protocol: String,
     val currency: String,
     val currency_address: String? = null,
+    val network: String,
     val apy: Double,
     val status: String = "active",
     val updated_at: String
