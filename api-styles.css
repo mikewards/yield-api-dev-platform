@@ -434,6 +434,14 @@
     color: var(--primary);
 }
 
+/* Override for code blocks inside lists - use dark theme */
+.guide-section li .code-block code,
+.code-block code,
+.code-block pre {
+    background: #1E293B !important;
+    color: #E2E8F0 !important;
+}
+
 @media (max-width: 768px) {
     .guide-section {
         padding-left: 0;
