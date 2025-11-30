@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Logs - TBD</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="api-styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <link rel="stylesheet" href="mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        /* Logs Page Specific Styles */
+        .logs-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-card .stat-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        .stat-card .stat-change.positive { color: #10B981; }
+        .stat-card .stat-change.negative { color: #EF4444; }
+        
+        /* Logs Filter Bar */
+        .logs-filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .logs-filter-bar select,
+        .logs-filter-bar input {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-white);
+        }
+        
+        .logs-filter-bar input[type="text"] {
+            min-width: 200px;
+        }
+        
+        /* Logs Table */
+        .logs-table {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .logs-table-header {
+            display: grid;
+            grid-template-columns: 100px 80px 1fr 150px 120px 100px 50px;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-gray);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .log-row {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .log-row:last-child {
+            border-bottom: none;
+        }
+        
+        .log-row-summary {
+            display: grid;
+            grid-template-columns: 100px 80px 1fr 150px 120px 100px 50px;
+            gap: 12px;
+            padding: 14px 16px;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 14px;
+        }
+        
+        .log-row-summary:hover {
+            background: var(--bg-gray);
+        }
+        
+        .log-row.expanded .log-row-summary {
+            background: var(--bg-gray);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .log-timestamp {
+            font-family: 'Inter', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .log-method {
+            font-weight: 600;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .log-method.get { background: rgba(0, 106, 255, 0.1); color: #006aff; }
+        .log-method.post { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .log-method.put, .log-method.patch { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .log-method.delete { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+        
+        .log-path {
+            font-family: 'Inter', monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .log-app {
+            font-size: 13px;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .log-status {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .log-status.success { color: #10B981; }
+        .log-status.error { color: #EF4444; }
+        .log-status.warning { color: #F59E0B; }
+        
+        .log-duration {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .log-expand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .log-row.expanded .log-expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Log Details (Expandable) */
+        .log-details {
+            display: none;
+            padding: 20px;
+            background: #FAFBFC;
+            border-top: 1px solid var(--border);
+        }
+        
+        .log-row.expanded .log-details {
+            display: block;
+        }
+        
+        .log-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .log-detail-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .log-detail-section h4 {
+            padding: 12px 16px;
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--bg-gray);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .log-detail-content {
+            padding: 16px;
+        }
+        
+        .log-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        
+        .log-detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .log-detail-label {
+            color: var(--text-secondary);
+        }
+        
+        .log-detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: 'Inter', monospace;
+        }
+        
+        .log-json-preview {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Inter', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* Empty state */
+        .logs-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .logs-empty svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        /* Retention notice */
+        .retention-notice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-gray);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .retention-notice svg {
+            flex-shrink: 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .logs-table-header {
+                display: none;
+            }
+            
+            .log-row-summary {
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto auto;
+                gap: 4px 12px;
+            }
+            
+            .log-timestamp { grid-column: 1; grid-row: 1; }
+            .log-status { grid-column: 2; grid-row: 1; text-align: right; }
+            .log-method { grid-column: 1; grid-row: 2; width: fit-content; }
+            .log-path { grid-column: 1 / -1; grid-row: 3; }
+            .log-app, .log-duration, .log-expand-icon { display: none; }
+            
+            .log-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 709.64 318.6" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-18.802 -64.294)">
+                            <path d="m486.47 249.44c17.36-18.58-2.61-52.28-1.19-100.23 1.43-47.87 33.75-64.18 33.75-64.18s-10.33 4.037-6.98 27.38c2.84 19.8 9.13 42.82 23.5 55.58 14.79 12.23 39.12 45.62 30.15 63.45 18.09-6.14 46.27 8.4 67.08 27.68 21.72 20.55 35.63 30.45 50.69 35.26 21.63 6.92 37.47 0.82 37.47 0.82-24.75 21.36-72.19 21.67-103.15 15.92-30.29-5.63-47.2-22.11-74.75-15.8-34.98 11.95-92.86 66.09-181.53 77.64s-298.26-20.39-323.39-46.83c-25.136-26.43-2.101-35.33-3.753-34.14-0.224-0.23 6.034 5.98 133.22 37.5-22.82-3.67-138.2-40.99-137.99-42.53 0.324 0.11 51.896-190.66 94.97-211.04 43.07-20.368 140.96 38.97 216.25 82.99 89.27 52.21 125.84 111.73 145.65 90.53z" style="stroke-linejoin:round;stroke:#0F172A;stroke-linecap:round;stroke-width:15;fill:none"/>
+                            <path d="m220 314.51a13.571 12.143 0 1 1 -27.14 0 13.571 12.143 0 1 1 27.14 0z" transform="matrix(.85895 0 0 .80874 30.239 43.723)" style="stroke-linejoin:round;stroke:#0F172A;stroke-linecap:round;stroke-width:15;fill:#0F172A"/>
+                        </g>
+                    </svg>
+                    <span class="logo-text">TBD</span>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <!-- Account dropdown -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="container">
+            <span class="secondary-nav-title">Dashboard</span>
+            <div class="secondary-nav-links">
+                <a href="dashboard.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Applications
+                </a>
+                <a href="dashboard-yield.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Yield Accounts
+                </a>
+                <a href="dashboard-logs.html" class="secondary-nav-link active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Logs
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>API Logs</h1>
+                <p>View request and response logs across all your applications.</p>
+            </div>
+
+            <!-- Retention Notice -->
+            <div class="retention-notice">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Logs are retained for <strong>7 days</strong> and then automatically deleted.</span>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="logs-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Requests (7d)</div>
+                    <div class="stat-value" id="statTotalRequests">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value" id="statSuccessRate">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Response Time</div>
+                    <div class="stat-value" id="statAvgTime">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Errors (24h)</div>
+                    <div class="stat-value" id="statErrors">-</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="logs-filter-bar">
+                <select id="filterApp">
+                    <option value="">All Applications</option>
+                </select>
+                <select id="filterEnvironment">
+                    <option value="">All Environments</option>
+                    <option value="sandbox">Sandbox</option>
+                    <option value="production">Production</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="">All Status</option>
+                    <option value="2xx">Success (2xx)</option>
+                    <option value="4xx">Client Error (4xx)</option>
+                    <option value="5xx">Server Error (5xx)</option>
+                </select>
+                <select id="filterMethod">
+                    <option value="">All Methods</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input type="text" id="filterPath" placeholder="Filter by path...">
+            </div>
+
+            <!-- Logs Table -->
+            <div class="logs-table" id="logsTable">
+                <div class="logs-table-header">
+                    <span>Time</span>
+                    <span>Method</span>
+                    <span>Path</span>
+                    <span>Application</span>
+                    <span>Status</span>
+                    <span>Duration</span>
+                    <span></span>
+                </div>
+                <div id="logsBody">
+                    <div class="loading-spinner" style="padding: 40px; text-align: center;">Loading logs...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('tbd_token');
+        const username = localStorage.getItem('tbd_username');
+        
+        if (!token) {
+            window.location.href = 'signin.html';
+        }
+        
+        document.getElementById('userInfo').textContent = username || 'Account';
+        
+        // Dropdown toggle
+        const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
+        const dashboardDropdown = document.getElementById('dashboardDropdown');
+        
+        dashboardDropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dashboardDropdown.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!dashboardDropdown.contains(e.target) && !dashboardDropdownBtn.contains(e.target)) {
+                dashboardDropdown.classList.remove('active');
+            }
+        });
+        
+        // Sign out
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            localStorage.clear();
+            window.location.href = 'signin.html';
+        });
+        
+        // Sample log data (in production, this would come from the API)
+        const sampleLogs = [
+            {
+                id: 'log_001',
+                timestamp: new Date(Date.now() - 60000).toISOString(),
+                method: 'GET',
+                path: '/v1/yield/rates',
+                application: 'Production App',
+                application_id: 'app_123',
+                environment: 'production',
+                status: 200,
+                duration_ms: 45,
+                request_id: 'req_abc123def456',
+                ip_address: '192.168.1.100',
+                user_agent: 'curl/7.79.1',
+                request_headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk_live_...' },
+                response_body: { rates: [{ currency: 'USDC', apy: 0.06 }] }
+            },
+            {
+                id: 'log_002',
+                timestamp: new Date(Date.now() - 120000).toISOString(),
+                method: 'POST',
+                path: '/v1/yield/accounts',
+                application: 'Production App',
+                application_id: 'app_123',
+                environment: 'production',
+                status: 201,
+                duration_ms: 234,
+                request_id: 'req_xyz789abc012',
+                ip_address: '192.168.1.100',
+                user_agent: 'MyApp/1.0',
+                request_body: { currency: 'USDC' },
+                response_body: { account_id: 'ya_123', status: 'active' }
+            },
+            {
+                id: 'log_003',
+                timestamp: new Date(Date.now() - 300000).toISOString(),
+                method: 'GET',
+                path: '/v1/markets',
+                application: 'Sandbox Test',
+                application_id: 'app_456',
+                environment: 'sandbox',
+                status: 200,
+                duration_ms: 67,
+                request_id: 'req_test123456',
+                ip_address: '10.0.0.1',
+                user_agent: 'PostmanRuntime/7.29.0',
+                response_body: { markets: [] }
+            },
+            {
+                id: 'log_004',
+                timestamp: new Date(Date.now() - 600000).toISOString(),
+                method: 'POST',
+                path: '/v1/auth/authenticate',
+                application: 'Production App',
+                application_id: 'app_123',
+                environment: 'production',
+                status: 401,
+                duration_ms: 12,
+                request_id: 'req_fail789',
+                ip_address: '203.0.113.50',
+                user_agent: 'curl/7.79.1',
+                error: { code: 'INVALID_CREDENTIALS', message: 'Invalid username or password' }
+            },
+            {
+                id: 'log_005',
+                timestamp: new Date(Date.now() - 900000).toISOString(),
+                method: 'DELETE',
+                path: '/v1/applications/app_old/tokens/tok_123',
+                application: 'Production App',
+                application_id: 'app_123',
+                environment: 'production',
+                status: 204,
+                duration_ms: 89,
+                request_id: 'req_del456',
+                ip_address: '192.168.1.100',
+                user_agent: 'MyApp/1.0'
+            }
+        ];
+        
+        // Render stats
+        function renderStats() {
+            const total = sampleLogs.length;
+            const successes = sampleLogs.filter(l => l.status >= 200 && l.status < 300).length;
+            const errors = sampleLogs.filter(l => l.status >= 400).length;
+            const avgTime = Math.round(sampleLogs.reduce((sum, l) => sum + l.duration_ms, 0) / total);
+            
+            document.getElementById('statTotalRequests').textContent = total.toLocaleString();
+            document.getElementById('statSuccessRate').textContent = Math.round((successes / total) * 100) + '%';
+            document.getElementById('statAvgTime').textContent = avgTime + 'ms';
+            document.getElementById('statErrors').textContent = errors;
+        }
+        
+        // Format timestamp
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        
+        // Get status class
+        function getStatusClass(status) {
+            if (status >= 200 && status < 300) return 'success';
+            if (status >= 400 && status < 500) return 'warning';
+            if (status >= 500) return 'error';
+            return '';
+        }
+        
+        // Render logs
+        function renderLogs(logs) {
+            const body = document.getElementById('logsBody');
+            
+            if (logs.length === 0) {
+                body.innerHTML = `
+                    <div class="logs-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <p>No logs found matching your filters.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            body.innerHTML = logs.map(log => `
+                <div class="log-row" data-log-id="${log.id}">
+                    <div class="log-row-summary" onclick="toggleLogDetails('${log.id}')">
+                        <span class="log-timestamp">${formatTime(log.timestamp)}</span>
+                        <span class="log-method ${log.method.toLowerCase()}">${log.method}</span>
+                        <span class="log-path">${log.path}</span>
+                        <span class="log-app">${log.application}</span>
+                        <span class="log-status ${getStatusClass(log.status)}">${log.status}</span>
+                        <span class="log-duration">${log.duration_ms}ms</span>
+                        <span class="log-expand-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="log-details">
+                        <div class="log-details-grid">
+                            <div class="log-detail-section">
+                                <h4>Request Details</h4>
+                                <div class="log-detail-content">
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">Request ID</span>
+                                        <span class="log-detail-value">${log.request_id}</span>
+                                    </div>
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">Timestamp</span>
+                                        <span class="log-detail-value">${new Date(log.timestamp).toLocaleString()}</span>
+                                    </div>
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">Environment</span>
+                                        <span class="log-detail-value">${log.environment}</span>
+                                    </div>
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">IP Address</span>
+                                        <span class="log-detail-value">${log.ip_address}</span>
+                                    </div>
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">User Agent</span>
+                                        <span class="log-detail-value">${log.user_agent}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="log-detail-section">
+                                <h4>Response</h4>
+                                <div class="log-detail-content">
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">Status Code</span>
+                                        <span class="log-detail-value">${log.status}</span>
+                                    </div>
+                                    <div class="log-detail-row">
+                                        <span class="log-detail-label">Duration</span>
+                                        <span class="log-detail-value">${log.duration_ms}ms</span>
+                                    </div>
+                                    ${log.error ? `
+                                        <div style="margin-top: 12px;">
+                                            <span class="log-detail-label">Error</span>
+                                            <div class="log-json-preview" style="margin-top: 8px;">${JSON.stringify(log.error, null, 2)}</div>
+                                        </div>
+                                    ` : log.response_body ? `
+                                        <div style="margin-top: 12px;">
+                                            <span class="log-detail-label">Response Body</span>
+                                            <div class="log-json-preview" style="margin-top: 8px;">${JSON.stringify(log.response_body, null, 2)}</div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Toggle log details
+        function toggleLogDetails(logId) {
+            const row = document.querySelector(`[data-log-id="${logId}"]`);
+            row.classList.toggle('expanded');
+        }
+        
+        // Initialize
+        renderStats();
+        renderLogs(sampleLogs);
+        
+        // Load applications for filter dropdown
+        async function loadApplicationsFilter() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/applications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('filterApp');
+                    if (data.applications) {
+                        data.applications.forEach(app => {
+                            const option = document.createElement('option');
+                            option.value = app.application_id;
+                            option.textContent = app.name;
+                            select.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load applications:', error);
+            }
+        }
+        
+        loadApplicationsFilter();
+    </script>
+    <script src="script.js"></script>
+    <script src="nav-auth.js"></script>
+</body>
+</html>
+

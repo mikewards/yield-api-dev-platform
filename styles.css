@@ -56,7 +56,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    height: 64px;
     gap: 16px;
 }
 
@@ -68,23 +68,38 @@ body {
     font-size: 20px;
     color: var(--text-primary);
     text-decoration: none;
-    line-height: 1;
+    height: 64px;
 }
 
 .logo svg {
     flex-shrink: 0;
+    width: 32px;
+    height: 32px;
 }
 
 .logo-text {
     color: var(--primary);
     font-weight: 700;
-    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .nav-links {
     display: flex;
     align-items: center;
     gap: 32px;
+    height: 64px;
+}
+
+.nav-links a:not(.btn-primary):not(.btn-secondary) {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    height: 64px;
 }
 
 .nav-links a {
@@ -93,8 +108,6 @@ body {
     font-weight: 500;
     font-size: 14px;
     transition: color 0.2s;
-    line-height: 1;
-    padding: 8px 0;
 }
 
 .nav-links a:hover {
