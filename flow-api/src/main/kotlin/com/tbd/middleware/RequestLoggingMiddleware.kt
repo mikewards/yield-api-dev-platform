@@ -72,25 +72,48 @@ fun Application.requestLogging() {
         var accountId: UUID? = null
         var environment = System.getenv("ENVIRONMENT") ?: "production"
         
+        // Capture values needed for async logging
+        val method = call.request.httpMethod.value
+        val statusCode = call.response.status()?.value ?: 0
+        val ipAddress = call.request.origin.remoteHost
+        val userAgent = call.request.userAgent()?.take(500)
+        
         if (authHeader?.startsWith("Bearer ") == true) {
             val tokenValue = authHeader.removePrefix("Bearer ")
             try {
-                // Look up token to get application info
-                newSuspendedTransaction {
-                    val tokenRow = AccessTokens
-                        .select { AccessTokens.token eq tokenValue }
-                        .firstOrNull()
-                    
-                    if (tokenRow != null) {
-                        applicationId = tokenRow[AccessTokens.applicationId]
-                        accountId = tokenRow[AccessTokens.accountId]
-                        environment = tokenRow[AccessTokens.environment]
+                // Look up token to get application info (synchronous, in same transaction context)
+                val tokenData = kotlinx.coroutines.runBlocking {
+                    newSuspendedTransaction {
+                        AccessTokens
+                            .select { AccessTokens.token eq tokenValue }
+                            .firstOrNull()
+                            ?.let { row ->
+                                Triple(
+                                    row[AccessTokens.applicationId],
+                                    row[AccessTokens.accountId],
+                                    row[AccessTokens.environment]
+                                )
+                            }
                     }
                 }
+                
+                if (tokenData != null) {
+                    applicationId = tokenData.first
+                    accountId = tokenData.second
+                    environment = tokenData.third
+                    println("📝 Logging request for app=${applicationId}, account=${accountId}, env=${environment}")
+                } else {
+                    println("⚠️ Token not found for logging: ${tokenValue.take(20)}...")
+                }
             } catch (e: Exception) {
-                // Ignore token lookup errors
+                println("⚠️ Token lookup failed for logging: ${e.message}")
             }
         }
+        
+        // Capture final values for async logging
+        val finalAppId = applicationId
+        val finalAccountId = accountId
+        val finalEnv = environment
         
         // Log asynchronously (non-blocking)
         loggingScope.launch {
@@ -99,26 +122,25 @@ fun Application.requestLogging() {
                     RequestLogs.insert {
                         it[RequestLogs.id] = UUID.randomUUID()
                         it[RequestLogs.requestId] = requestId
-                        it[RequestLogs.applicationId] = applicationId
-                        it[RequestLogs.accountId] = accountId
-                        it[RequestLogs.environment] = environment
-                        it[RequestLogs.method] = call.request.httpMethod.value
+                        it[RequestLogs.applicationId] = finalAppId
+                        it[RequestLogs.accountId] = finalAccountId
+                        it[RequestLogs.environment] = finalEnv
+                        it[RequestLogs.method] = method
                         it[RequestLogs.path] = path
-                        it[RequestLogs.statusCode] = call.response.status()?.value ?: 0
+                        it[RequestLogs.statusCode] = statusCode
                         it[RequestLogs.durationMs] = duration
-                        it[RequestLogs.ipAddress] = call.request.origin.remoteHost
-                        it[RequestLogs.userAgent] = call.request.userAgent()?.take(500)
-                        it[RequestLogs.requestBody] = null // Skip for now to avoid complexity
-                        it[RequestLogs.responseBody] = null // Skip for now - response bodies can be large
-                        it[RequestLogs.errorMessage] = if ((call.response.status()?.value ?: 200) >= 400) {
-                            "HTTP ${call.response.status()?.value}"
-                        } else null
+                        it[RequestLogs.ipAddress] = ipAddress
+                        it[RequestLogs.userAgent] = userAgent
+                        it[RequestLogs.requestBody] = null
+                        it[RequestLogs.responseBody] = null
+                        it[RequestLogs.errorMessage] = if (statusCode >= 400) "HTTP $statusCode" else null
                         it[RequestLogs.timestamp] = Instant.now()
                     }
                 }
+                println("✅ Request logged: $method $path -> $statusCode (${duration}ms)")
             } catch (e: Exception) {
-                // Log errors but don't crash - logging should never break the app
-                println("Failed to log request: ${e.message}")
+                println("❌ Failed to log request: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
