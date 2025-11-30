@@ -701,9 +701,5 @@ body.menu-open {
     .footer {
         padding-bottom: env(safe-area-inset-bottom);
     }
-    
-    .nav-links {
-        padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    }
 }
 
