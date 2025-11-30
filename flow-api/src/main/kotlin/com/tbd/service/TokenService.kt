@@ -51,17 +51,32 @@ class TokenService {
     }
     
     fun validateToken(token: String): ResultRow? {
-        return transaction {
-            val tokenRow = AccessTokens.select { AccessTokens.token eq token }.firstOrNull()
-            if (tokenRow == null) return@transaction null
-            
-            // Check expiration
-            val expiresAt = tokenRow[AccessTokens.expiresAt]
-            if (expiresAt != null && expiresAt.isBefore(java.time.Instant.now())) {
-                return@transaction null
+        return try {
+            transaction {
+                println("🔍 Looking up token in database: ${token.take(20)}...")
+                val tokenRow = AccessTokens.select { AccessTokens.token eq token }.firstOrNull()
+                
+                if (tokenRow == null) {
+                    println("❌ Token not found in database")
+                    return@transaction null
+                }
+                
+                println("✅ Token found in database - account: ${tokenRow[AccessTokens.accountId]}, environment: ${tokenRow[AccessTokens.environment]}")
+                
+                // Check expiration
+                val expiresAt = tokenRow[AccessTokens.expiresAt]
+                if (expiresAt != null && expiresAt.isBefore(java.time.Instant.now())) {
+                    println("❌ Token expired: $expiresAt")
+                    return@transaction null
+                }
+                
+                println("✅ Token is valid and not expired")
+                tokenRow
             }
-            
-            tokenRow
+        } catch (e: Exception) {
+            println("❌ Database error during token validation: ${e.message}")
+            e.printStackTrace()
+            null
         }
     }
     
