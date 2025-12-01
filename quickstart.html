@@ -19,53 +19,59 @@
         
         .qs-hero {
             background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-            padding: 80px 24px 64px;
+            padding: 48px 24px 32px;
             text-align: center;
         }
         
         .qs-hero h1 {
-            font-size: clamp(32px, 5vw, 48px);
+            font-size: clamp(28px, 5vw, 40px);
             font-weight: 700;
             letter-spacing: -0.03em;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text-primary);
         }
         
         .qs-hero p {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-secondary);
-            max-width: 500px;
-            margin: 0 auto 32px;
+            max-width: 450px;
+            margin: 0 auto 16px;
             line-height: 1.6;
         }
         
         .qs-time-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: white;
-            border: 1px solid var(--border);
-            padding: 8px 16px;
+            gap: 6px;
+            background: #f1f5f9;
+            border: none;
+            padding: 6px 12px;
             border-radius: 100px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-secondary);
         }
         
         .qs-time-badge svg {
             color: var(--qs-accent);
+            width: 14px;
+            height: 14px;
         }
         
         .qs-container {
             max-width: 680px;
             margin: 0 auto;
-            padding: 0 24px 80px;
+            padding: 0 24px 60px;
         }
         
         .qs-step {
             position: relative;
-            padding: 40px 0;
+            padding: 24px 0;
             border-bottom: 1px solid var(--border);
+        }
+        
+        .qs-step:first-of-type {
+            padding-top: 16px;
         }
         
         .qs-step:last-of-type {
@@ -75,20 +81,20 @@
         .qs-step-header {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin-bottom: 12px;
         }
         
         .qs-step-num {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: var(--bg-dark);
+            width: 28px;
+            height: 28px;
+            background: #0f172a;
             color: white;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             flex-shrink: 0;
         }
@@ -263,7 +269,7 @@
         }
         
         .qs-response-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-tertiary);
             text-transform: uppercase;
@@ -272,14 +278,19 @@
         }
         
         .qs-response-content {
-            background: #f1f5f9;
-            border-radius: 8px;
+            background: #0f172a;
+            border-radius: 10px;
             padding: 16px 20px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             line-height: 1.7;
-            color: #475569;
+            color: #94a3b8;
             overflow-x: auto;
+        }
+        
+        .qs-response-content pre {
+            margin: 0;
+            color: #e2e8f0;
         }
         
         .qs-cta-btn {
@@ -317,32 +328,34 @@
         }
         
         .qs-next-steps {
-            margin-top: 64px;
-            padding-top: 48px;
+            margin-top: 40px;
+            padding-top: 32px;
             border-top: 1px solid var(--border);
         }
         
         .qs-next-steps h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: var(--text-primary);
         }
         
         .qs-links-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
         }
         
         .qs-link-card {
-            display: block;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             text-decoration: none;
             transition: all 0.15s;
+            min-height: 80px;
         }
         
         .qs-link-card:hover {
@@ -352,15 +365,16 @@
         }
         
         .qs-link-card h3 {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 4px;
         }
         
         .qs-link-card p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
+            flex: 1;
             margin: 0;
             line-height: 1.5;
         }
