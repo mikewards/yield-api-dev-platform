@@ -3,11 +3,13 @@ package com.tbd.service
 import com.tbd.dto.*
 import com.tbd.model.AccessTokens
 import com.tbd.model.Applications
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
@@ -15,20 +17,35 @@ import java.util.*
 class ApplicationService {
     private val json = Json { ignoreUnknownKeys = true }
     private val walletService = WalletService()
+    private val alchemyService = AlchemyService()
+    private val logger = LoggerFactory.getLogger(ApplicationService::class.java)
     
     companion object {
-        // Default RPC URLs - free public endpoints for easy onboarding
-        const val DEFAULT_SANDBOX_RPC = "https://rpc.sepolia.org"
-        const val DEFAULT_PRODUCTION_RPC = "https://eth.llamarpc.com" // Free public mainnet RPC
+        // Fallback RPC URLs - used if Alchemy provisioning fails
+        const val FALLBACK_SANDBOX_RPC = "https://rpc.sepolia.org"
+        const val FALLBACK_PRODUCTION_RPC = "https://eth.llamarpc.com"
     }
     
     fun createApplication(accountId: UUID, request: CreateApplicationRequest): ApplicationResponse {
         val now = Instant.now()
         val webhookSecret = if (request.webhook_url != null) generateWebhookSecret() else null
         
-        // Auto-provision RPC URLs with defaults if not provided
-        val sandboxRpc = request.sandbox_rpc_url?.takeIf { it.isNotBlank() } ?: DEFAULT_SANDBOX_RPC
-        val productionRpc = request.production_rpc_url?.takeIf { it.isNotBlank() } ?: DEFAULT_PRODUCTION_RPC
+        // Provision Alchemy keys if not provided
+        val (sandboxRpc, productionRpc) = if (request.sandbox_rpc_url.isNullOrBlank() || request.production_rpc_url.isNullOrBlank()) {
+            logger.info("Provisioning Alchemy RPC keys for application: ${request.name}")
+            try {
+                val alchemyKeys = runBlocking { 
+                    alchemyService.provisionApps(request.name) 
+                }
+                logger.info("Successfully provisioned Alchemy keys - Sandbox: ${alchemyKeys.sandboxRpcUrl.take(50)}...")
+                Pair(alchemyKeys.sandboxRpcUrl, alchemyKeys.productionRpcUrl)
+            } catch (e: Exception) {
+                logger.error("Failed to provision Alchemy keys, using fallback: ${e.message}")
+                Pair(FALLBACK_SANDBOX_RPC, FALLBACK_PRODUCTION_RPC)
+            }
+        } else {
+            Pair(request.sandbox_rpc_url, request.production_rpc_url)
+        }
         
         // Create application
         val applicationId = transaction {
