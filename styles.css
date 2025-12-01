@@ -78,6 +78,21 @@ a.text-link:not(.btn):hover {
     text-decoration: none !important;
 }
 
+/* Ensure footer links keep their original styling */
+.footer a,
+.footer-section a,
+.footer-section ul li a {
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
+}
+
+.footer a:hover,
+.footer-section a:hover,
+.footer-section ul li a:hover {
+    color: var(--primary) !important;
+    text-decoration: none !important;
+}
+
 .container {
     max-width: 1280px;
     margin: 0 auto;
