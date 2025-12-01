@@ -141,10 +141,12 @@
         .code-block pre {
             margin: 0;
             padding: 20px;
+            background: #1E293B;
             font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
             font-size: 14px;
             line-height: 1.6;
             overflow-x: auto;
+            color: #E2E8F0;
         }
         
         .code-block code {
@@ -159,6 +161,50 @@
         .code-block .comment { color: #64748b; }
         .code-block .string { color: #34d399; }
         .code-block .keyword { color: #60a5fa; }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 900px) {
+            .guides-layout {
+                grid-template-columns: 1fr;
+                padding: 24px 16px;
+            }
+            
+            .guides-sidebar {
+                display: none;
+            }
+            
+            .guides-main {
+                max-width: 100%;
+            }
+            
+            .guides-main h1 {
+                font-size: 28px;
+            }
+            
+            .guide-section h2 {
+                font-size: 20px;
+            }
+            
+            .api-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .code-block pre {
+                font-size: 12px;
+                padding: 16px;
+            }
+            
+            .step-list li {
+                padding-left: 40px;
+            }
+            
+            .step-list li::before {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
         
         .callout {
             background: var(--bg-gray);
