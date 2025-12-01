@@ -30,6 +30,70 @@ function copyCode(button, codeId) {
     });
 }
 
+// Syntax highlighting for cURL commands
+function highlightCurl(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight curl command
+    html = html.replace(/^(curl)\s/gm, '<span class="token-cmd">$1</span> ');
+    
+    // Highlight URLs (http/https)
+    html = html.replace(/(https?:\/\/[^\s\\]+)/g, '<span class="token-url">$1</span>');
+    
+    // Highlight flags like -X, -H, -d
+    html = html.replace(/(\s)(-[A-Za-z]+)(\s)/g, '$1<span class="token-flag">$2</span>$3');
+    
+    // Highlight header values in quotes
+    html = html.replace(/"([^"]+)"/g, '<span class="token-string">"$1"</span>');
+    
+    // Highlight single-quoted strings (JSON body)
+    html = html.replace(/'(\{[\s\S]*?\})'/g, function(match, json) {
+        return "'" + highlightJsonInline(json) + "'";
+    });
+    
+    return html;
+}
+
+// Highlight JSON inline (within cURL body)
+function highlightJsonInline(json) {
+    let html = json;
+    // Keys
+    html = html.replace(/"([^"]+)"(\s*:)/g, '<span class="token-property">"$1"</span>$2');
+    // String values (after colon)
+    html = html.replace(/:(\s*)"([^"]+)"/g, ':$1<span class="token-string-value">"$2"</span>');
+    return html;
+}
+
+// Syntax highlighting for JSON responses
+function highlightJson(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight property keys
+    html = html.replace(/"([^"]+)"(\s*:)/g, '<span class="token-property">"$1"</span>$2');
+    
+    // Highlight string values (after colon, with quotes)
+    html = html.replace(/:(\s*)"([^"]*)"/g, ':$1<span class="token-string-value">"$2"</span>');
+    
+    // Highlight numbers
+    html = html.replace(/:(\s*)(\d+\.?\d*)/g, ':$1<span class="token-number">$2</span>');
+    
+    // Highlight booleans
+    html = html.replace(/:(\s*)(true|false)/g, ':$1<span class="token-boolean">$2</span>');
+    
+    // Highlight null
+    html = html.replace(/:(\s*)(null)/g, ':$1<span class="token-null">$2</span>');
+    
+    return html;
+}
+
 // Generate line numbers for code blocks
 function addLineNumbers(codeBlock) {
     const content = codeBlock.querySelector('.code-block-content');
@@ -60,10 +124,25 @@ function addLineNumbers(codeBlock) {
 
 // Auto-initialize code blocks on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Add line numbers and copy functionality to all code blocks
+    // Process all code blocks with syntax highlighting
     document.querySelectorAll('.code-block-unified').forEach((block, index) => {
         const pre = block.querySelector('pre');
+        const code = pre ? pre.querySelector('code') : null;
         const copyBtn = block.querySelector('.code-copy-btn');
+        
+        // Apply syntax highlighting
+        if (code && !code.dataset.highlighted) {
+            const text = code.textContent || '';
+            const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
+            const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+            
+            if (isCurl) {
+                code.innerHTML = highlightCurl(text);
+            } else if (isJson) {
+                code.innerHTML = highlightJson(text);
+            }
+            code.dataset.highlighted = 'true';
+        }
         
         // Add line numbers
         addLineNumbers(block);
@@ -72,6 +151,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (pre && copyBtn && !pre.id) {
             pre.id = 'code-' + index;
             copyBtn.setAttribute('onclick', `copyCode(this, '${pre.id}')`);
+        }
+    });
+    
+    // Process response blocks
+    document.querySelectorAll('.response-block-unified').forEach((block, index) => {
+        const pre = block.querySelector('pre');
+        const code = pre ? pre.querySelector('code') : null;
+        const content = block.querySelector('.response-content');
+        
+        // Apply JSON highlighting to response blocks
+        if (code && !code.dataset.highlighted) {
+            const text = code.textContent || '';
+            code.innerHTML = highlightJson(text);
+            code.dataset.highlighted = 'true';
+        }
+        
+        // Add line numbers to response blocks
+        if (content && pre && !content.querySelector('.code-line-numbers')) {
+            const codeText = pre.textContent || '';
+            const lines = codeText.split('\n');
+            const lineCount = lines.length;
+            
+            const lineNumbers = document.createElement('div');
+            lineNumbers.className = 'code-line-numbers';
+            
+            for (let i = 1; i <= lineCount; i++) {
+                const span = document.createElement('span');
+                span.textContent = i;
+                lineNumbers.appendChild(span);
+            }
+            
+            content.insertBefore(lineNumbers, pre);
         }
     });
 });

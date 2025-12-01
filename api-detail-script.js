@@ -819,6 +819,53 @@ const apiData = {
     }
 };
 
+// Syntax highlighting for cURL commands (local copy for this script)
+function highlightCurlLocal(text) {
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight curl command
+    html = html.replace(/^(curl)\s/gm, '<span class="token-cmd">$1</span> ');
+    
+    // Highlight URLs (http/https)
+    html = html.replace(/(https?:\/\/[^\s\\]+)/g, '<span class="token-url">$1</span>');
+    
+    // Highlight flags like -X, -H, -d
+    html = html.replace(/(\s)(-[A-Za-z]+)(\s)/g, '$1<span class="token-flag">$2</span>$3');
+    
+    // Highlight header values in quotes (but not the JSON body)
+    html = html.replace(/"([^"{}]+)"/g, '<span class="token-string">"$1"</span>');
+    
+    return html;
+}
+
+// Syntax highlighting for JSON
+function highlightJsonLocal(text) {
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight property keys
+    html = html.replace(/"([^"]+)"(\s*:)/g, '<span class="token-property">"$1"</span>$2');
+    
+    // Highlight string values (after colon)
+    html = html.replace(/:(\s*)"([^"]*)"/g, ':$1<span class="token-string-value">"$2"</span>');
+    
+    // Highlight numbers
+    html = html.replace(/:(\s*)(\d+\.?\d*)/g, ':$1<span class="token-number">$2</span>');
+    
+    // Highlight booleans
+    html = html.replace(/:(\s*)(true|false)/g, ':$1<span class="token-boolean">$2</span>');
+    
+    // Highlight null
+    html = html.replace(/:(\s*)(null)/g, ':$1<span class="token-null">$2</span>');
+    
+    return html;
+}
+
 // Function to update curl example with current environment URL
 function updateCurlExample(curlExample) {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
@@ -850,7 +897,8 @@ function updateCurlExample(curlExample) {
     
     const curlExampleEl = document.getElementById('curl-example');
     if (curlExampleEl) {
-        curlExampleEl.textContent = updatedExample;
+        // Apply syntax highlighting
+        curlExampleEl.innerHTML = highlightCurlLocal(updatedExample);
     }
 }
 
@@ -893,7 +941,8 @@ function updateAllCurlExamples() {
         const original = curlExampleEl.textContent;
         const updated = replaceUrls(original);
         if (updated !== original) {
-            curlExampleEl.textContent = updated;
+            // Apply syntax highlighting when updating
+            curlExampleEl.innerHTML = highlightCurlLocal(updated);
             console.log('✅ Updated curl-example URL');
         }
     }
@@ -1117,9 +1166,11 @@ function populatePage(endpoint) {
         requestBody.innerHTML = '<p style="color: var(--text-secondary);">No request body required for this endpoint.</p>';
     }
     
-    // Populate responses
-    document.getElementById('success-response').textContent = JSON.stringify(endpoint.successResponse, null, 2);
-    document.getElementById('error-response').textContent = JSON.stringify(endpoint.errorResponse, null, 2);
+    // Populate responses with syntax highlighting
+    const successJson = JSON.stringify(endpoint.successResponse, null, 2);
+    const errorJson = JSON.stringify(endpoint.errorResponse, null, 2);
+    document.getElementById('success-response').innerHTML = highlightJsonLocal(successJson);
+    document.getElementById('error-response').innerHTML = highlightJsonLocal(errorJson);
     
     // Populate CURL example
     // Update curl example with current environment URL
