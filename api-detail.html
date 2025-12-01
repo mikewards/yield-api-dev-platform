@@ -137,22 +137,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="code-example-box" style="width: 100%; min-width: 100%; box-sizing: border-box;">
-                            <div class="code-header-bar">
-                                <span class="code-lang">cURL</span>
+                        <div class="code-block-unified" style="width: 100%; min-width: 100%; box-sizing: border-box;">
+                            <div class="code-block-header">
+                                <span class="code-block-label">Terminal</span>
+                                <button class="code-copy-btn" onclick="copyCode(this, 'curl-example')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    Copy
+                                </button>
                             </div>
-                            <pre style="width: 100%; box-sizing: border-box;"><code id="curl-example" style="display: block; width: 100%;">curl https://api.tbd.com/v1/yield/accounts \
-  -X POST \
-  -H "Authorization: Bearer sk_live_..." \
-  -H "Content-Type: application/json" \
-  -d '{
+                            <div class="code-block-content">
+                                <pre id="curl-example"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "currency": "USDC",
     "initial_deposit": {
       "amount": "1000.00",
       "currency": "USDC"
     },
     "protocol_preference": "auto"
-  }'</code></pre>
+  }'</span></pre>
+                            </div>
                         </div>
                     </div>
 
@@ -165,8 +171,9 @@
                         </div>
                         <div class="response-content">
                             <div class="tab-content active" id="success-tab">
-                                <div class="code-example-box">
-                                    <pre><code id="success-response">{
+                                <div class="response-block-unified">
+                                    <div class="response-content dark">
+                                        <pre id="success-response">{
   "account_id": "ya_1234567890abcdef",
   "currency": "USDC",
   "protocol": "morpho",
@@ -177,12 +184,14 @@
     "amount": "1000.00",
     "currency": "USDC"
   }
-}</code></pre>
+}</pre>
+                                    </div>
                                 </div>
                             </div>
                             <div class="tab-content" id="error-tab">
-                                <div class="code-example-box">
-                                    <pre><code id="error-response">{
+                                <div class="response-block-unified">
+                                    <div class="response-content dark">
+                                        <pre id="error-response">{
   "error": {
     "code": "INSUFFICIENT_FUNDS",
     "message": "Insufficient funds to create yield account",

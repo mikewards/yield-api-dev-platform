@@ -11,6 +11,38 @@
     }
 })();
 
+// Unified Code Block Copy Function
+function copyCode(button, codeId) {
+    const codeElement = document.getElementById(codeId);
+    if (!codeElement) return;
+    
+    const code = codeElement.innerText || codeElement.textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg> Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// Auto-initialize copy buttons on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all code blocks without explicit copy handlers and add them
+    document.querySelectorAll('.code-block-unified').forEach((block, index) => {
+        const pre = block.querySelector('pre');
+        const copyBtn = block.querySelector('.code-copy-btn');
+        if (pre && copyBtn && !pre.id) {
+            pre.id = 'code-' + index;
+            copyBtn.setAttribute('onclick', `copyCode(this, '${pre.id}')`);
+        }
+    });
+});
+
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
