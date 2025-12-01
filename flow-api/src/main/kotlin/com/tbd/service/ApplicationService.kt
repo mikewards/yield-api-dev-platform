@@ -3,7 +3,6 @@ package com.tbd.service
 import com.tbd.dto.*
 import com.tbd.model.AccessTokens
 import com.tbd.model.Applications
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
@@ -34,9 +33,7 @@ class ApplicationService {
         val (sandboxRpc, productionRpc) = if (request.sandbox_rpc_url.isNullOrBlank() || request.production_rpc_url.isNullOrBlank()) {
             logger.info("Provisioning Alchemy RPC keys for application: ${request.name}")
             try {
-                val alchemyKeys = runBlocking { 
-                    alchemyService.provisionApps(request.name) 
-                }
+                val alchemyKeys = alchemyService.provisionApps(request.name)
                 logger.info("Successfully provisioned Alchemy keys - Sandbox: ${alchemyKeys.sandboxRpcUrl.take(50)}...")
                 Pair(alchemyKeys.sandboxRpcUrl, alchemyKeys.productionRpcUrl)
             } catch (e: Exception) {
