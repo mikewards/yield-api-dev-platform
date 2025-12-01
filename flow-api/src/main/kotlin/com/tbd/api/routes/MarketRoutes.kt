@@ -8,7 +8,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 // Get network name based on environment
 fun getNetworkName(): String {
@@ -27,31 +28,48 @@ fun Application.marketRoutes() {
         route("/v1/markets") {
             authenticate("bearer-auth") {
                 get {
-                    println("🔐 /v1/markets endpoint called - authentication passed")
                     try {
                         val protocolFilter = call.request.queryParameters["protocol"]
                         val currencyFilter = call.request.queryParameters["currency"]
                         val network = getNetworkName()
-                        
-                        println("📊 Fetching markets - Protocol: $protocolFilter, Currency: $currencyFilter, Network: $network")
+                        val now = java.time.Instant.now().toString()
                         
                         val markets = mutableListOf<Market>()
-                    
-                    // Fetch Morpho markets
-                    if (protocolFilter == null || protocolFilter == "morpho") {
-                        try {
-                            println("🔄 Fetching Morpho markets...")
-                            val morphoMarkets = runBlocking {
-                                protocolService.listMorphoMarkets()
-                            }
-                            println("✅ Morpho markets fetched: ${morphoMarkets.size} markets")
+                        
+                        // Fetch BOTH protocols in PARALLEL (2 API calls total, not sequential)
+                        coroutineScope {
+                            val morphoDeferred = if (protocolFilter == null || protocolFilter == "morpho") {
+                                async {
+                                    try {
+                                        protocolService.listMorphoMarkets()
+                                    } catch (e: Exception) {
+                                        println("⚠️ Morpho API error: ${e.message}")
+                                        emptyList()
+                                    }
+                                }
+                            } else null
                             
+                            val aaveDeferred = if (protocolFilter == null || protocolFilter == "aave") {
+                                async {
+                                    try {
+                                        protocolService.listAaveMarkets()
+                                    } catch (e: Exception) {
+                                        println("⚠️ Aave API error: ${e.message}")
+                                        emptyList()
+                                    }
+                                }
+                            } else null
+                            
+                            // Await both in parallel
+                            val morphoMarkets = morphoDeferred?.await() ?: emptyList()
+                            val aaveMarkets = aaveDeferred?.await() ?: emptyList()
+                            
+                            // Process Morpho markets
                             morphoMarkets.forEach { morphoMarket ->
                                 val symbol = morphoMarket.loanAsset?.symbol
                                 val address = morphoMarket.loanAsset?.address
                                 val apy = morphoMarket.state?.supplyApy ?: 0.0
                                 
-                                // Apply currency filter if specified
                                 if (currencyFilter == null || symbol?.equals(currencyFilter, ignoreCase = true) == true) {
                                     if (symbol != null && apy > 0.0) {
                                         markets.add(Market(
@@ -62,33 +80,17 @@ fun Application.marketRoutes() {
                                             network = network,
                                             apy = apy,
                                             status = "active",
-                                            updated_at = java.time.Instant.now().toString()
+                                            updated_at = now
                                         ))
                                     }
                                 }
                             }
-                        } catch (e: Exception) {
-                            println("⚠️ Failed to fetch Morpho markets: ${e.message}")
-                            e.printStackTrace()
-                            // Continue with Aave markets even if Morpho fails
-                        }
-                    }
-                    
-                    // Fetch Aave markets
-                    if (protocolFilter == null || protocolFilter == "aave") {
-                        try {
-                            println("🔄 Fetching Aave markets...")
-                            val aaveMarkets = runBlocking {
-                                protocolService.listAaveMarkets()
-                            }
-                            println("✅ Aave markets fetched: ${aaveMarkets.size} markets")
                             
+                            // Process Aave markets
                             aaveMarkets.forEach { aaveReserve ->
-                                val symbol = aaveReserve.underlyingToken?.symbol
-                                val apyValue = aaveReserve.supplyInfo?.apy?.value
-                                val apy = apyValue?.toDoubleOrNull() ?: 0.0
+                                val symbol = aaveReserve.symbol
+                                val apy = aaveReserve.supplyApy
                                 
-                                // Apply currency filter if specified
                                 if (currencyFilter == null || symbol?.equals(currencyFilter, ignoreCase = true) == true) {
                                     if (symbol != null && apy > 0.0) {
                                         markets.add(Market(
@@ -99,33 +101,16 @@ fun Application.marketRoutes() {
                                             network = network,
                                             apy = apy,
                                             status = "active",
-                                            updated_at = java.time.Instant.now().toString()
+                                            updated_at = now
                                         ))
                                     }
                                 }
                             }
-                        } catch (e: Exception) {
-                            println("⚠️ Failed to fetch Aave markets: ${e.message}")
-                            e.printStackTrace()
-                            // Return whatever we have from Morpho
-                        }
-                    }
-                    
-                        // Always return a response, even if empty
-                        println("📦 Total markets collected: ${markets.size}")
-                        if (markets.isEmpty()) {
-                            println("⚠️ No markets found. Protocol filter: $protocolFilter, Currency filter: $currencyFilter")
-                        } else {
-                            println("✅ Returning ${markets.size} markets")
                         }
                         
-                        // Ensure we always send a response
-                        val response = MarketsResponse(markets = markets)
-                        println("📤 Sending response: ${response.markets.size} markets")
-                        call.respond(response)
+                        call.respond(MarketsResponse(markets = markets))
                     } catch (e: Exception) {
                         println("❌ Error in /v1/markets: ${e.message}")
-                        e.printStackTrace()
                         call.respond(
                             HttpStatusCode.InternalServerError,
                             ErrorResponse(
