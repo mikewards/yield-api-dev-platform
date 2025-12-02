@@ -10,6 +10,16 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
 
+// Get network name based on environment
+fun getNetworkName(): String {
+    val env = System.getenv("ENVIRONMENT") ?: "production"
+    return if (env == "sandbox" || env == "staging") {
+        "ethereum_sepolia"
+    } else {
+        "ethereum_mainnet"
+    }
+}
+
 fun Application.marketRoutes() {
     val protocolService = ProtocolService()
     
@@ -21,8 +31,9 @@ fun Application.marketRoutes() {
                     try {
                         val protocolFilter = call.request.queryParameters["protocol"]
                         val currencyFilter = call.request.queryParameters["currency"]
+                        val network = getNetworkName()
                         
-                        println("📊 Fetching markets - Protocol: $protocolFilter, Currency: $currencyFilter")
+                        println("📊 Fetching markets - Protocol: $protocolFilter, Currency: $currencyFilter, Network: $network")
                         
                         val markets = mutableListOf<Market>()
                     
@@ -48,6 +59,7 @@ fun Application.marketRoutes() {
                                             protocol = "morpho",
                                             currency = symbol,
                                             currency_address = address,
+                                            network = network,
                                             apy = apy,
                                             status = "active",
                                             updated_at = java.time.Instant.now().toString()
@@ -84,6 +96,7 @@ fun Application.marketRoutes() {
                                             protocol = "aave",
                                             currency = symbol,
                                             currency_address = aaveReserve.underlyingToken?.address,
+                                            network = network,
                                             apy = apy,
                                             status = "active",
                                             updated_at = java.time.Instant.now().toString()
