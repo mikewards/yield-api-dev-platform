@@ -1,90 +1,70 @@
-# TBD Platform - Project Summary
+# TBD
 
-**Status**: Live | **Environments**: Production + Sandbox | **Updated**: November 2025
+## The Pitch
+
+We're building the Square of DeFi.
+
+Remember when Square made it possible for anyone to accept credit cards with a simple API and a headphone jack? We're doing the same thing for cryptocurrency yield.
+
+Right now, if a developer wants to let their users earn interest on crypto, they need to:
+- Integrate with multiple DeFi protocols (Morpho, Aave, Compound...)
+- Manage smart contract interactions
+- Handle wallet security and key management
+- Navigate compliance in every jurisdiction
+- Monitor positions across fragmented systems
+
+It's a mess. So developers don't bother.
+
+**TBD fixes this with one REST endpoint:**
+
+```bash
+curl https://api.tbd.com/v1/yield/accounts \
+  -d '{"currency": "USDC", "amount": "10000"}'
+```
+
+That's it. Behind the scenes, we route to the best protocol, handle the smart contracts, secure the keys, and manage compliance. The developer gets yield. Their users get yield. Everyone wins.
 
 ---
 
-## What We Built
+## What's Live Today
 
-**TBD** is a DeFi API platform providing a unified REST API to access yield opportunities across Morpho and Aave. One API, multiple protocols, no smart contract complexity.
+We have a working API gateway hitting real DeFi protocols:
 
-### ✅ Live & Working
+- **`/v1/yield/rates`** — Real-time APY from Morpho and Aave
+- **`/v1/markets`** — Every available yield opportunity, one call
+- **Applications & wallets** — Each app gets its own segregated wallet, encrypted keys
+- **Sandbox + Production** — Test on Sepolia, deploy to mainnet
 
-| Component | Status |
-|-----------|--------|
-| **API Gateway** | Kotlin/Ktor on Railway (staging + production) |
-| **Developer Portal** | Cloudflare Pages with auto-deploy |
-| **Database** | PostgreSQL with encrypted wallet storage |
-| **Monitoring** | Sentry error tracking |
+The developer portal is live. Interactive docs. SDK playgrounds. Environment toggles. It feels like Stripe docs because that's what developers expect now.
 
-### Working Endpoints
-
-```
-GET  /v1/yield/rates    → APY from Morpho + Aave (with network field)
-GET  /v1/markets        → All available markets (with network field)
-POST /v1/accounts       → Create account
-POST /v1/auth/authenticate → Login, get JWT
-POST /v1/applications   → Create app (auto-creates wallet)
-POST /v1/applications/{id}/tokens → Generate API keys
-GET  /health            → Health check
-```
-
-### Developer Experience
-- Interactive API docs with Production/Sandbox toggle
-- SDK playgrounds (Applications, Wallets, Yield Accounts)
-- Guides section with integration patterns
-- Mobile-responsive design
-
----
-
-## Recent Updates
-
-- **Network field** added to `/markets` and `/yield/rates` responses
-- **Environment toggle** fixed for CURL examples
-- **UI consistency** across all pages (Inter font, unified styling)
-- **SDKs page** redesigned to match Guides layout
+**Stack:** Kotlin/Ktor, PostgreSQL, web3j, Railway, Cloudflare Pages.
 
 ---
 
 ## What's Next
 
-### Immediate (2-4 weeks)
-- [ ] Test deposit/withdraw flows end-to-end
-- [ ] Implement position tracking (`GET /v1/yield/positions`)
-- [ ] Add transaction history (`GET /v1/transactions`)
-- [ ] Verify on-chain transactions
+The read-side is done. Now we're wiring up the write-side:
 
-### Medium-term (1-3 months)
-- [ ] Python & Node.js SDKs
-- [ ] Webhook delivery (config exists, delivery not implemented)
-- [ ] Additional protocols
-- [ ] Rate limiting
+1. **Deposits & withdrawals** — The code exists, needs end-to-end testing with real transactions
+2. **Position tracking** — Show developers their users' balances and accrued yield
+3. **More protocols** — We started with Morpho and Aave because they're the best. We'll add more as they prove themselves.
 
-### Long-term
-- Multi-chain support
-- Yield optimization algorithms
-- Enterprise features (compliance reporting, audit logs)
+After that: Python and Node SDKs, webhook delivery, and yield optimization (automatically route to highest APY).
 
 ---
 
-## Known Limitations
+## Why This Matters
 
-1. Ethereum mainnet/Sepolia only
-2. Some currencies return 0% APY (no active markets)
-3. Deposit/withdraw code exists but untested on-chain
-4. Webhooks configured but not delivered
+DeFi has $50B+ locked in lending protocols. But it's inaccessible to 99% of developers because the integration is too hard.
 
----
+We're the abstraction layer that unlocks it.
 
-## URLs
+Every fintech app, neobank, and crypto wallet becomes a potential customer. They want to offer yield. They don't want to become DeFi experts.
 
-| Environment | API | Frontend |
-|-------------|-----|----------|
-| Production | `flow-platform-production.up.railway.app` | `tbd.kcwn89.workers.dev` |
-| Sandbox | `flow-platform-flow-platform-staging.up.railway.app` | Same |
+That's us.
 
 ---
 
-**Stack**: Kotlin/Ktor • PostgreSQL • web3j • Railway • Cloudflare Pages • Sentry
+**Live now:** [tbd.kcwn89.workers.dev](https://tbd.kcwn89.workers.dev)
 
-*~50% of planned features complete. Core API working. Focus: complete yield operations, expand protocols.*
+*One API. Multiple protocols. Yield for everyone.*
