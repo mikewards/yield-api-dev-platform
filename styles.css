@@ -319,6 +319,11 @@ body {
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
+    color: #E2E8F0;
+}
+
+.code-content code {
+    color: #E2E8F0;
 }
 
 .code-keyword {
@@ -564,6 +569,11 @@ body {
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
+    color: #E2E8F0;
+}
+
+.code-block code {
+    color: #E2E8F0;
 }
 
 /* Security Section */
