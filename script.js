@@ -68,37 +68,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeIcon = document.getElementById('closeIcon');
     const navbar = document.querySelector('.navbar');
     
+    function openMenu() {
+        navLinks.classList.add('mobile-open');
+        document.body.classList.add('menu-open');
+        if (menuIcon) menuIcon.style.display = 'none';
+        if (closeIcon) closeIcon.style.display = 'block';
+    }
+    
+    function closeMenu() {
+        navLinks.classList.remove('mobile-open');
+        document.body.classList.remove('menu-open');
+        if (menuIcon) menuIcon.style.display = 'block';
+        if (closeIcon) closeIcon.style.display = 'none';
+    }
+    
     if (mobileMenuToggle && navLinks) {
         mobileMenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
-            navLinks.classList.toggle('mobile-open');
+            
             if (navLinks.classList.contains('mobile-open')) {
-                if (menuIcon) menuIcon.style.display = 'none';
-                if (closeIcon) closeIcon.style.display = 'block';
+                closeMenu();
             } else {
-                if (menuIcon) menuIcon.style.display = 'block';
-                if (closeIcon) closeIcon.style.display = 'none';
+                openMenu();
             }
         });
         
         // Close menu when clicking on a link
         navLinks.querySelectorAll('a, button').forEach(link => {
             link.addEventListener('click', function() {
-                navLinks.classList.remove('mobile-open');
-                if (menuIcon) menuIcon.style.display = 'block';
-                if (closeIcon) closeIcon.style.display = 'none';
+                closeMenu();
             });
         });
         
         // Close menu when clicking outside
-        if (navbar) {
-            document.addEventListener('click', function(event) {
-                if (!navbar.contains(event.target) && navLinks.classList.contains('mobile-open')) {
-                    navLinks.classList.remove('mobile-open');
-                    if (menuIcon) menuIcon.style.display = 'block';
-                    if (closeIcon) closeIcon.style.display = 'none';
+        document.addEventListener('click', function(event) {
+            if (navLinks.classList.contains('mobile-open')) {
+                if (!navbar.contains(event.target)) {
+                    closeMenu();
                 }
-            });
-        }
+            }
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navLinks.classList.contains('mobile-open')) {
+                closeMenu();
+            }
+        });
+        
+        // Close menu on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && navLinks.classList.contains('mobile-open')) {
+                closeMenu();
+            }
+        });
     }
 });
