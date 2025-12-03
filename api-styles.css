@@ -22,7 +22,7 @@
 }
 
 .api-version {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 12px;
     font-size: 14px;
@@ -30,16 +30,18 @@
 }
 
 .version-select {
-    padding: 8px 12px;
-    padding-right: 32px;
+    padding: 6px 10px;
+    padding-right: 28px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 6px;
     background: var(--bg-white);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-primary);
     cursor: pointer;
     appearance: none;
+    width: auto;
+    min-width: unset;
     -webkit-appearance: none;
     -moz-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23475569' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
