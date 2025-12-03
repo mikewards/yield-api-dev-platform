@@ -92,6 +92,33 @@
                     <a href="account.html" class="btn-primary btn-large">Start Building</a>
                     <a href="api-reference.html" class="btn-secondary btn-large">View Documentation</a>
                 </div>
+                <!-- Code example - shows between CTA and stats on mobile -->
+                <div class="hero-code-mobile">
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="code-title">api.tbd.com</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code><span class="code-keyword">curl</span> https://api.tbd.com/v1/yield/start \
+  -u <span class="code-string">sk_live_...</span> \
+  -d <span class="code-string">"amount=1000"</span> \
+  -d <span class="code-string">"currency=USDC"</span> \
+  -d <span class="code-string">"yield_rate=0.06"</span>
+
+<span class="code-comment"># Response</span>
+{
+  <span class="code-key">"yield_account_id"</span>: <span class="code-string">"ya_1234..."</span>,
+  <span class="code-key">"annual_yield"</span>: <span class="code-number">0.06</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"active"</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
                 <div class="hero-stats">
                     <div class="stat">
                         <div class="stat-value">6%</div>
@@ -107,6 +134,7 @@
                     </div>
                 </div>
             </div>
+            <!-- Desktop-only code visual -->
             <div class="hero-visual">
                 <div class="code-window">
                     <div class="code-header">
