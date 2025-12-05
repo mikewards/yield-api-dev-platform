@@ -756,14 +756,16 @@ function updateCurlExample(curlExample) {
     // Replace placeholder with actual URL
     let updatedExample = curlExample.replace(/\{\{API_URL\}\}/g, currentUrl);
     
-    // Replace any hardcoded URLs (including Railway URLs, api.tbd.com, api.flow.com, etc.)
+    // Replace any hardcoded URLs (order matters - more specific first)
     const urlPatterns = [
-        /https?:\/\/api\.(flow|tbd)\.com/g,
-        /https?:\/\/api-sandbox\.(flow|tbd)\.com/g,
-        /https?:\/\/flow-platform-staging\.up\.railway\.app/g,
-        /https?:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
-        /https?:\/\/flow-platform-production\.up\.railway\.app/g,
-        /https?:\/\/[^\s\/]+\.up\.railway\.app(?=\/v1)/g  // Any Railway URL before /v1
+        /https:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+        /https:\/\/flow-platform-staging\.up\.railway\.app/g,
+        /https:\/\/flow-platform-production\.up\.railway\.app/g,
+        /https:\/\/api-sandbox\.tbd\.com/g,
+        /https:\/\/api\.tbd\.com/g,
+        /https:\/\/api-sandbox\.flow\.com/g,
+        /https:\/\/api\.flow\.com/g,
+        /https:\/\/[a-z0-9-]+\.up\.railway\.app(?=\/v1)/g
     ];
     
     urlPatterns.forEach(pattern => {
@@ -785,16 +787,38 @@ function updateAllCurlExamples() {
     };
     
     const currentUrl = apiUrls[env] || apiUrls.production;
+    console.log('🔄 Updating CURL examples to:', env, currentUrl);
     
-    // Also specifically update the #curl-example element
+    // Helper function to replace URLs in text
+    function replaceUrls(text) {
+        // List of URL patterns to replace (order matters - more specific first)
+        const patterns = [
+            /https:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
+            /https:\/\/flow-platform-staging\.up\.railway\.app/g,
+            /https:\/\/flow-platform-production\.up\.railway\.app/g,
+            /https:\/\/api-sandbox\.tbd\.com/g,
+            /https:\/\/api\.tbd\.com/g,
+            /https:\/\/api-sandbox\.flow\.com/g,
+            /https:\/\/api\.flow\.com/g,
+            // Match any Railway URL ending before /v1
+            /https:\/\/[a-z0-9-]+\.up\.railway\.app(?=\/v1)/g
+        ];
+        
+        let result = text;
+        patterns.forEach(pattern => {
+            result = result.replace(pattern, currentUrl);
+        });
+        return result;
+    }
+    
+    // Update the #curl-example element
     const curlExampleEl = document.getElementById('curl-example');
     if (curlExampleEl) {
-        let text = curlExampleEl.textContent;
-        // Match any URL pattern before /v1/
-        const urlPattern = /https?:\/\/[^\s\/]+(?=\/v1\/)/g;
-        const updated = text.replace(urlPattern, currentUrl);
-        if (updated !== text) {
+        const original = curlExampleEl.textContent;
+        const updated = replaceUrls(original);
+        if (updated !== original) {
             curlExampleEl.textContent = updated;
+            console.log('✅ Updated curl-example URL');
         }
     }
     
@@ -804,10 +828,7 @@ function updateAllCurlExamples() {
         
         let text = el.textContent;
         if (text.includes('curl ') && text.includes('/v1/')) {
-            // Match any URL pattern before /v1/
-            const urlPattern = /https?:\/\/[^\s\/]+(?=\/v1\/)/g;
-            const updated = text.replace(urlPattern, currentUrl);
-            
+            const updated = replaceUrls(text);
             if (updated !== text) {
                 el.textContent = updated;
             }
@@ -1127,6 +1148,11 @@ window.toggleNested = function(nestedId) {
 // Tab switching
 document.addEventListener('DOMContentLoaded', () => {
     initializePage();
+    
+    // Ensure URLs are updated after page init based on current environment
+    setTimeout(() => {
+        updateAllCurlExamples();
+    }, 100);
     
     // Response tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
