@@ -54,6 +54,7 @@ data class TransactionResponse(
 data class YieldRate(
     val currency: String,
     val protocol: String,
+    val network: String,
     val annual_yield_rate: Double,
     val apy: Double,
     val updated_at: String,

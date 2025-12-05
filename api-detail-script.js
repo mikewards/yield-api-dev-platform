@@ -716,6 +716,7 @@ const apiData = {
                     {
                         currency: 'USDC',
                         protocol: 'morpho',
+                        network: 'ethereum_mainnet',
                         annual_yield_rate: 0.044,
                         apy: 0.044,
                         updated_at: '2025-01-15T10:30:00Z'
@@ -723,6 +724,7 @@ const apiData = {
                     {
                         currency: 'USDC',
                         protocol: 'aave',
+                        network: 'ethereum_mainnet',
                         annual_yield_rate: 0.036,
                         apy: 0.036,
                         updated_at: '2025-01-15T10:30:00Z'
@@ -737,6 +739,51 @@ const apiData = {
                 }
             },
             curlExample: `curl {{API_URL}}/v1/yield/rates \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \\
+  -H "Content-Type: application/json"`
+        }
+    },
+    'markets': {
+        list: {
+            method: 'GET',
+            path: '/v1/markets',
+            title: 'List markets',
+            summary: 'List all available markets across Morpho and Aave protocols with current rates and availability.',
+            description: 'Returns a list of all available yield markets from both Morpho and Aave protocols, including current APY rates and network information.',
+            permissions: 'MARKETS_READ',
+            requestBody: [],
+            successResponse: {
+                markets: [
+                    {
+                        market_id: 'morpho_usdc_eth',
+                        protocol: 'morpho',
+                        currency: 'USDC',
+                        currency_address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+                        network: 'ethereum_mainnet',
+                        apy: 0.044,
+                        status: 'active',
+                        updated_at: '2025-01-15T10:30:00Z'
+                    },
+                    {
+                        market_id: 'aave_usdc',
+                        protocol: 'aave',
+                        currency: 'USDC',
+                        currency_address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+                        network: 'ethereum_mainnet',
+                        apy: 0.036,
+                        status: 'active',
+                        updated_at: '2025-01-15T10:30:00Z'
+                    }
+                ]
+            },
+            errorResponse: {
+                error: {
+                    code: 'UNAUTHORIZED',
+                    message: 'Invalid or missing authentication token',
+                    type: 'authentication_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/markets \\
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json"`
         }
