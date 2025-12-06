@@ -4,6 +4,27 @@
    ============================================== */
 
 /* ============================================
+   0. SCROLL PROGRESS BAR (Mobile Only)
+   ============================================ */
+.scroll-progress {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .scroll-progress {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+        z-index: 9999;
+        transition: width 0.1s ease-out;
+    }
+}
+
+/* ============================================
    1. GLOBAL MOBILE RESETS
    ============================================ */
 
