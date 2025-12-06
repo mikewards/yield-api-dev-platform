@@ -56,7 +56,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 64px;
+    padding: 14px 0;
     gap: 16px;
 }
 
@@ -68,7 +68,6 @@ body {
     font-size: 20px;
     color: var(--text-primary);
     text-decoration: none;
-    height: 64px;
 }
 
 .logo svg {
@@ -80,29 +79,15 @@ body {
 .logo-text {
     color: var(--primary);
     font-weight: 700;
-    display: flex;
-    align-items: center;
 }
 
 .nav-links {
     display: flex;
     align-items: center;
     gap: 32px;
-    height: 64px;
 }
 
-.nav-links a:not(.btn-primary):not(.btn-secondary) {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    height: 64px;
-}
-
-.nav-links a {
+.nav-links > a:not(.btn-primary):not(.btn-secondary) {
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
@@ -112,7 +97,6 @@ body {
 
 .nav-links a:hover {
     color: var(--primary);
-    transition: color 0.2s ease;
 }
 
 /* Mobile Menu Toggle Button */
