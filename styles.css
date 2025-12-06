@@ -68,11 +68,17 @@ body {
     font-size: 20px;
     color: var(--text-primary);
     text-decoration: none;
+    line-height: 1;
+}
+
+.logo svg {
+    flex-shrink: 0;
 }
 
 .logo-text {
     color: var(--primary);
     font-weight: 700;
+    line-height: 1;
 }
 
 .nav-links {
@@ -87,6 +93,8 @@ body {
     font-weight: 500;
     font-size: 14px;
     transition: color 0.2s;
+    line-height: 1;
+    padding: 8px 0;
 }
 
 .nav-links a:hover {
