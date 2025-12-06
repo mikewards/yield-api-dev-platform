@@ -339,14 +339,28 @@
         gap: 32px;
     }
     
-    /* Footer grid - keep horizontal 2x2 on tablet */
+    /* Footer grid - all 4 sections in one row */
     .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px 16px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
     }
     
     .footer-section:first-child {
         grid-column: 1 / -1;
+        margin-bottom: 8px;
+    }
+    
+    .footer-section h4 {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .footer-section ul li {
+        margin-bottom: 6px;
+    }
+    
+    .footer-section ul li a {
+        font-size: 12px;
     }
     
     /* Guides layout */
@@ -371,10 +385,10 @@
 }
 
 @media (max-width: 480px) {
-    /* Footer stays 2x2 even on small screens */
+    /* Footer - all 4 sections still in one row, tighter spacing */
     .footer-content {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px 12px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
     }
     
     .footer-section:first-child {
@@ -382,11 +396,16 @@
     }
     
     .footer-section h4 {
-        font-size: 13px;
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    
+    .footer-section ul li {
+        margin-bottom: 4px;
     }
     
     .footer-section ul li a {
-        font-size: 13px;
+        font-size: 11px;
     }
 }
 
