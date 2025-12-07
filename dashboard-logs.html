@@ -50,24 +50,30 @@
         
         /* Logs Filter Bar */
         .logs-filter-bar {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 12px;
             margin-bottom: 24px;
-            flex-wrap: wrap;
-            align-items: center;
         }
         
         .logs-filter-bar select,
         .logs-filter-bar input {
-            padding: 8px 12px;
+            width: 100%;
+            padding: 10px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 14px;
             background: var(--bg-white);
         }
         
-        .logs-filter-bar input[type="text"] {
-            min-width: 200px;
+        @media (max-width: 768px) {
+            .logs-filter-bar {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .logs-filter-bar input[type="text"] {
+                grid-column: 1 / -1;
+            }
         }
         
         /* Logs Table */
