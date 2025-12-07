@@ -56,7 +56,6 @@
             margin-bottom: 24px;
         }
         
-        .logs-filter-bar select,
         .logs-filter-bar input {
             width: 100%;
             padding: 10px 14px;
@@ -69,24 +68,10 @@
             transition: all 0.15s ease;
         }
         
-        .logs-filter-bar select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px;
-            cursor: pointer;
-        }
-        
-        .logs-filter-bar select:hover,
         .logs-filter-bar input:hover {
             border-color: var(--text-tertiary);
         }
         
-        .logs-filter-bar select:focus,
         .logs-filter-bar input:focus {
             outline: none;
             border-color: var(--primary);
@@ -95,6 +80,102 @@
         
         .logs-filter-bar input::placeholder {
             color: var(--text-tertiary);
+        }
+        
+        /* Custom Dropdown */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+        
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .custom-select-trigger:hover {
+            border-color: var(--text-tertiary);
+        }
+        
+        .custom-select.open .custom-select-trigger {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+        }
+        
+        .custom-select-trigger svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-tertiary);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .custom-select.open .custom-select-trigger svg {
+            transform: rotate(180deg);
+        }
+        
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.15s ease;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        
+        .custom-select.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .custom-select-option {
+            padding: 10px 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+        
+        .custom-select-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .custom-select-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .custom-select-option:only-child {
+            border-radius: 8px;
+        }
+        
+        .custom-select-option:hover {
+            background: var(--bg-gray);
+        }
+        
+        .custom-select-option.selected {
+            background: var(--bg-gray-dark);
+            font-weight: 500;
         }
         
         @media (max-width: 768px) {
@@ -476,27 +557,51 @@
 
             <!-- Filters -->
             <div class="logs-filter-bar">
-                <select id="filterApp">
-                    <option value="">All Applications</option>
-                </select>
-                <select id="filterEnvironment">
-                    <option value="">All Environments</option>
-                    <option value="sandbox">Sandbox</option>
-                    <option value="production">Production</option>
-                </select>
-                <select id="filterStatus">
-                    <option value="">All Status</option>
-                    <option value="2xx">Success (2xx)</option>
-                    <option value="4xx">Client Error (4xx)</option>
-                    <option value="5xx">Server Error (5xx)</option>
-                </select>
-                <select id="filterMethod">
-                    <option value="">All Methods</option>
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                </select>
+                <div class="custom-select" id="filterApp" data-value="">
+                    <div class="custom-select-trigger">
+                        <span>All Applications</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="">All Applications</div>
+                    </div>
+                </div>
+                <div class="custom-select" id="filterEnvironment" data-value="">
+                    <div class="custom-select-trigger">
+                        <span>All Environments</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="">All Environments</div>
+                        <div class="custom-select-option" data-value="sandbox">Sandbox</div>
+                        <div class="custom-select-option" data-value="production">Production</div>
+                    </div>
+                </div>
+                <div class="custom-select" id="filterStatus" data-value="">
+                    <div class="custom-select-trigger">
+                        <span>All Status</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="">All Status</div>
+                        <div class="custom-select-option" data-value="2xx">Success (2xx)</div>
+                        <div class="custom-select-option" data-value="4xx">Client Error (4xx)</div>
+                        <div class="custom-select-option" data-value="5xx">Server Error (5xx)</div>
+                    </div>
+                </div>
+                <div class="custom-select" id="filterMethod" data-value="">
+                    <div class="custom-select-trigger">
+                        <span>All Methods</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="">All Methods</div>
+                        <div class="custom-select-option" data-value="GET">GET</div>
+                        <div class="custom-select-option" data-value="POST">POST</div>
+                        <div class="custom-select-option" data-value="PUT">PUT</div>
+                        <div class="custom-select-option" data-value="DELETE">DELETE</div>
+                    </div>
+                </div>
                 <input type="text" id="filterPath" placeholder="Filter by path...">
             </div>
 
@@ -752,9 +857,57 @@
             row.classList.toggle('expanded');
         }
         
+        // Custom Select Dropdown Logic
+        function initCustomSelects() {
+            const customSelects = document.querySelectorAll('.custom-select');
+            
+            customSelects.forEach(select => {
+                const trigger = select.querySelector('.custom-select-trigger');
+                const options = select.querySelectorAll('.custom-select-option');
+                
+                // Toggle dropdown
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Close other dropdowns
+                    customSelects.forEach(s => {
+                        if (s !== select) s.classList.remove('open');
+                    });
+                    select.classList.toggle('open');
+                });
+                
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const value = option.dataset.value;
+                        const text = option.textContent;
+                        
+                        // Update trigger text
+                        trigger.querySelector('span').textContent = text;
+                        
+                        // Update data-value
+                        select.dataset.value = value;
+                        
+                        // Update selected state
+                        options.forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        
+                        // Close dropdown
+                        select.classList.remove('open');
+                    });
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', () => {
+                customSelects.forEach(s => s.classList.remove('open'));
+            });
+        }
+        
         // Initialize
         renderStats();
         renderLogs(sampleLogs);
+        initCustomSelects();
         
         // Load applications for filter dropdown
         async function loadApplicationsFilter() {
@@ -765,13 +918,24 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const select = document.getElementById('filterApp');
+                    const selectContainer = document.getElementById('filterApp');
+                    const optionsContainer = selectContainer.querySelector('.custom-select-options');
+                    
                     if (data.applications) {
                         data.applications.forEach(app => {
-                            const option = document.createElement('option');
-                            option.value = app.application_id;
+                            const option = document.createElement('div');
+                            option.className = 'custom-select-option';
+                            option.dataset.value = app.application_id;
                             option.textContent = app.name;
-                            select.appendChild(option);
+                            option.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                selectContainer.querySelector('.custom-select-trigger span').textContent = app.name;
+                                selectContainer.dataset.value = app.application_id;
+                                optionsContainer.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+                                option.classList.add('selected');
+                                selectContainer.classList.remove('open');
+                            });
+                            optionsContainer.appendChild(option);
                         });
                     }
                 }
