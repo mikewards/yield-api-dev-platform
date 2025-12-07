@@ -857,6 +857,40 @@
             row.classList.toggle('expanded');
         }
         
+        // Filter logs based on current filter values
+        function filterLogs() {
+            const appFilter = document.getElementById('filterApp').dataset.value || '';
+            const envFilter = document.getElementById('filterEnvironment').dataset.value || '';
+            const statusFilter = document.getElementById('filterStatus').dataset.value || '';
+            const methodFilter = document.getElementById('filterMethod').dataset.value || '';
+            const pathFilter = document.getElementById('filterPath').value.toLowerCase().trim();
+            
+            const filtered = sampleLogs.filter(log => {
+                // Application filter
+                if (appFilter && log.application_id !== appFilter) return false;
+                
+                // Environment filter
+                if (envFilter && log.environment !== envFilter) return false;
+                
+                // Status filter
+                if (statusFilter) {
+                    if (statusFilter === '2xx' && (log.status < 200 || log.status >= 300)) return false;
+                    if (statusFilter === '4xx' && (log.status < 400 || log.status >= 500)) return false;
+                    if (statusFilter === '5xx' && log.status < 500) return false;
+                }
+                
+                // Method filter
+                if (methodFilter && log.method !== methodFilter) return false;
+                
+                // Path filter
+                if (pathFilter && !log.path.toLowerCase().includes(pathFilter)) return false;
+                
+                return true;
+            });
+            
+            renderLogs(filtered);
+        }
+        
         // Custom Select Dropdown Logic
         function initCustomSelects() {
             const customSelects = document.querySelectorAll('.custom-select');
@@ -894,6 +928,9 @@
                         
                         // Close dropdown
                         select.classList.remove('open');
+                        
+                        // Apply filters
+                        filterLogs();
                     });
                 });
             });
@@ -903,6 +940,9 @@
                 customSelects.forEach(s => s.classList.remove('open'));
             });
         }
+        
+        // Initialize path filter input
+        document.getElementById('filterPath').addEventListener('input', filterLogs);
         
         // Initialize
         renderStats();
@@ -934,6 +974,7 @@
                                 optionsContainer.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
                                 option.classList.add('selected');
                                 selectContainer.classList.remove('open');
+                                filterLogs(); // Apply filters
                             });
                             optionsContainer.appendChild(option);
                         });
