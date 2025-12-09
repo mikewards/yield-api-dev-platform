@@ -584,15 +584,6 @@
             </div>
 
             <!-- Retention Notice -->
-            <div class="retention-notice" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <span style="color: #92400E;"><strong>Sample Data:</strong> These are demo logs. Real API logging coming soon!</span>
-            </div>
-            
             <div class="retention-notice">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -721,99 +712,6 @@
             window.location.href = 'signin.html';
         });
         
-        // Sample log data (in production, this would come from the API)
-        // Application names will be populated after loading user's applications
-        let sampleLogs = [
-            {
-                id: 'log_001',
-                timestamp: new Date(Date.now() - 60000).toISOString(),
-                method: 'GET',
-                path: '/v1/yield/rates',
-                application: 'Loading...',
-                application_id: 'user_app',
-                environment: 'production',
-                status: 200,
-                duration_ms: 45,
-                request_id: 'req_abc123def456',
-                ip_address: '192.168.1.100',
-                user_agent: 'curl/7.79.1',
-                request_headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk_live_...' },
-                response_body: { rates: [{ currency: 'USDC', apy: 0.06 }] }
-            },
-            {
-                id: 'log_002',
-                timestamp: new Date(Date.now() - 120000).toISOString(),
-                method: 'POST',
-                path: '/v1/yield/accounts',
-                application: 'Loading...',
-                application_id: 'user_app',
-                environment: 'production',
-                status: 201,
-                duration_ms: 234,
-                request_id: 'req_xyz789abc012',
-                ip_address: '192.168.1.100',
-                user_agent: 'MyApp/1.0',
-                request_body: { currency: 'USDC' },
-                response_body: { account_id: 'ya_123', status: 'active' }
-            },
-            {
-                id: 'log_003',
-                timestamp: new Date(Date.now() - 300000).toISOString(),
-                method: 'GET',
-                path: '/v1/markets',
-                application: 'Loading...',
-                application_id: 'user_app',
-                environment: 'sandbox',
-                status: 200,
-                duration_ms: 67,
-                request_id: 'req_test123456',
-                ip_address: '10.0.0.1',
-                user_agent: 'PostmanRuntime/7.29.0',
-                response_body: { markets: [] }
-            },
-            {
-                id: 'log_004',
-                timestamp: new Date(Date.now() - 600000).toISOString(),
-                method: 'POST',
-                path: '/v1/auth/authenticate',
-                application: 'Loading...',
-                application_id: 'user_app',
-                environment: 'production',
-                status: 401,
-                duration_ms: 12,
-                request_id: 'req_fail789',
-                ip_address: '203.0.113.50',
-                user_agent: 'curl/7.79.1',
-                error: { code: 'INVALID_CREDENTIALS', message: 'Invalid username or password' }
-            },
-            {
-                id: 'log_005',
-                timestamp: new Date(Date.now() - 900000).toISOString(),
-                method: 'DELETE',
-                path: '/v1/applications/app_old/tokens/tok_123',
-                application: 'Loading...',
-                application_id: 'user_app',
-                environment: 'production',
-                status: 204,
-                duration_ms: 89,
-                request_id: 'req_del456',
-                ip_address: '192.168.1.100',
-                user_agent: 'MyApp/1.0'
-            }
-        ];
-        
-        // Render stats
-        function renderStats() {
-            const total = sampleLogs.length;
-            const successes = sampleLogs.filter(l => l.status >= 200 && l.status < 300).length;
-            const errors = sampleLogs.filter(l => l.status >= 400).length;
-            const avgTime = Math.round(sampleLogs.reduce((sum, l) => sum + l.duration_ms, 0) / total);
-            
-            document.getElementById('statTotalRequests').textContent = total.toLocaleString();
-            document.getElementById('statSuccessRate').textContent = Math.round((successes / total) * 100) + '%';
-            document.getElementById('statAvgTime').textContent = avgTime + 'ms';
-            document.getElementById('statErrors').textContent = errors;
-        }
         
         // Format timestamp with date
         function formatTime(isoString) {
@@ -966,38 +864,78 @@
             });
         }
         
-        // Filter logs based on current filter values
-        function filterLogs() {
+        // Current logs data
+        let currentLogs = [];
+        
+        // Fetch logs from API with filters
+        async function fetchLogs() {
             const appFilter = document.getElementById('filterApp').dataset.value || '';
             const envFilter = document.getElementById('filterEnvironment').dataset.value || '';
             const statusFilter = document.getElementById('filterStatus').dataset.value || '';
             const methodFilter = document.getElementById('filterMethod').dataset.value || '';
-            const pathFilter = document.getElementById('filterPath').value.toLowerCase().trim();
+            const pathFilter = document.getElementById('filterPath').value.trim();
             
-            const filtered = sampleLogs.filter(log => {
-                // Application filter
-                if (appFilter && log.application_id !== appFilter) return false;
+            // Build query params
+            const params = new URLSearchParams();
+            if (appFilter) params.append('application_id', appFilter);
+            if (envFilter) params.append('environment', envFilter);
+            if (statusFilter) params.append('status', statusFilter);
+            if (methodFilter) params.append('method', methodFilter);
+            if (pathFilter) params.append('path', pathFilter);
+            params.append('page_size', '100');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/logs?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 
-                // Environment filter
-                if (envFilter && log.environment !== envFilter) return false;
-                
-                // Status filter
-                if (statusFilter) {
-                    if (statusFilter === '2xx' && (log.status < 200 || log.status >= 300)) return false;
-                    if (statusFilter === '4xx' && (log.status < 400 || log.status >= 500)) return false;
-                    if (statusFilter === '5xx' && log.status < 500) return false;
+                if (response.ok) {
+                    const data = await response.json();
+                    currentLogs = data.logs || [];
+                    
+                    // Update stats
+                    if (data.stats) {
+                        document.getElementById('statTotalRequests').textContent = data.stats.total_requests_7d.toLocaleString();
+                        document.getElementById('statSuccessRate').textContent = data.stats.success_rate + '%';
+                        document.getElementById('statAvgTime').textContent = data.stats.avg_duration_ms + 'ms';
+                        document.getElementById('statErrors').textContent = data.stats.errors_24h;
+                    }
+                    
+                    // Transform API response to match render format
+                    const transformedLogs = currentLogs.map(log => ({
+                        id: log.id,
+                        timestamp: log.timestamp,
+                        method: log.method,
+                        path: log.path,
+                        application: log.application_name || 'Unknown',
+                        application_id: log.application_id,
+                        environment: log.environment,
+                        status: log.status_code,
+                        duration_ms: log.duration_ms,
+                        request_id: log.request_id,
+                        ip_address: log.ip_address,
+                        user_agent: log.user_agent,
+                        request_body: log.request_body ? JSON.parse(log.request_body) : null,
+                        response_body: log.response_body ? JSON.parse(log.response_body) : null,
+                        error: log.error_message ? { message: log.error_message } : null
+                    }));
+                    
+                    renderLogs(transformedLogs);
+                } else {
+                    console.error('Failed to fetch logs:', response.status);
+                    renderLogs([]);
                 }
-                
-                // Method filter
-                if (methodFilter && log.method !== methodFilter) return false;
-                
-                // Path filter
-                if (pathFilter && !log.path.toLowerCase().includes(pathFilter)) return false;
-                
-                return true;
-            });
-            
-            renderLogs(filtered);
+            } catch (error) {
+                console.error('Failed to fetch logs:', error);
+                renderLogs([]);
+            }
+        }
+        
+        // Debounce for path filter
+        let filterTimeout;
+        function filterLogs() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(fetchLogs, 300);
         }
         
         // Custom Select Dropdown Logic
@@ -1038,8 +976,8 @@
                         // Close dropdown
                         select.classList.remove('open');
                         
-                        // Apply filters
-                        filterLogs();
+                        // Fetch filtered logs
+                        fetchLogs();
                     });
                 });
             });
@@ -1054,11 +992,9 @@
         document.getElementById('filterPath').addEventListener('input', filterLogs);
         
         // Initialize
-        renderStats();
-        renderLogs(sampleLogs);
         initCustomSelects();
         
-        // Load applications for filter dropdown and update sample logs
+        // Load applications for filter dropdown
         async function loadApplicationsFilter() {
             try {
                 const response = await fetch(`${API_BASE_URL}/v1/applications`, {
@@ -1071,19 +1007,6 @@
                     const optionsContainer = selectContainer.querySelector('.custom-select-options');
                     
                     if (data.applications && data.applications.length > 0) {
-                        // Get the first app name to use in sample logs
-                        const firstApp = data.applications[0];
-                        
-                        // Update sample logs with actual user's application name
-                        sampleLogs = sampleLogs.map(log => ({
-                            ...log,
-                            application: firstApp.name,
-                            application_id: firstApp.application_id
-                        }));
-                        
-                        // Re-render logs with actual app name
-                        renderLogs(sampleLogs);
-                        
                         // Add applications to filter dropdown
                         data.applications.forEach(app => {
                             const option = document.createElement('div');
@@ -1097,7 +1020,7 @@
                                 optionsContainer.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
                                 option.classList.add('selected');
                                 selectContainer.classList.remove('open');
-                                filterLogs(); // Apply filters
+                                fetchLogs(); // Fetch filtered logs
                             });
                             optionsContainer.appendChild(option);
                         });
@@ -1108,7 +1031,9 @@
             }
         }
         
+        // Initialize: Load applications dropdown, then fetch real logs
         loadApplicationsFilter();
+        fetchLogs();
     </script>
     <script src="script.js"></script>
     <script src="nav-auth.js"></script>
