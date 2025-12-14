@@ -6,8 +6,10 @@ import com.tbd.middleware.auth
 import com.tbd.middleware.cors
 import com.tbd.middleware.logging
 import com.tbd.middleware.rateLimit
+import com.tbd.middleware.requestLogging
 import com.tbd.middleware.sentry
 import com.tbd.middleware.statusPages
+import com.tbd.service.LogCleanupJob
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -24,6 +26,8 @@ fun Application.module() {
     // Initialize database (with error handling - don't crash if DB fails)
     try {
         DatabaseFactory.init()
+        // Start background job to clean up old logs
+        LogCleanupJob.start()
     } catch (e: Exception) {
         println("❌ CRITICAL: Database initialization failed: ${e.message}")
         e.printStackTrace()
@@ -45,6 +49,7 @@ fun Application.module() {
     logging()
     statusPages()
     auth()
+    requestLogging()  // Log requests after auth (so we have user context)
     
     // Configure routes
     healthRoutes()
@@ -58,4 +63,5 @@ fun Application.module() {
     marketRoutes()
     transactionRoutes()
     webhookRoutes()
+    logRoutes()
 }
