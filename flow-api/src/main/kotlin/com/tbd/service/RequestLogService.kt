@@ -40,8 +40,9 @@ class RequestLogService {
             )
         }
         
-        // Build query conditions
-        var conditions: Op<Boolean> = RequestLogs.applicationId inList accountAppIds
+        // Build query conditions - match by applicationId OR accountId
+        var conditions: Op<Boolean> = (RequestLogs.applicationId inList accountAppIds) or 
+                                       (RequestLogs.accountId eq accountId)
         
         // Filter by specific application
         if (applicationId != null) {
