@@ -198,7 +198,7 @@
         
         .logs-table-header {
             display: grid;
-            grid-template-columns: 100px 80px 1fr 150px 120px 100px 50px;
+            grid-template-columns: 140px 80px 1fr 150px 80px 80px 40px;
             gap: 12px;
             padding: 12px 16px;
             background: var(--bg-gray);
@@ -220,7 +220,7 @@
         
         .log-row-summary {
             display: grid;
-            grid-template-columns: 100px 80px 1fr 150px 120px 100px 50px;
+            grid-template-columns: 140px 80px 1fr 150px 80px 80px 40px;
             gap: 12px;
             padding: 14px 16px;
             align-items: center;
@@ -584,6 +584,15 @@
             </div>
 
             <!-- Retention Notice -->
+            <div class="retention-notice" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span style="color: #92400E;"><strong>Sample Data:</strong> These are demo logs. Real API logging coming soon!</span>
+            </div>
+            
             <div class="retention-notice">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -806,10 +815,18 @@
             document.getElementById('statErrors').textContent = errors;
         }
         
-        // Format timestamp
+        // Format timestamp with date
         function formatTime(isoString) {
             const date = new Date(isoString);
-            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+            
+            if (isToday) {
+                return 'Today ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + 
+                       date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
         }
         
         // Get status class
