@@ -273,19 +273,6 @@
     font-weight: 600;
 }
 
-/* RPC Section */
-.rpc-section {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-}
-
-.rpc-auto-note {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin: 8px 0 16px 0;
-}
-
 .form-actions {
     display: flex;
     gap: 8px;
