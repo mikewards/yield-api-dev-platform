@@ -1,35 +1,13 @@
 package com.tbd.service
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
-@Serializable
-data class AlchemyCreateAppRequest(
-    val name: String,
-    val network: String,  // "ETH_SEPOLIA" or "ETH_MAINNET"
-    val description: String? = null
-)
-
-@Serializable
-data class AlchemyAppResponse(
-    val id: String? = null,
-    val name: String? = null,
-    val network: String? = null,
-    val apiKey: String? = null,
-    val httpsUrl: String? = null,
-    val wssUrl: String? = null,
-    val error: String? = null
-)
-
-@Serializable
+/**
+ * Alchemy RPC URL provisioning service.
+ * 
+ * Uses a shared Alchemy API key to construct RPC URLs for users.
+ * This approach is simpler and more reliable than creating individual apps via API.
+ */
 data class AlchemyProvisionedKeys(
     val sandboxRpcUrl: String,
     val sandboxApiKey: String,
@@ -40,21 +18,15 @@ data class AlchemyProvisionedKeys(
 class AlchemyService {
     private val logger = LoggerFactory.getLogger(AlchemyService::class.java)
     
-    private val adminApiKey: String? = System.getenv("ALCHEMY_ADMIN_API_KEY")
-    
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
-        }
-    }
+    // Alchemy App API Key (not the Access Token)
+    private val alchemyApiKey: String? = System.getenv("ALCHEMY_API_KEY")
     
     companion object {
-        private const val ALCHEMY_API_BASE = "https://dashboard.alchemy.com/api"
+        // Alchemy RPC URL templates
+        private const val ALCHEMY_SEPOLIA_TEMPLATE = "https://eth-sepolia.g.alchemy.com/v2/"
+        private const val ALCHEMY_MAINNET_TEMPLATE = "https://eth-mainnet.g.alchemy.com/v2/"
         
-        // Fallback to public RPCs if Alchemy fails
+        // Fallback to public RPCs if Alchemy not configured
         const val FALLBACK_SANDBOX_RPC = "https://rpc.sepolia.org"
         const val FALLBACK_PRODUCTION_RPC = "https://eth.llamarpc.com"
     }
@@ -63,16 +35,20 @@ class AlchemyService {
      * Check if Alchemy integration is configured
      */
     fun isConfigured(): Boolean {
-        return !adminApiKey.isNullOrBlank()
+        val configured = !alchemyApiKey.isNullOrBlank()
+        logger.info("Alchemy configured: $configured, key present: ${alchemyApiKey?.take(8)}...")
+        return configured
     }
     
     /**
-     * Provision Alchemy apps for both sandbox and production environments
-     * Returns RPC URLs with embedded API keys
+     * Provision Alchemy RPC URLs using the shared API key.
+     * All users share the same Alchemy infrastructure (common pattern for platforms).
      */
-    suspend fun provisionApps(appName: String): AlchemyProvisionedKeys {
+    fun provisionApps(appName: String): AlchemyProvisionedKeys {
+        logger.info("Provisioning RPC URLs for app: $appName")
+        
         if (!isConfigured()) {
-            logger.warn("Alchemy admin API key not configured, using fallback public RPCs")
+            logger.warn("ALCHEMY_API_KEY not configured, using fallback public RPCs")
             return AlchemyProvisionedKeys(
                 sandboxRpcUrl = FALLBACK_SANDBOX_RPC,
                 sandboxApiKey = "",
@@ -81,77 +57,17 @@ class AlchemyService {
             )
         }
         
-        try {
-            // Create sandbox app (Sepolia testnet)
-            val sandboxApp = createApp("$appName-sandbox", "ETH_SEPOLIA")
-            
-            // Create production app (Ethereum mainnet)
-            val productionApp = createApp("$appName-production", "ETH_MAINNET")
-            
-            return AlchemyProvisionedKeys(
-                sandboxRpcUrl = sandboxApp.httpsUrl ?: FALLBACK_SANDBOX_RPC,
-                sandboxApiKey = sandboxApp.apiKey ?: "",
-                productionRpcUrl = productionApp.httpsUrl ?: FALLBACK_PRODUCTION_RPC,
-                productionApiKey = productionApp.apiKey ?: ""
-            )
-        } catch (e: Exception) {
-            logger.error("Failed to provision Alchemy apps: ${e.message}", e)
-            return AlchemyProvisionedKeys(
-                sandboxRpcUrl = FALLBACK_SANDBOX_RPC,
-                sandboxApiKey = "",
-                productionRpcUrl = FALLBACK_PRODUCTION_RPC,
-                productionApiKey = ""
-            )
-        }
-    }
-    
-    /**
-     * Create a single Alchemy app
-     */
-    private suspend fun createApp(name: String, network: String): AlchemyAppResponse {
-        logger.info("Creating Alchemy app: $name on network: $network")
+        val sandboxUrl = "$ALCHEMY_SEPOLIA_TEMPLATE$alchemyApiKey"
+        val productionUrl = "$ALCHEMY_MAINNET_TEMPLATE$alchemyApiKey"
         
-        try {
-            val response = client.post("$ALCHEMY_API_BASE/create-app") {
-                contentType(ContentType.Application.Json)
-                header("Authorization", "Bearer $adminApiKey")
-                setBody(AlchemyCreateAppRequest(
-                    name = name,
-                    network = network,
-                    description = "Auto-provisioned by TBD Platform"
-                ))
-            }
-            
-            if (response.status.isSuccess()) {
-                val app = response.body<AlchemyAppResponse>()
-                logger.info("Successfully created Alchemy app: ${app.name} with key: ${app.apiKey?.take(10)}...")
-                return app
-            } else {
-                val errorBody = response.body<AlchemyAppResponse>()
-                logger.error("Alchemy API error: ${response.status} - ${errorBody.error}")
-                throw Exception("Alchemy API error: ${errorBody.error}")
-            }
-        } catch (e: Exception) {
-            logger.error("Failed to create Alchemy app: ${e.message}")
-            throw e
-        }
-    }
-    
-    /**
-     * Delete an Alchemy app (for cleanup)
-     */
-    suspend fun deleteApp(appId: String): Boolean {
-        if (!isConfigured()) return false
+        logger.info("Provisioned Alchemy URLs - Sandbox: ${sandboxUrl.take(50)}..., Production: ${productionUrl.take(50)}...")
         
-        return try {
-            val response = client.delete("$ALCHEMY_API_BASE/apps/$appId") {
-                header("Authorization", "Bearer $adminApiKey")
-            }
-            response.status.isSuccess()
-        } catch (e: Exception) {
-            logger.error("Failed to delete Alchemy app: ${e.message}")
-            false
-        }
+        return AlchemyProvisionedKeys(
+            sandboxRpcUrl = sandboxUrl,
+            sandboxApiKey = alchemyApiKey!!,
+            productionRpcUrl = productionUrl,
+            productionApiKey = alchemyApiKey
+        )
     }
 }
 
