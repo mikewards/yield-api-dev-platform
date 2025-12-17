@@ -653,14 +653,21 @@
             if (!confirm('Are you sure you want to delete this application? All API keys will be revoked.')) return;
             
             try {
-                await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
+                const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                closeModal('appDetailsModal');
-                loadApplications();
+                
+                if (response.ok) {
+                    closeModal('appDetailsModal');
+                    loadApplications();
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error?.message || 'Failed to delete application');
+                }
             } catch (error) {
-                alert('Failed to delete application');
+                console.error('Delete error:', error);
+                alert('Failed to delete application: ' + error.message);
             }
         }
         
