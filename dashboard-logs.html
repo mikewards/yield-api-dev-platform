@@ -808,29 +808,30 @@
                                         <span class="log-detail-label">Duration</span>
                                         <span class="log-detail-value">${log.duration_ms}ms</span>
                                     </div>
-                                    ${log.error ? `
+                                    ${log.error_message ? `
                                         <div style="margin-top: 12px;">
                                             <span class="log-detail-label">Error</span>
                                             <div class="log-json-wrapper" style="margin-top: 8px;">
-                                                <div class="log-json-preview">${JSON.stringify(log.error, null, 2)}</div>
-                                                <button class="copy-json-btn" onclick="copyJson(this, '${encodeURIComponent(JSON.stringify(log.error, null, 2))}')">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                                    Copy
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ` : log.response_body ? `
-                                        <div style="margin-top: 12px;">
-                                            <span class="log-detail-label">Response Body</span>
-                                            <div class="log-json-wrapper" style="margin-top: 8px;">
-                                                <div class="log-json-preview">${JSON.stringify(log.response_body, null, 2)}</div>
-                                                <button class="copy-json-btn" onclick="copyJson(this, '${encodeURIComponent(JSON.stringify(log.response_body, null, 2))}')">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                                    Copy
-                                                </button>
+                                                <div class="log-json-preview">${log.error_message}</div>
                                             </div>
                                         </div>
                                     ` : ''}
+                                    <div style="margin-top: 12px;">
+                                        <span class="log-detail-label">Response Body</span>
+                                        ${log.response_body ? `
+                                            <div class="log-json-wrapper" style="margin-top: 8px;">
+                                                <div class="log-json-preview">${typeof log.response_body === 'string' ? log.response_body : JSON.stringify(JSON.parse(log.response_body), null, 2)}</div>
+                                                <button class="copy-json-btn" onclick="copyJson(this, '${encodeURIComponent(typeof log.response_body === 'string' ? log.response_body : JSON.stringify(log.response_body))}')">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        ` : `
+                                            <div style="margin-top: 8px; color: #64748b; font-size: 13px; font-style: italic;">
+                                                Response body capture coming soon
+                                            </div>
+                                        `}
+                                    </div>
                                 </div>
                             </div>
                         </div>
