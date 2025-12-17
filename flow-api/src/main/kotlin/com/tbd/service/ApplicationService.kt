@@ -3,6 +3,8 @@ package com.tbd.service
 import com.tbd.dto.*
 import com.tbd.model.AccessTokens
 import com.tbd.model.Applications
+import com.tbd.model.ApplicationWallets
+import com.tbd.model.RequestLogs
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
@@ -151,10 +153,23 @@ class ApplicationService {
     
     fun deleteApplication(accountId: UUID, applicationId: UUID): Boolean {
         return transaction {
-            // First delete all tokens associated with this application
+            // First verify the application belongs to this account
+            val app = Applications.select { 
+                (Applications.id eq applicationId) and (Applications.accountId eq accountId)
+            }.firstOrNull() ?: return@transaction false
+            
+            // Delete all wallets associated with this application
+            ApplicationWallets.deleteWhere { ApplicationWallets.applicationId eq applicationId }
+            
+            // Delete all tokens associated with this application
             AccessTokens.deleteWhere { AccessTokens.applicationId eq applicationId }
             
-            // Then delete the application
+            // Set request logs applicationId to null (they reference this app)
+            RequestLogs.update({ RequestLogs.applicationId eq applicationId }) {
+                it[RequestLogs.applicationId] = null
+            }
+            
+            // Finally delete the application
             val deleted = Applications.deleteWhere { 
                 (Applications.id eq applicationId) and (Applications.accountId eq accountId)
             }
