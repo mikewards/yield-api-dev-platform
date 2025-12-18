@@ -2,12 +2,15 @@ package com.tbd.api.routes
 
 import com.tbd.dto.*
 import com.tbd.integration.ProtocolService
+import com.tbd.integration.morpho.MorphoMarket
+import com.tbd.integration.aave.AaveReserve
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -38,34 +41,34 @@ fun Application.marketRoutes() {
                         
                         // Fetch BOTH protocols in PARALLEL (2 API calls total, not sequential)
                         coroutineScope {
-                            val morphoDeferred = if (protocolFilter == null || protocolFilter == "morpho") {
+                            val morphoDeferred: Deferred<List<MorphoMarket>>? = if (protocolFilter == null || protocolFilter == "morpho") {
                                 async {
                                     try {
                                         protocolService.listMorphoMarkets()
                                     } catch (e: Exception) {
                                         println("⚠️ Morpho API error: ${e.message}")
-                                        emptyList()
+                                        emptyList<MorphoMarket>()
                                     }
                                 }
                             } else null
                             
-                            val aaveDeferred = if (protocolFilter == null || protocolFilter == "aave") {
+                            val aaveDeferred: Deferred<List<AaveReserve>>? = if (protocolFilter == null || protocolFilter == "aave") {
                                 async {
                                     try {
                                         protocolService.listAaveMarkets()
                                     } catch (e: Exception) {
                                         println("⚠️ Aave API error: ${e.message}")
-                                        emptyList()
+                                        emptyList<AaveReserve>()
                                     }
                                 }
                             } else null
                             
                             // Await both in parallel
-                            val morphoMarkets = morphoDeferred?.await() ?: emptyList()
-                            val aaveMarkets = aaveDeferred?.await() ?: emptyList()
+                            val morphoMarkets: List<MorphoMarket> = morphoDeferred?.await() ?: emptyList()
+                            val aaveMarkets: List<AaveReserve> = aaveDeferred?.await() ?: emptyList()
                             
                             // Process Morpho markets
-                            morphoMarkets.forEach { morphoMarket ->
+                            for (morphoMarket in morphoMarkets) {
                                 val symbol = morphoMarket.loanAsset?.symbol
                                 val address = morphoMarket.loanAsset?.address
                                 val apy = morphoMarket.state?.supplyApy ?: 0.0
@@ -87,7 +90,7 @@ fun Application.marketRoutes() {
                             }
                             
                             // Process Aave markets
-                            aaveMarkets.forEach { aaveReserve ->
+                            for (aaveReserve in aaveMarkets) {
                                 val symbol = aaveReserve.symbol
                                 val apy = aaveReserve.supplyApy
                                 
