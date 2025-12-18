@@ -8,9 +8,9 @@ import kotlin.time.Duration.Companion.seconds
  * Retry configuration
  */
 data class RetryConfig(
-    val maxAttempts: Int = 3,
-    val initialDelay: kotlin.time.Duration = 500.milliseconds,
-    val maxDelay: kotlin.time.Duration = 5.seconds,
+    val maxAttempts: Int = 2,
+    val initialDelay: kotlin.time.Duration = 100.milliseconds,
+    val maxDelay: kotlin.time.Duration = 1.seconds,
     val multiplier: Double = 2.0,
     val retryableExceptions: Set<Class<out Throwable>> = setOf(
         java.net.ConnectException::class.java,

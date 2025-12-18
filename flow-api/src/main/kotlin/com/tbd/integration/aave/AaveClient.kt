@@ -46,7 +46,11 @@ data class AaveMarket(
 data class AaveReserve(
     val underlyingToken: AaveToken? = null,
     val supplyInfo: AaveSupplyInfo? = null
-)
+) {
+    // Helper properties for easy access
+    val symbol: String? get() = underlyingToken?.symbol
+    val supplyApy: Double get() = supplyInfo?.apy?.value?.toDoubleOrNull() ?: 0.0
+}
 
 @Serializable
 data class AaveToken(
@@ -87,8 +91,8 @@ class AaveClient {
     suspend fun getCurrentRate(currency: String): Double {
         return retryWithBackoff(
             config = RetryConfig(
-                maxAttempts = 3,
-                initialDelay = 500.milliseconds
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
             )
         ) {
             try {
@@ -151,8 +155,8 @@ class AaveClient {
     suspend fun listMarkets(): List<AaveReserve> {
         return retryWithBackoff(
             config = RetryConfig(
-                maxAttempts = 3,
-                initialDelay = 500.milliseconds
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
             )
         ) {
             try {
