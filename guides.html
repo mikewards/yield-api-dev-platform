@@ -473,23 +473,41 @@
                     <li>
                         <h4>Create a yield account</h4>
                         <p>Use your API key to create a yield account for earning interest on deposits.</p>
-                        <div class="code-block">
-                            <pre><code>curl https://api.tbd.com/v1/yield/accounts \
-  -X POST \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"currency": "USDC"}'</code></pre>
+                        <div class="code-block-unified">
+                            <div class="code-block-header">
+                                <span class="code-block-label">Terminal</span>
+                                <button class="code-copy-btn" onclick="copyCode(this, 'code-create-yield')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="code-block-content">
+                                <pre id="code-create-yield"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{"currency": "USDC"}'</span></pre>
+                            </div>
                         </div>
                     </li>
                     <li>
                         <h4>Deposit funds and start earning</h4>
                         <p>Deposit cryptocurrency into your yield account. TBD automatically routes to the best protocol.</p>
-                        <div class="code-block">
-                            <pre><code>curl https://api.tbd.com/v1/yield/accounts/{account_id}/deposit \
-  -X POST \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"amount": "1000.00", "currency": "USDC"}'</code></pre>
+                        <div class="code-block-unified">
+                            <div class="code-block-header">
+                                <span class="code-block-label">Terminal</span>
+                                <button class="code-copy-btn" onclick="copyCode(this, 'code-deposit')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                    Copy
+                                </button>
+                            </div>
+                            <div class="code-block-content">
+                                <pre id="code-deposit"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts/{account_id}/deposit</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{"amount": "1000.00", "currency": "USDC"}'</span></pre>
+                            </div>
                         </div>
                     </li>
                 </ol>
@@ -504,8 +522,17 @@
                 <h2>Authentication</h2>
                 <p>All API requests require a Bearer token in the Authorization header:</p>
                 
-                <div class="code-block">
-                    <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Header</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-auth-header')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-auth-header">Authorization: Bearer <span class="token-var">YOUR_API_KEY</span></pre>
+                    </div>
                 </div>
                 
                 <h3>API Keys</h3>
@@ -832,18 +859,21 @@
                 <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
                     When you exceed a rate limit, the API returns a <code>429 Too Many Requests</code> response:
                 </p>
-                <div class="code-block" style="background: #1E293B; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-                    <pre style="margin: 0; color: #E2E8F0; font-size: 13px;"><code>{
+                <div class="response-block-unified">
+                    <p class="response-label">Error Response</p>
+                    <div class="response-content">
+<pre>{
   "status": "error",
   "code": 429,
   "message": "Rate limit exceeded. Please retry after 45 seconds.",
   "error": {
     "code": "RATE_LIMIT_EXCEEDED",
-    "message": "You have exceeded the rate limit of 100 requests per minute for this endpoint.",
+    "message": "You have exceeded the rate limit of 100 requests per minute.",
     "type": "rate_limit_error",
     "retry_after_seconds": 45
   }
-}</code></pre>
+}</pre>
+                    </div>
                 </div>
                 <p style="font-size: 16px; color: var(--text-secondary);">
                     The <code>Retry-After</code> header indicates how long to wait before retrying. 
