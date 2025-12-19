@@ -175,7 +175,7 @@
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <p><strong>Ready to go!</strong> Your application will be auto-configured with blockchain RPC endpoints. You can start making API calls immediately after creating an API key.</p>
+                    <p><strong>Ready to go!</strong> Create an API key after setup to start making API calls immediately.</p>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal('createAppModal')">Cancel</button>
@@ -232,108 +232,6 @@
                             </div>
                         </div>
                         
-                        <div class="rpc-section">
-                            <div class="section-header-inline">
-                                <h4>Ethereum RPC Configuration</h4>
-                                <button class="btn-small btn-secondary" onclick="toggleRpcEdit()" id="editRpcBtn">Customize</button>
-                            </div>
-                            <p class="rpc-auto-note">Auto-configured with free public endpoints. Customize if you need higher rate limits.</p>
-                            
-                            <div id="rpcDisplayMode">
-                                <div class="meta-item">
-                                    <span class="meta-label">Sandbox RPC URL (Sepolia)</span>
-                                    <span class="meta-value" id="detailSandboxRpc">Auto-configured</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Production RPC URL (Mainnet)</span>
-                                    <span class="meta-value" id="detailProductionRpc">Auto-configured</span>
-                                </div>
-                            </div>
-                            
-                            <form id="editRpcForm" style="display: none;">
-                                <div class="form-group">
-                                    <label for="editSandboxRpc">
-                                        Sandbox RPC URL (Testnet)
-                                        <span class="tooltip-trigger" id="sandboxTooltipTrigger">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
-                                        </span>
-                                    </label>
-                                    <input type="url" id="editSandboxRpc" name="editSandboxRpc" 
-                                           placeholder="https://sepolia.infura.io/v3/YOUR_KEY">
-                                    <small>For Sepolia testnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
-                                    <div class="tooltip-content" id="rpc-sandbox-tooltip">
-                                        <div class="tooltip-header">
-                                            <h5>How to get a Sandbox RPC URL</h5>
-                                        </div>
-                                        <div class="tooltip-body">
-                                            <p><strong>Option 1: Infura (Free)</strong></p>
-                                            <ol>
-                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
-                                                <li>Create a new project</li>
-                                                <li>Select "Sepolia" network</li>
-                                                <li>Copy your API key</li>
-                                                <li>Use: <code>https://sepolia.infura.io/v3/YOUR_KEY</code></li>
-                                            </ol>
-                                            <p><strong>Option 2: Alchemy (Free)</strong></p>
-                                            <ol>
-                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
-                                                <li>Create a new app</li>
-                                                <li>Select "Ethereum" → "Sepolia" network</li>
-                                                <li>Copy your API key</li>
-                                                <li>Use: <code>https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY</code></li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="editProductionRpc">
-                                        Production RPC URL (Mainnet)
-                                        <span class="tooltip-trigger" id="productionTooltipTrigger">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
-                                        </span>
-                                    </label>
-                                    <input type="url" id="editProductionRpc" name="editProductionRpc" 
-                                           placeholder="https://mainnet.infura.io/v3/YOUR_KEY">
-                                    <small>For Ethereum mainnet. Get free API keys from <a href="https://infura.io" target="_blank">Infura</a> or <a href="https://alchemy.com" target="_blank">Alchemy</a></small>
-                                    <div class="tooltip-content" id="rpc-production-tooltip">
-                                        <div class="tooltip-header">
-                                            <h5>How to get a Production RPC URL</h5>
-                                        </div>
-                                        <div class="tooltip-body">
-                                            <p><strong>Option 1: Infura (Free tier available)</strong></p>
-                                            <ol>
-                                                <li>Go to <a href="https://infura.io" target="_blank">infura.io</a> and sign up</li>
-                                                <li>Create a new project</li>
-                                                <li>Select "Ethereum Mainnet" network</li>
-                                                <li>Copy your API key</li>
-                                                <li>Use: <code>https://mainnet.infura.io/v3/YOUR_KEY</code></li>
-                                            </ol>
-                                            <p><strong>Option 2: Alchemy (Free tier available)</strong></p>
-                                            <ol>
-                                                <li>Go to <a href="https://alchemy.com" target="_blank">alchemy.com</a> and sign up</li>
-                                                <li>Create a new app</li>
-                                                <li>Select "Ethereum" → "Ethereum Mainnet" network</li>
-                                                <li>Copy your API key</li>
-                                                <li>Use: <code>https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY</code></li>
-                                            </ol>
-                                            <p class="tooltip-note">Both providers offer free tiers with generous rate limits for development.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-actions">
-                                    <button type="button" class="btn-secondary btn-small" onclick="cancelRpcEdit()">Cancel</button>
-                                    <button type="submit" class="btn-primary btn-small">Save RPC URLs</button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                     
                     <!-- Right: API Keys -->
@@ -570,48 +468,6 @@
         });
         
         
-        // RPC Edit Functions
-        function toggleRpcEdit() {
-            document.getElementById('rpcDisplayMode').style.display = 'none';
-            document.getElementById('editRpcForm').style.display = 'block';
-            document.getElementById('editRpcBtn').style.display = 'none';
-        }
-        
-        function cancelRpcEdit() {
-            document.getElementById('rpcDisplayMode').style.display = 'block';
-            document.getElementById('editRpcForm').style.display = 'none';
-            document.getElementById('editRpcBtn').style.display = 'inline-block';
-            // Reset form values
-            if (currentAppData) {
-                document.getElementById('editSandboxRpc').value = currentAppData.sandbox_rpc_url || '';
-                document.getElementById('editProductionRpc').value = currentAppData.production_rpc_url || '';
-            }
-        }
-        
-        function setupRpcTooltips() {
-            // Remove existing listeners
-            const sandboxTrigger = document.getElementById('sandboxTooltipTrigger');
-            const productionTrigger = document.getElementById('productionTooltipTrigger');
-            
-            if (sandboxTrigger) {
-                sandboxTrigger.onmouseenter = function() {
-                    document.getElementById('rpc-sandbox-tooltip').style.display = 'block';
-                };
-                sandboxTrigger.onmouseleave = function() {
-                    document.getElementById('rpc-sandbox-tooltip').style.display = 'none';
-                };
-            }
-            
-            if (productionTrigger) {
-                productionTrigger.onmouseenter = function() {
-                    document.getElementById('rpc-production-tooltip').style.display = 'block';
-                };
-                productionTrigger.onmouseleave = function() {
-                    document.getElementById('rpc-production-tooltip').style.display = 'none';
-                };
-            }
-        }
-        
         // Create Token Form
         document.getElementById('createTokenForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -736,58 +592,6 @@
                     document.getElementById('detailWebhookSecret').textContent = webhookSecretVisible ? app.webhook_secret : '••••••••••••••••';
                 } else {
                     document.getElementById('webhookSecretRow').style.display = 'none';
-                }
-                
-                // RPC URLs
-                const detailSandboxRpc = document.getElementById('detailSandboxRpc');
-                const detailProductionRpc = document.getElementById('detailProductionRpc');
-                const editSandboxRpc = document.getElementById('editSandboxRpc');
-                const editProductionRpc = document.getElementById('editProductionRpc');
-                
-                if (detailSandboxRpc) detailSandboxRpc.textContent = app.sandbox_rpc_url || 'Not configured';
-                if (detailProductionRpc) detailProductionRpc.textContent = app.production_rpc_url || 'Not configured';
-                if (editSandboxRpc) editSandboxRpc.value = app.sandbox_rpc_url || '';
-                if (editProductionRpc) editProductionRpc.value = app.production_rpc_url || '';
-                
-                // Setup tooltips for RPC fields and RPC form
-                setupRpcTooltips();
-                
-                // Setup RPC form submit handler (only once)
-                const editRpcForm = document.getElementById('editRpcForm');
-                if (editRpcForm && !editRpcForm.dataset.listenerAttached) {
-                    editRpcForm.dataset.listenerAttached = 'true';
-                    editRpcForm.addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        
-                        try {
-                            const response = await fetch(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
-                                method: 'PATCH',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${token}`
-                                },
-                                body: JSON.stringify({
-                                    sandbox_rpc_url: document.getElementById('editSandboxRpc').value || undefined,
-                                    production_rpc_url: document.getElementById('editProductionRpc').value || undefined
-                                })
-                            });
-                            
-                            if (response.ok) {
-                                const app = await response.json();
-                                currentAppData = app;
-                                const detailSandboxRpc = document.getElementById('detailSandboxRpc');
-                                const detailProductionRpc = document.getElementById('detailProductionRpc');
-                                if (detailSandboxRpc) detailSandboxRpc.textContent = app.sandbox_rpc_url || 'Not configured';
-                                if (detailProductionRpc) detailProductionRpc.textContent = app.production_rpc_url || 'Not configured';
-                                cancelRpcEdit();
-                            } else {
-                                const data = await response.json();
-                                alert(data.error?.message || 'Failed to update RPC URLs');
-                            }
-                        } catch (error) {
-                            alert('Failed to update RPC URLs');
-                        }
-                    });
                 }
                 
                 loadAppTokens(appId);

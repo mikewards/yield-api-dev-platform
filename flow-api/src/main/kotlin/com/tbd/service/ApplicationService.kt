@@ -8,7 +8,6 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
@@ -16,48 +15,26 @@ import java.util.*
 class ApplicationService {
     private val json = Json { ignoreUnknownKeys = true }
     private val walletService = WalletService()
-    private val alchemyService = AlchemyService()
-    private val logger = LoggerFactory.getLogger(ApplicationService::class.java)
-    
-    companion object {
-        // Fallback RPC URLs - used if Alchemy provisioning fails
-        const val FALLBACK_SANDBOX_RPC = "https://rpc.sepolia.org"
-        const val FALLBACK_PRODUCTION_RPC = "https://eth.llamarpc.com"
-    }
     
     fun createApplication(accountId: UUID, request: CreateApplicationRequest): ApplicationResponse {
         val now = Instant.now()
         val webhookSecret = if (request.webhook_url != null) generateWebhookSecret() else null
         
-        // Provision Alchemy keys if not provided
-        val (sandboxRpc, productionRpc) = if (request.sandbox_rpc_url.isNullOrBlank() || request.production_rpc_url.isNullOrBlank()) {
-            logger.info("Provisioning Alchemy RPC keys for application: ${request.name}")
-            try {
-                val alchemyKeys = alchemyService.provisionApps(request.name)
-                logger.info("Successfully provisioned Alchemy keys - Sandbox: ${alchemyKeys.sandboxRpcUrl.take(50)}...")
-                Pair(alchemyKeys.sandboxRpcUrl, alchemyKeys.productionRpcUrl)
-            } catch (e: Exception) {
-                logger.error("Failed to provision Alchemy keys, using fallback: ${e.message}")
-                Pair(FALLBACK_SANDBOX_RPC, FALLBACK_PRODUCTION_RPC)
-            }
-        } else {
-            Pair(request.sandbox_rpc_url, request.production_rpc_url)
-        }
-        
-        // Create application
+        // Create application (RPC URLs not needed - we handle blockchain infrastructure internally)
         val applicationId = transaction {
             Applications.insert {
                 it[Applications.accountId] = accountId
                 it[Applications.name] = request.name
                 it[Applications.description] = request.description
-                it[Applications.environment] = request.environment ?: "both" // Default to "both" if not specified
+                it[Applications.environment] = request.environment ?: "both"
                 it[Applications.status] = "active"
                 it[Applications.webhookUrl] = request.webhook_url
                 it[Applications.webhookSecret] = webhookSecret
                 it[Applications.allowedOrigins] = request.allowed_origins?.let { origins -> json.encodeToString(origins) }
                 it[Applications.permissions] = request.permissions?.let { perms -> json.encodeToString(perms) }
-                it[Applications.sandboxRpcUrl] = sandboxRpc
-                it[Applications.productionRpcUrl] = productionRpc
+                // RPC URLs deprecated - not exposed to developers
+                it[Applications.sandboxRpcUrl] = null
+                it[Applications.productionRpcUrl] = null
                 it[Applications.createdAt] = now
                 it[Applications.updatedAt] = now
             } get Applications.id
