@@ -370,6 +370,28 @@
     color: var(--text-primary);
 }
 
+/* Fixed width for code blocks in API detail page */
+.example-section .code-block-unified {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.example-section .code-block-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.example-section .code-block-content pre {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    white-space: pre;
+    word-wrap: normal;
+}
+
 .code-example-box {
     background: #1E293B;
     border-radius: 8px;
