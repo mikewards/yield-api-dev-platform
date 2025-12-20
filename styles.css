@@ -35,6 +35,35 @@ body {
     max-width: 100vw;
 }
 
+/* Content Links - Blue text, underline on hover */
+main a:not(.btn):not(.nav-link):not(.logo):not(.dropdown-item):not(.tab-btn):not(.env-btn),
+section a:not(.btn):not(.nav-link):not(.logo):not(.dropdown-item):not(.tab-btn):not(.env-btn),
+.api-main a:not(.btn):not(.tab-btn),
+.guides-content a:not(.btn):not(.tab-btn),
+.main-content a:not(.btn),
+.dashboard-content a:not(.btn),
+.legal-content a,
+article a:not(.btn),
+p a:not(.btn),
+li a:not(.btn):not(.nav-link):not(.dropdown-item) {
+    color: var(--accent);
+    text-decoration: none;
+    transition: text-decoration 0.15s ease;
+}
+
+main a:not(.btn):not(.nav-link):not(.logo):not(.dropdown-item):not(.tab-btn):not(.env-btn):hover,
+section a:not(.btn):not(.nav-link):not(.logo):not(.dropdown-item):not(.tab-btn):not(.env-btn):hover,
+.api-main a:not(.btn):not(.tab-btn):hover,
+.guides-content a:not(.btn):not(.tab-btn):hover,
+.main-content a:not(.btn):hover,
+.dashboard-content a:not(.btn):hover,
+.legal-content a:hover,
+article a:not(.btn):hover,
+p a:not(.btn):hover,
+li a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
+    text-decoration: underline;
+}
+
 .container {
     max-width: 1280px;
     margin: 0 auto;
@@ -1181,14 +1210,7 @@ select option {
     margin-bottom: 8px;
 }
 
-.legal-content a {
-    color: var(--accent);
-    text-decoration: none;
-}
-
-.legal-content a:hover {
-    text-decoration: underline;
-}
+/* .legal-content a styles moved to global content link rules */
 
 /* ===========================================
    UNIFIED CODE BLOCK STYLING
