@@ -36,28 +36,30 @@ body {
 }
 
 /* Content Links - Blue text, underline on hover
-   Only applies to inline text links within paragraphs, NOT to:
+   Only applies to inline text links within content, NOT to:
    - Navigation/sidebar links
    - Card links
    - Footer links
    - Buttons
    - API endpoint links
 */
-p a:not(.btn),
-.note a,
-.callout a,
-.warning-box a,
-a.text-link {
+p a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link),
+li a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a),
+.note a:not(.btn),
+.callout a:not(.btn),
+.warning-box a:not(.btn),
+a.text-link:not(.btn) {
     color: var(--accent);
     text-decoration: none;
     transition: text-decoration 0.15s ease;
 }
 
-p a:not(.btn):hover,
-.note a:hover,
-.callout a:hover,
-.warning-box a:hover,
-a.text-link:hover {
+p a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):hover,
+li a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a):hover,
+.note a:not(.btn):hover,
+.callout a:not(.btn):hover,
+.warning-box a:not(.btn):hover,
+a.text-link:not(.btn):hover {
     text-decoration: underline;
 }
 
