@@ -103,18 +103,24 @@
                             <h2>Create Your Account</h2>
                             <p>Start by creating a TBD developer account. You'll need a username and password.</p>
                             
-                            <div class="code-example-box">
-                                <div class="code-header">
-                                    <span>cURL</span>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-create-account')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
                                 </div>
-                                <pre><code>curl https://api.tbd.com/v1/accounts \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
+                                <div class="code-block-content">
+                                    <pre id="code-create-account"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "username": "your_username",
     "password": "your_secure_password",
     "email": "your_email@example.com"
-  }'</code></pre>
+  }'</span></pre>
+                                </div>
                             </div>
 
                             <div class="response-box">
@@ -141,17 +147,23 @@
                             <p>Authenticate with your account credentials to receive an access token, then create a Personal Access Token for API calls.</p>
                             
                             <h3>Step 2a: Authenticate</h3>
-                            <div class="code-example-box">
-                                <div class="code-header">
-                                    <span>cURL</span>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-auth')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
                                 </div>
-                                <pre><code>curl https://api.tbd.com/v1/auth/authenticate \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
+                                <div class="code-block-content">
+                                    <pre id="code-auth"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/auth/authenticate</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "username": "your_username",
     "password": "your_secure_password"
-  }'</code></pre>
+  }'</span></pre>
+                                </div>
                             </div>
 
                             <div class="response-box">
@@ -165,18 +177,24 @@
                             </div>
 
                             <h3>Step 2b: Create Personal Access Token</h3>
-                            <div class="code-example-box">
-                                <div class="code-header">
-                                    <span>cURL</span>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-create-token')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
                                 </div>
-                                <pre><code>curl https://api.tbd.com/v1/access-tokens \
-  -X POST \
-  -H "Authorization: Bearer sk_live_temp_..." \
-  -H "Content-Type: application/json" \
-  -d '{
+                                <div class="code-block-content">
+                                    <pre id="code-create-token"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/access-tokens</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "name": "My API Key",
     "expires_in": 31536000
-  }'</code></pre>
+  }'</span></pre>
+                                </div>
                             </div>
 
                             <div class="response-box">
@@ -203,22 +221,28 @@
                             <h2>Make Your First API Call</h2>
                             <p>Now that you have an access token, let's create your first yield account and start earning 6% yield.</p>
                             
-                            <div class="code-example-box">
-                                <div class="code-header">
-                                    <span>cURL</span>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-yield-account')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
                                 </div>
-                                <pre><code>curl https://api.tbd.com/v1/yield/accounts \
-  -X POST \
-  -H "Authorization: Bearer sk_live_1234567890abcdef" \
-  -H "Content-Type: application/json" \
-  -d '{
+                                <div class="code-block-content">
+                                    <pre id="code-yield-account"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "currency": "USDC",
     "initial_deposit": {
       "amount": "1000.00",
       "currency": "USDC"
     },
     "protocol_preference": "auto"
-  }'</code></pre>
+  }'</span></pre>
+                                </div>
                             </div>
 
                             <div class="response-box">
