@@ -1322,6 +1322,12 @@ select option {
     box-sizing: border-box;
 }
 
+/* When containing language code blocks, use block layout */
+.code-block-content:has(.lang-code) {
+    display: block;
+    position: relative;
+}
+
 .code-block-content pre {
     margin: 0;
     padding: 16px 20px;
@@ -1370,10 +1376,16 @@ select option {
 
 /* Language code block switching */
 .lang-code {
-    display: none;
+    display: none !important;
+    width: 100%;
 }
 
 .lang-code.active {
+    display: block !important;
+}
+
+/* Ensure line numbers are positioned correctly for language blocks */
+.code-block-content:has(.lang-code) .code-line-numbers {
     display: block;
 }
 

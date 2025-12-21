@@ -223,6 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.code-block-unified').forEach((block, index) => {
         const allPre = block.querySelectorAll('pre');
         const copyBtn = block.querySelector('.code-copy-btn');
+        const content = block.querySelector('.code-block-content');
+        
+        // If this block has language code blocks, fix the layout
+        if (content && content.querySelector('.lang-code')) {
+            content.style.display = 'block';
+        }
         
         // Process each pre element (for language switching)
         allPre.forEach((pre, preIndex) => {
@@ -233,9 +239,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const text = code.textContent || '';
                 const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
                 const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
-                const isJavaScript = text.includes('require') || text.includes('const') || text.includes('await');
-                const isPython = text.includes('import ') || text.includes('print(') || text.includes('def ');
-                const isRuby = text.includes('require ') || text.includes('puts ') || text.includes('def ');
+                const isJavaScript = (text.includes('const ') || text.includes('require(') || text.includes('await ')) && !text.includes('import ');
+                const isPython = text.includes('import ') || (text.includes('print(') && !text.includes('require'));
+                const isRuby = text.includes('require ') && text.includes('puts');
                 
                 if (isCurl) {
                     code.innerHTML = highlightCurl(text);
