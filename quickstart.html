@@ -5,101 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick Start - TBD</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="api-styles.css">
     <link rel="stylesheet" href="mobile.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        .quickstart-layout {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 64px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 48px 24px;
+        :root {
+            --qs-bg: #fafafa;
+            --qs-code-bg: #0f172a;
+            --qs-accent: #6366f1;
+            --qs-success: #22c55e;
         }
         
-        .quickstart-sidebar {
-            position: sticky;
-            top: 100px;
-            height: fit-content;
+        .qs-hero {
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            padding: 80px 24px 64px;
+            text-align: center;
         }
         
-        .quickstart-sidebar h3 {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-tertiary);
-            margin-bottom: 12px;
-        }
-        
-        .quickstart-sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .quickstart-sidebar li {
-            margin-bottom: 4px;
-        }
-        
-        .quickstart-sidebar a {
-            display: block;
-            padding: 6px 12px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.15s;
-        }
-        
-        .quickstart-sidebar a:hover {
-            color: var(--text-primary);
-            background: var(--bg-gray);
-        }
-        
-        .quickstart-main {
-            max-width: 720px;
-        }
-        
-        .quickstart-main h1 {
-            font-size: 36px;
+        .qs-hero h1 {
+            font-size: clamp(32px, 5vw, 48px);
             font-weight: 700;
+            letter-spacing: -0.03em;
             margin-bottom: 16px;
-            letter-spacing: -0.02em;
+            color: var(--text-primary);
         }
         
-        .quickstart-main > p:first-of-type {
+        .qs-hero p {
             font-size: 18px;
             color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 32px;
             line-height: 1.6;
-            margin-bottom: 48px;
         }
         
-        .qs-section {
-            margin-bottom: 56px;
-            scroll-margin-top: 100px;
-        }
-        
-        .qs-section h2 {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .step-num {
+        .qs-time-badge {
             display: inline-flex;
             align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .qs-time-badge svg {
+            color: var(--qs-accent);
+        }
+        
+        .qs-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+        
+        .qs-step {
+            position: relative;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .qs-step:last-of-type {
+            border-bottom: none;
+        }
+        
+        .qs-step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .qs-step-num {
+            display: flex;
+            align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             background: var(--bg-dark);
             color: white;
             border-radius: 50%;
@@ -108,55 +93,99 @@
             flex-shrink: 0;
         }
         
-        .step-num.completed {
-            background: #22c55e;
+        .qs-step-num.done {
+            background: var(--qs-success);
         }
         
-        .qs-section p {
+        .qs-step-num.done::after {
+            content: "✓";
+            font-size: 14px;
+        }
+        
+        .qs-step-num.done span {
+            display: none;
+        }
+        
+        .qs-step-content {
+            flex: 1;
+        }
+        
+        .qs-step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+        
+        .qs-step-desc {
             font-size: 15px;
             line-height: 1.7;
             color: var(--text-secondary);
-            margin-bottom: 16px;
         }
         
-        .qs-section ol, .qs-section ul {
-            margin: 16px 0;
-            padding-left: 20px;
+        .qs-step-desc a {
+            color: var(--qs-accent);
+            text-decoration: none;
+            font-weight: 500;
         }
         
-        .qs-section li {
+        .qs-step-desc a:hover {
+            text-decoration: underline;
+        }
+        
+        .qs-step-desc strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .qs-instructions {
+            margin-top: 16px;
+            padding-left: 0;
+        }
+        
+        .qs-instructions li {
             font-size: 15px;
-            line-height: 1.7;
+            line-height: 1.8;
             color: var(--text-secondary);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+            list-style: none;
         }
         
-        .qs-section code {
-            background: var(--bg-gray);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 13px;
-            color: #e11d48;
+        .qs-instructions li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 50%;
         }
         
         .qs-code-block {
-            background: #1a1a2e;
-            border-radius: 8px;
+            margin-top: 24px;
+            background: var(--qs-code-bg);
+            border-radius: 12px;
             overflow: hidden;
-            margin: 20px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
         
         .qs-code-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
+            padding: 12px 20px;
             background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
         
-        .qs-code-header span {
+        .qs-code-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 12px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.5);
@@ -164,194 +193,307 @@
             letter-spacing: 0.05em;
         }
         
+        .qs-code-label::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+        
         .qs-copy-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 4px 8px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
         }
         
         .qs-copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
         
         .qs-copy-btn.copied {
+            background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
         }
         
         .qs-code-content {
-            padding: 16px 20px;
+            padding: 20px;
             overflow-x: auto;
         }
         
         .qs-code-content pre {
             margin: 0;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #e2e8f0;
         }
         
-        .token-var {
+        .qs-code-content .token-url {
+            color: #38bdf8;
+        }
+        
+        .qs-code-content .token-flag {
+            color: #a78bfa;
+        }
+        
+        .qs-code-content .token-string {
+            color: #4ade80;
+        }
+        
+        .qs-code-content .token-var {
             color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
         
-        .user-token {
-            color: #22c55e;
+        .qs-response {
+            margin-top: 20px;
         }
         
-        .response-block {
-            margin-top: 24px;
-        }
-        
-        .response-block h4 {
-            font-size: 13px;
-            font-weight: 500;
+        .qs-response-label {
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-tertiary);
-            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
         }
         
-        .qs-response-json {
-            background: #0f172a;
+        .qs-response-content {
+            background: #f1f5f9;
             border-radius: 8px;
             padding: 16px 20px;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            line-height: 1.6;
-            color: #94a3b8;
+            line-height: 1.7;
+            color: #475569;
             overflow-x: auto;
         }
         
-        .logged-in-badge {
-            display: none;
-            font-size: 13px;
-            color: #22c55e;
-            margin-left: auto;
-            font-weight: 500;
-        }
-        
-        .logged-in-badge.show {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .action-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .action-link:hover {
-            text-decoration: underline;
-        }
-        
-        .try-btn {
+        .qs-cta-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             background: var(--bg-dark);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 14px;
             font-weight: 500;
-            border-radius: 6px;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            text-decoration: none;
+            transition: all 0.15s;
             margin-top: 16px;
         }
         
-        .try-btn:hover {
-            background: #1a1a1a;
+        .qs-cta-btn:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
         }
         
-        .try-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .qs-cta-btn.secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
         
-        .try-result {
-            margin-top: 16px;
-            display: none;
+        .qs-cta-btn.secondary:hover {
+            background: var(--bg-gray);
+            border-color: var(--text-tertiary);
         }
         
-        .try-result.show {
-            display: block;
-        }
-        
-        .try-result.success .qs-response-json {
-            border-left: 3px solid #22c55e;
-        }
-        
-        .try-result.error .qs-response-json {
-            border-left: 3px solid #ef4444;
-        }
-        
-        .next-links {
-            margin-top: 48px;
-            padding-top: 32px;
+        .qs-next-steps {
+            margin-top: 64px;
+            padding-top: 48px;
             border-top: 1px solid var(--border);
         }
         
-        .next-links h3 {
-            font-size: 16px;
+        .qs-next-steps h2 {
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
         }
         
-        .next-links-grid {
+        .qs-links-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 16px;
         }
         
-        .next-link {
+        .qs-link-card {
             display: block;
-            padding: 16px;
-            background: var(--bg-gray);
-            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             text-decoration: none;
             transition: all 0.15s;
         }
         
-        .next-link:hover {
-            background: var(--bg-secondary);
+        .qs-link-card:hover {
+            border-color: var(--qs-accent);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
         }
         
-        .next-link h4 {
-            font-size: 14px;
+        .qs-link-card h3 {
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 4px;
         }
         
-        .next-link p {
+        .qs-link-card p {
             font-size: 13px;
             color: var(--text-secondary);
             margin: 0;
+            line-height: 1.5;
         }
         
-        @media (max-width: 900px) {
-            .quickstart-layout {
-                grid-template-columns: 1fr;
-                gap: 32px;
+        .qs-link-card .arrow {
+            color: var(--qs-accent);
+            margin-left: 4px;
+            transition: transform 0.15s;
+        }
+        
+        .qs-link-card:hover .arrow {
+            transform: translateX(3px);
+        }
+        
+        /* Logged in state */
+        .qs-logged-in-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--qs-success);
+            font-weight: 500;
+            margin-left: 12px;
+        }
+        
+        /* Try it button */
+        .qs-try-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .qs-try-section.show {
+            display: block;
+        }
+        
+        .qs-try-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .qs-try-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .qs-try-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .qs-live-result {
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .qs-live-result.show {
+            display: block;
+        }
+        
+        .qs-live-result pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #94a3b8;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+        
+        .qs-live-result.success pre {
+            border-left: 3px solid #22c55e;
+        }
+        
+        .qs-live-result.error pre {
+            border-left: 3px solid #ef4444;
+        }
+        
+        @media (max-width: 640px) {
+            .qs-hero {
+                padding: 48px 20px 40px;
             }
             
-            .quickstart-sidebar {
-                position: static;
-                display: none;
+            .qs-hero h1 {
+                font-size: 28px;
             }
             
-            .next-links-grid {
+            .qs-hero p {
+                font-size: 16px;
+            }
+            
+            .qs-container {
+                padding: 0 20px 60px;
+            }
+            
+            .qs-step {
+                padding: 32px 0;
+            }
+            
+            .qs-step-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .qs-step-num {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+            
+            .qs-step-title {
+                font-size: 18px;
+            }
+            
+            .qs-code-content pre {
+                font-size: 11px;
+            }
+            
+            .qs-links-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -427,137 +569,138 @@
     </nav>
 
     <main>
-        <div class="quickstart-layout">
-            <aside class="quickstart-sidebar">
-                <h3>On this page</h3>
-                <ul>
-                    <li><a href="#create-account">1. Sign Up</a></li>
-                    <li><a href="#get-token">2. Get API Key</a></li>
-                    <li><a href="#first-request">3. Make Request</a></li>
-                    <li><a href="#next-steps">Next Steps</a></li>
-                </ul>
-            </aside>
+        <!-- Hero Section -->
+        <div class="qs-hero">
+            <h1>Get started with TBD</h1>
+            <p>Make your first API call in under 2 minutes. No credit card required.</p>
+            <span class="qs-time-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                3 steps
+            </span>
+        </div>
 
-            <div class="quickstart-main">
-                <h1>Quick Start</h1>
-                <p>Make your first API call in 3 steps.</p>
+        <!-- Steps -->
+        <div class="qs-container">
+            
+            <!-- Step 1 -->
+            <div class="qs-step" id="step1">
+                <div class="qs-step-header">
+                    <div class="qs-step-num" id="step1Num"><span>1</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Create your account</h2>
+                        <p class="qs-step-desc" id="step1Desc">
+                            <a href="signin.html?signup=true">Sign up for free</a> — takes 30 seconds.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Step 1: Create Account -->
-                <section class="qs-section" id="create-account">
-                    <h2>
-                        <span class="step-num" id="step1Num">1</span>
-                        Sign Up
-                        <span class="logged-in-badge" id="step1Badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
+            <!-- Step 2 -->
+            <div class="qs-step" id="step2">
+                <div class="qs-step-header">
+                    <div class="qs-step-num" id="step2Num"><span>2</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Get your API key</h2>
+                        <p class="qs-step-desc" id="step2Desc">
+                            Create an application in the <a href="dashboard.html">Dashboard</a>, then generate an API key.
+                        </p>
+                        <ul class="qs-instructions">
+                            <li>Go to <a href="dashboard.html">Dashboard</a> → click <strong>New Application</strong></li>
+                            <li>Open your app → click <strong>Create API Key</strong></li>
+                            <li>Select <strong>Sandbox</strong> environment</li>
+                            <li>Copy your API key</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="qs-step" id="step3">
+                <div class="qs-step-header">
+                    <div class="qs-step-num"><span>3</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Make your first request</h2>
+                        <p class="qs-step-desc">
+                            Run this command in your terminal. Replace <code style="background: rgba(251,191,36,0.15); color: #d97706; padding: 2px 6px; border-radius: 4px; font-size: 13px;">YOUR_API_KEY</code> with your key.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="qs-code-block">
+                    <div class="qs-code-header">
+                        <span class="qs-code-label">Terminal</span>
+                        <button class="qs-copy-btn" id="copyBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                             </svg>
-                            Done
-                        </span>
-                    </h2>
-                    <p id="step1Content"><a href="signin.html?signup=true" class="action-link">Create a free account</a> — no credit card required.</p>
-                </section>
-
-                <!-- Step 2: Get API Key -->
-                <section class="qs-section" id="get-token">
-                    <h2>
-                        <span class="step-num" id="step2Num">2</span>
-                        Get an API Key
-                        <span class="logged-in-badge" id="step2Badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            Done
-                        </span>
-                    </h2>
-                    <ol>
-                        <li>Go to <a href="dashboard.html" class="action-link">Dashboard</a></li>
-                        <li>Create an application</li>
-                        <li>Click <strong>Create API Key</strong> → select <strong>Sandbox</strong></li>
-                        <li>Copy your token</li>
-                    </ol>
-                </section>
-
-                <!-- Step 3: Make Your First Request -->
-                <section class="qs-section" id="first-request">
-                    <h2>
-                        <span class="step-num">3</span>
-                        Make a Request
-                    </h2>
-                    <p>Paste this in your terminal (replace <code>YOUR_API_TOKEN</code>):</p>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="qs-code-content">
+                        <pre id="curlCommand"><span class="token-url">curl</span> https://flow-platform-flow-platform-staging.up.railway.app/v1/yield/rates \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var" id="tokenPlaceholder">YOUR_API_KEY</span>"</span></pre>
+                    </div>
                     
-                    <div class="qs-code-block">
-                        <div class="qs-code-header">
-                            <span>Terminal</span>
-                            <button class="qs-copy-btn" onclick="copyCode()">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
-                                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                                </svg>
-                                Copy
-                            </button>
-                        </div>
-                        <div class="qs-code-content">
-                            <pre id="curlCommand">curl https://flow-platform-flow-platform-staging.up.railway.app/v1/yield/rates \
-  -H "Authorization: Bearer <span class="token-var" id="tokenPlaceholder">YOUR_API_TOKEN</span>"</pre>
+                    <div class="qs-try-section" id="trySection">
+                        <button class="qs-try-btn" id="tryBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5,3 19,12 5,21"/>
+                            </svg>
+                            Run this request
+                        </button>
+                        <div class="qs-live-result" id="liveResult">
+                            <pre id="liveResultJson"></pre>
                         </div>
                     </div>
+                </div>
 
-                    <div class="response-block">
-                        <h4>Response</h4>
-                        <div class="qs-response-json">{
+                <div class="qs-response">
+                    <p class="qs-response-label">Example Response</p>
+                    <div class="qs-response-content">
+<pre>{
   "rates": [
     {
       "currency": "USDC",
       "protocol": "aave",
       "network": "ethereum_sepolia",
-      "apy": 0.0523,
-      "updated_at": "2025-12-01T12:00:00Z"
+      "apy": 0.0523
     },
     {
       "currency": "DAI",
-      "protocol": "aave",
+      "protocol": "aave", 
       "network": "ethereum_sepolia",
-      "apy": 0.0302,
-      "updated_at": "2025-12-01T12:00:00Z"
+      "apy": 0.0302
     }
   ]
-}</div>
+}</pre>
                     </div>
+                </div>
+            </div>
 
-                    <div id="tryItSection" style="display: none;">
-                        <button class="try-btn" id="tryItBtn" onclick="tryApiCall()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5,3 19,12 5,21"/>
-                            </svg>
-                            Run Request
-                        </button>
-                        <div class="try-result" id="tryResult">
-                            <div class="qs-response-json" id="tryResultJson"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Next Steps -->
-                <div class="next-links" id="next-steps">
-                    <h3>Next Steps</h3>
-                    <div class="next-links-grid">
-                        <a href="guides.html#authentication" class="next-link">
-                            <h4>Authentication Guide</h4>
-                            <p>Learn about tokens, scopes, and environments</p>
-                        </a>
-                        <a href="api-reference.html" class="next-link">
-                            <h4>API Reference</h4>
-                            <p>Full documentation for all endpoints</p>
-                        </a>
-                        <a href="dashboard-yield.html" class="next-link">
-                            <h4>Create a Yield Account</h4>
-                            <p>Start earning yield on deposits</p>
-                        </a>
-                        <a href="guides.html#rate-limits" class="next-link">
-                            <h4>Rate Limits</h4>
-                            <p>Understand request limits and quotas</p>
-                        </a>
-                    </div>
+            <!-- Next Steps -->
+            <div class="qs-next-steps">
+                <h2>What's next?</h2>
+                <div class="qs-links-grid">
+                    <a href="guides.html" class="qs-link-card">
+                        <h3>Read the Guides <span class="arrow">→</span></h3>
+                        <p>Authentication, environments, and best practices</p>
+                    </a>
+                    <a href="api-reference.html" class="qs-link-card">
+                        <h3>API Reference <span class="arrow">→</span></h3>
+                        <p>Full documentation for all endpoints</p>
+                    </a>
+                    <a href="dashboard-yield.html" class="qs-link-card">
+                        <h3>Create a Yield Account <span class="arrow">→</span></h3>
+                        <p>Start earning yield on crypto deposits</p>
+                    </a>
+                    <a href="sdks.html" class="qs-link-card">
+                        <h3>Explore SDKs <span class="arrow">→</span></h3>
+                        <p>Pre-built components for faster integration</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -613,20 +756,21 @@
     <script>
         const token = localStorage.getItem('tbd_token');
         const userInfo = localStorage.getItem('tbd_user');
-        let userToken = null;
+        let userApiKey = null;
         
-        async function initQuickStart() {
+        async function init() {
             if (token && userInfo) {
                 // Mark step 1 as complete
-                document.getElementById('step1Num').classList.add('completed');
-                document.getElementById('step1Badge').classList.add('show');
-                document.getElementById('step1Content').innerHTML = 'Signed in as <strong>' + JSON.parse(userInfo).email + '</strong>';
+                document.getElementById('step1Num').classList.add('done');
+                const user = JSON.parse(userInfo);
+                document.getElementById('step1Desc').innerHTML = 
+                    `Signed in as <strong>${user.email}</strong>`;
                 
-                await checkForToken();
+                await checkForApiKey();
             }
         }
         
-        async function checkForToken() {
+        async function checkForApiKey() {
             try {
                 const appsRes = await fetch(`${API_BASE_URL}/v1/applications`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -636,7 +780,6 @@
                 const apps = await appsRes.json();
                 if (!apps.applications?.length) return;
                 
-                // Check for tokens
                 const appId = apps.applications[0].application_id;
                 const tokensRes = await fetch(`${API_BASE_URL}/v1/applications/${appId}/tokens`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -646,28 +789,32 @@
                 const tokens = await tokensRes.json();
                 if (!tokens.tokens?.length) return;
                 
-                // Mark step 2 as complete and populate token
-                document.getElementById('step2Num').classList.add('completed');
-                document.getElementById('step2Badge').classList.add('show');
+                // Mark step 2 as complete
+                document.getElementById('step2Num').classList.add('done');
+                document.getElementById('step2Desc').innerHTML = 
+                    `API key ready in <strong>${apps.applications[0].name}</strong>`;
                 
-                userToken = tokens.tokens[0].access_token;
+                // Populate the token in the curl command
+                userApiKey = tokens.tokens[0].access_token;
                 const placeholder = document.getElementById('tokenPlaceholder');
-                placeholder.textContent = userToken;
+                placeholder.textContent = userApiKey;
                 placeholder.classList.remove('token-var');
-                placeholder.classList.add('user-token');
+                placeholder.style.background = 'rgba(34, 197, 94, 0.15)';
+                placeholder.style.color = '#22c55e';
                 
                 // Show try button
-                document.getElementById('tryItSection').style.display = 'block';
+                document.getElementById('trySection').classList.add('show');
                 
             } catch (e) {
-                console.error('Error checking token:', e);
+                console.error('Error:', e);
             }
         }
         
-        function copyCode() {
+        // Copy button
+        document.getElementById('copyBtn').addEventListener('click', () => {
             const code = document.getElementById('curlCommand').innerText;
             navigator.clipboard.writeText(code).then(() => {
-                const btn = document.querySelector('.qs-copy-btn');
+                const btn = document.getElementById('copyBtn');
                 btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg> Copied!';
                 btn.classList.add('copied');
                 setTimeout(() => {
@@ -675,21 +822,22 @@
                     btn.classList.remove('copied');
                 }, 2000);
             });
-        }
+        });
         
-        async function tryApiCall() {
-            if (!userToken) return;
+        // Try button
+        document.getElementById('tryBtn').addEventListener('click', async () => {
+            if (!userApiKey) return;
             
-            const btn = document.getElementById('tryItBtn');
-            const result = document.getElementById('tryResult');
-            const json = document.getElementById('tryResultJson');
+            const btn = document.getElementById('tryBtn');
+            const result = document.getElementById('liveResult');
+            const json = document.getElementById('liveResultJson');
             
             btn.disabled = true;
-            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="32"/></svg> Running...';
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32"/></svg> Running...';
             
             try {
                 const res = await fetch(`${API_BASE_URL}/v1/yield/rates`, {
-                    headers: { 'Authorization': `Bearer ${userToken}` }
+                    headers: { 'Authorization': `Bearer ${userApiKey}` }
                 });
                 const data = await res.json();
                 
@@ -704,15 +852,15 @@
             }
             
             btn.disabled = false;
-            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Run Again';
-        }
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Run again';
+        });
         
-        // Spin animation
+        // Add spin animation
         const style = document.createElement('style');
-        style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        style.textContent = '.spin { animation: spin 1s linear infinite; } @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
         document.head.appendChild(style);
         
-        initQuickStart();
+        init();
     </script>
 </body>
 </html>
