@@ -39,8 +39,8 @@ Cloudflare Pages provides:
 **Build settings:**
 - **Framework preset:** None (or "Plain HTML")
 - **Build command:** (leave empty - no build needed)
-- **Build output directory:** `/` (root directory)
-- **Root directory:** `/` (leave as root)
+- **Build output directory:** `/` (root of frontend directory)
+- **Root directory:** `frontend` (set to frontend directory)
 
 **Environment variables:** (Optional)
 - None needed for static site
