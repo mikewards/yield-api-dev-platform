@@ -119,18 +119,24 @@
             <div class="api-example-section">
                 <h2>Or create via API</h2>
                 <p>You can also create an account programmatically using our API:</p>
-                <div class="code-example-box">
-                    <div class="code-header">
-                        <span>cURL</span>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Terminal</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-api-account')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
                     </div>
-                    <pre><code>curl http://localhost:8080/v1/accounts \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
+                    <div class="code-block-content">
+                        <pre id="code-api-account"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
     "username": "your_username",
     "password": "your_secure_password",
     "email": "your_email@example.com"
-  }'</code></pre>
+  }'</span></pre>
+                    </div>
                 </div>
                 <p class="api-note">See our <a href="getting-started.html">Getting Started guide</a> for more information.</p>
             </div>
