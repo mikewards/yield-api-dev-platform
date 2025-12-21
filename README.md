@@ -57,10 +57,12 @@ flow-platform/
 │   ├── src/main/kotlin/   # Source code
 │   └── build.gradle.kts   # Build configuration
 ├── frontend/              # Frontend application
-│   ├── pages/            # HTML pages
+│   ├── *.html            # HTML pages (root of frontend/)
 │   ├── styles/           # CSS files
 │   ├── scripts/          # JavaScript files
-│   └── sdk-demos/        # SDK demo pages
+│   ├── sdk-demos/        # SDK demo pages
+│   ├── worker.js         # Cloudflare Worker entry point
+│   └── wrangler.jsonc    # Cloudflare Worker config
 ├── docs/                  # Documentation
 │   ├── deployment/        # Deployment guides
 │   ├── development/       # Development setup
