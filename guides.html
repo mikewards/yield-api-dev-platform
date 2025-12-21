@@ -428,7 +428,6 @@
         <aside class="guides-sidebar">
             <h3>Getting Started</h3>
             <ul>
-                <li><a href="#quick-start">Quick Start</a></li>
                 <li><a href="#authentication">Authentication</a></li>
             </ul>
             
@@ -459,63 +458,6 @@
         <main class="guides-main">
             <h1>TBD Guides</h1>
             <p>Learn how to integrate TBD's DeFi yield APIs into your application. This guide covers everything from authentication to production deployment.</p>
-
-            <!-- Quick Start -->
-            <section id="quick-start" class="guide-section">
-                <h2>Quick Start</h2>
-                <p>Get your first yield account running in three steps.</p>
-                
-                <ol class="step-list">
-                    <li>
-                        <h4>Create an account and get your API key</h4>
-                        <p>Sign up at <a href="account.html">tbd.com/account</a>, then go to your <a href="dashboard.html">dashboard</a> to create an application and generate an API key.</p>
-                    </li>
-                    <li>
-                        <h4>Create a yield account</h4>
-                        <p>Use your API key to create a yield account for earning interest on deposits.</p>
-                        <div class="code-block-unified">
-                            <div class="code-block-header">
-                                <span class="code-block-label">Terminal</span>
-                                <button class="code-copy-btn" onclick="copyCode(this, 'code-create-yield')">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                    Copy
-                                </button>
-                            </div>
-                            <div class="code-block-content">
-                                <pre id="code-create-yield"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
-  <span class="token-flag">-X</span> POST \
-  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
-  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">'{"currency": "USDC"}'</span></pre>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <h4>Deposit funds and start earning</h4>
-                        <p>Deposit cryptocurrency into your yield account. TBD automatically routes to the best protocol.</p>
-                        <div class="code-block-unified">
-                            <div class="code-block-header">
-                                <span class="code-block-label">Terminal</span>
-                                <button class="code-copy-btn" onclick="copyCode(this, 'code-deposit')">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                                    Copy
-                                </button>
-                            </div>
-                            <div class="code-block-content">
-                                <pre id="code-deposit"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts/{account_id}/deposit</span> \
-  <span class="token-flag">-X</span> POST \
-  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
-  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">'{"amount": "1000.00", "currency": "USDC"}'</span></pre>
-                            </div>
-                        </div>
-                    </li>
-                </ol>
-                
-                <div class="callout">
-                    <p><strong>That's it.</strong> Your funds are now earning yield through Morpho or Aave. Monitor your position with <code>GET /v1/yield/positions</code>.</p>
-                </div>
-            </section>
 
             <!-- Authentication -->
             <section id="authentication" class="guide-section">
