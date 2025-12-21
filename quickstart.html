@@ -431,34 +431,22 @@
             <aside class="quickstart-sidebar">
                 <h3>On this page</h3>
                 <ul>
-                    <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#create-account">1. Create Account</a></li>
-                    <li><a href="#create-app">2. Create Application</a></li>
-                    <li><a href="#get-token">3. Get API Token</a></li>
-                    <li><a href="#first-request">4. Make Request</a></li>
+                    <li><a href="#create-account">1. Sign Up</a></li>
+                    <li><a href="#get-token">2. Get API Key</a></li>
+                    <li><a href="#first-request">3. Make Request</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
             </aside>
 
             <div class="quickstart-main">
                 <h1>Quick Start</h1>
-                <p>Get from zero to your first API call in under 2 minutes. This guide walks you through authentication and making your first request to the TBD API.</p>
-
-                <!-- Prerequisites -->
-                <section class="qs-section" id="prerequisites">
-                    <h2>Prerequisites</h2>
-                    <p>You'll need:</p>
-                    <ul style="list-style: disc; padding-left: 24px;">
-                        <li>A terminal with <code>curl</code> installed (macOS/Linux have this by default)</li>
-                        <li>A TBD account (free to create)</li>
-                    </ul>
-                </section>
+                <p>Make your first API call in 3 steps.</p>
 
                 <!-- Step 1: Create Account -->
                 <section class="qs-section" id="create-account">
                     <h2>
                         <span class="step-num" id="step1Num">1</span>
-                        Create an Account
+                        Sign Up
                         <span class="logged-in-badge" id="step1Badge">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
@@ -466,14 +454,14 @@
                             Done
                         </span>
                     </h2>
-                    <p id="step1Content">Sign up at <a href="signin.html?signup=true" class="action-link">tbd.com/signin</a>. No credit card required.</p>
+                    <p id="step1Content"><a href="signin.html?signup=true" class="action-link">Create a free account</a> — no credit card required.</p>
                 </section>
 
-                <!-- Step 2: Create Application -->
-                <section class="qs-section" id="create-app">
+                <!-- Step 2: Get API Key -->
+                <section class="qs-section" id="get-token">
                     <h2>
                         <span class="step-num" id="step2Num">2</span>
-                        Create an Application
+                        Get an API Key
                         <span class="logged-in-badge" id="step2Badge">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
@@ -482,41 +470,20 @@
                         </span>
                     </h2>
                     <ol>
-                        <li>Go to <a href="dashboard.html" class="action-link">Dashboard → Applications</a></li>
-                        <li>Click <strong>Create Application</strong></li>
-                        <li>Enter a name (e.g., "My First App")</li>
+                        <li>Go to <a href="dashboard.html" class="action-link">Dashboard</a></li>
+                        <li>Create an application</li>
+                        <li>Click <strong>Create API Key</strong> → select <strong>Sandbox</strong></li>
+                        <li>Copy your token</li>
                     </ol>
-                    <p>Your application is auto-configured with Ethereum RPC endpoints for both sandbox (Sepolia testnet) and production (mainnet).</p>
                 </section>
 
-                <!-- Step 3: Get API Token -->
-                <section class="qs-section" id="get-token">
-                    <h2>
-                        <span class="step-num" id="step3Num">3</span>
-                        Get an API Token
-                        <span class="logged-in-badge" id="step3Badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            Done
-                        </span>
-                    </h2>
-                    <ol>
-                        <li>Click on your application to open it</li>
-                        <li>Under <strong>API Keys</strong>, click <strong>Create API Key</strong></li>
-                        <li>Select <strong>Sandbox</strong> environment and click <strong>Create</strong></li>
-                        <li>Copy the token (starts with <code>tbd_sand_</code>)</li>
-                    </ol>
-                    <p>Save this token securely. You won't be able to see it again.</p>
-                </section>
-
-                <!-- Step 4: Make Your First Request -->
+                <!-- Step 3: Make Your First Request -->
                 <section class="qs-section" id="first-request">
                     <h2>
-                        <span class="step-num">4</span>
-                        Make Your First Request
+                        <span class="step-num">3</span>
+                        Make a Request
                     </h2>
-                    <p>Run this command in your terminal. Replace <code>YOUR_API_TOKEN</code> with the token you just created.</p>
+                    <p>Paste this in your terminal (replace <code>YOUR_API_TOKEN</code>):</p>
                     
                     <div class="qs-code-block">
                         <div class="qs-code-header">
@@ -655,11 +622,11 @@
                 document.getElementById('step1Badge').classList.add('show');
                 document.getElementById('step1Content').innerHTML = 'Signed in as <strong>' + JSON.parse(userInfo).email + '</strong>';
                 
-                await checkForAppAndToken();
+                await checkForToken();
             }
         }
         
-        async function checkForAppAndToken() {
+        async function checkForToken() {
             try {
                 const appsRes = await fetch(`${API_BASE_URL}/v1/applications`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -668,10 +635,6 @@
                 
                 const apps = await appsRes.json();
                 if (!apps.applications?.length) return;
-                
-                // Mark step 2 as complete
-                document.getElementById('step2Num').classList.add('completed');
-                document.getElementById('step2Badge').classList.add('show');
                 
                 // Check for tokens
                 const appId = apps.applications[0].application_id;
@@ -683,9 +646,9 @@
                 const tokens = await tokensRes.json();
                 if (!tokens.tokens?.length) return;
                 
-                // Mark step 3 as complete and populate token
-                document.getElementById('step3Num').classList.add('completed');
-                document.getElementById('step3Badge').classList.add('show');
+                // Mark step 2 as complete and populate token
+                document.getElementById('step2Num').classList.add('completed');
+                document.getElementById('step2Badge').classList.add('show');
                 
                 userToken = tokens.tokens[0].access_token;
                 const placeholder = document.getElementById('tokenPlaceholder');
@@ -697,7 +660,7 @@
                 document.getElementById('tryItSection').style.display = 'block';
                 
             } catch (e) {
-                console.error('Error checking app/token:', e);
+                console.error('Error checking token:', e);
             }
         }
         
