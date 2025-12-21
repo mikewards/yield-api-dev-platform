@@ -9,7 +9,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 // Get network name based on environment
 fun getYieldNetworkName(): String {
@@ -40,70 +41,70 @@ fun Application.yieldAccountRoutes() {
                     }
                     
                     val rates = mutableListOf<YieldRate>()
+                    val now = java.time.Instant.now().toString()
                     
-                    for (curr in currencies) {
-                        if (protocolFilter == null || protocolFilter == "morpho") {
-                            try {
-                                val morphoRate = runBlocking {
-                                    protocolService.getMorphoRates(curr)
+                    // Fetch ALL markets from both protocols in PARALLEL (2 API calls total)
+                    coroutineScope {
+                        val morphoMarketsDeferred = if (protocolFilter == null || protocolFilter == "morpho") {
+                            async { 
+                                try {
+                                    protocolService.listMorphoMarkets()
+                                } catch (e: Exception) {
+                                    println("⚠️ Morpho API error: ${e.message}")
+                                    emptyList()
                                 }
+                            }
+                        } else null
+                        
+                        val aaveMarketsDeferred = if (protocolFilter == null || protocolFilter == "aave") {
+                            async {
+                                try {
+                                    protocolService.listAaveMarkets()
+                                } catch (e: Exception) {
+                                    println("⚠️ Aave API error: ${e.message}")
+                                    emptyList()
+                                }
+                            }
+                        } else null
+                        
+                        // Await both results (parallel execution)
+                        val morphoMarkets = morphoMarketsDeferred?.await() ?: emptyList()
+                        val aaveMarkets = aaveMarketsDeferred?.await() ?: emptyList()
+                        
+                        // Extract rates for each currency from pre-fetched markets
+                        for (curr in currencies) {
+                            // Morpho rates
+                            if (protocolFilter == null || protocolFilter == "morpho") {
+                                val matchingMarket = morphoMarkets
+                                    .filter { it.loanAsset?.symbol?.equals(curr, ignoreCase = true) == true }
+                                    .maxByOrNull { it.state?.supplyApy ?: 0.0 }
+                                
+                                val apy = matchingMarket?.state?.supplyApy ?: 0.0
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "morpho",
                                     network = network,
-                                    annual_yield_rate = morphoRate,
-                                    apy = morphoRate,
-                                    updated_at = java.time.Instant.now().toString()
-                                ))
-                            } catch (e: IllegalArgumentException) {
-                                // No active markets found - include in response with note
-                                println("⚠️ No active Morpho markets found for $curr: ${e.message}")
-                                rates.add(YieldRate(
-                                    currency = curr,
-                                    protocol = "morpho",
-                                    network = network,
-                                    annual_yield_rate = 0.0,
-                                    apy = 0.0,
-                                    updated_at = java.time.Instant.now().toString(),
-                                    note = "No active markets found"
-                                ))
-                            } catch (e: Exception) {
-                                println("⚠️ Morpho API error for $curr: ${e.message}")
-                                rates.add(YieldRate(
-                                    currency = curr,
-                                    protocol = "morpho",
-                                    network = network,
-                                    annual_yield_rate = 0.0,
-                                    apy = 0.0,
-                                    updated_at = java.time.Instant.now().toString(),
-                                    note = "API error: ${e.message}"
+                                    annual_yield_rate = apy,
+                                    apy = apy,
+                                    updated_at = now,
+                                    note = if (apy == 0.0) "No active markets" else null
                                 ))
                             }
-                        }
-                        
-                        if (protocolFilter == null || protocolFilter == "aave") {
-                            try {
-                                val aaveRate = runBlocking {
-                                    protocolService.getAaveRates(curr)
-                                }
+                            
+                            // Aave rates
+                            if (protocolFilter == null || protocolFilter == "aave") {
+                                val matchingReserve = aaveMarkets
+                                    .find { it.symbol?.equals(curr, ignoreCase = true) == true }
+                                
+                                val apy = matchingReserve?.supplyApy ?: 0.0
                                 rates.add(YieldRate(
                                     currency = curr,
                                     protocol = "aave",
                                     network = network,
-                                    annual_yield_rate = aaveRate,
-                                    apy = aaveRate,
-                                    updated_at = java.time.Instant.now().toString()
-                                ))
-                            } catch (e: Exception) {
-                                println("⚠️ Aave rate fetch failed for $curr: ${e.message}")
-                                rates.add(YieldRate(
-                                    currency = curr,
-                                    protocol = "aave",
-                                    network = network,
-                                    annual_yield_rate = 0.0,
-                                    apy = 0.0,
-                                    updated_at = java.time.Instant.now().toString(),
-                                    note = "API error: ${e.message}"
+                                    annual_yield_rate = apy,
+                                    apy = apy,
+                                    updated_at = now,
+                                    note = if (apy == 0.0) "No active markets" else null
                                 ))
                             }
                         }

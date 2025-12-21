@@ -92,8 +92,8 @@ class MorphoClient {
     suspend fun getCurrentRate(currency: String): Double {
         return retryWithBackoff(
             config = RetryConfig(
-                maxAttempts = 3,
-                initialDelay = 500.milliseconds
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
             )
         ) {
             try {
@@ -160,8 +160,8 @@ class MorphoClient {
     suspend fun listMarkets(): List<MorphoMarket> {
         return retryWithBackoff(
             config = RetryConfig(
-                maxAttempts = 3,
-                initialDelay = 500.milliseconds
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
             )
         ) {
             try {
