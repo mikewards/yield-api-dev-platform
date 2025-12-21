@@ -44,7 +44,7 @@ body {
    - API endpoint links
 */
 p a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link),
-li a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a),
+li:not(.guides-sidebar li):not(.api-sidebar li):not(.sidebar-list li) a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a),
 .note a:not(.btn),
 .callout a:not(.btn),
 .warning-box a:not(.btn),
@@ -55,12 +55,27 @@ a.text-link:not(.btn) {
 }
 
 p a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):hover,
-li a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a):hover,
+li:not(.guides-sidebar li):not(.api-sidebar li):not(.sidebar-list li) a:not(.btn):not(.nav-link):not(.dropdown-item):not(.secondary-nav-link):not(.qs-link-card a):hover,
 .note a:not(.btn):hover,
 .callout a:not(.btn):hover,
 .warning-box a:not(.btn):hover,
 a.text-link:not(.btn):hover {
     text-decoration: underline;
+}
+
+/* Ensure sidebar links keep their original styling */
+.api-sidebar a,
+.guides-sidebar a,
+.sidebar-list a {
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
+}
+
+.api-sidebar a:hover,
+.guides-sidebar a:hover,
+.sidebar-list a:hover {
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
 }
 
 .container {
