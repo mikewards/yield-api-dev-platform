@@ -30,12 +30,45 @@ function copyCode(button, codeId) {
     });
 }
 
-// Auto-initialize copy buttons on page load
+// Generate line numbers for code blocks
+function addLineNumbers(codeBlock) {
+    const content = codeBlock.querySelector('.code-block-content');
+    const pre = codeBlock.querySelector('pre');
+    if (!content || !pre) return;
+    
+    // Count lines
+    const codeText = pre.textContent || '';
+    const lines = codeText.split('\n');
+    const lineCount = lines.length;
+    
+    // Check if line numbers already exist
+    if (content.querySelector('.code-line-numbers')) return;
+    
+    // Create line numbers element
+    const lineNumbers = document.createElement('div');
+    lineNumbers.className = 'code-line-numbers';
+    
+    for (let i = 1; i <= lineCount; i++) {
+        const span = document.createElement('span');
+        span.textContent = i;
+        lineNumbers.appendChild(span);
+    }
+    
+    // Insert line numbers before pre
+    content.insertBefore(lineNumbers, pre);
+}
+
+// Auto-initialize code blocks on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Find all code blocks without explicit copy handlers and add them
+    // Add line numbers and copy functionality to all code blocks
     document.querySelectorAll('.code-block-unified').forEach((block, index) => {
         const pre = block.querySelector('pre');
         const copyBtn = block.querySelector('.code-copy-btn');
+        
+        // Add line numbers
+        addLineNumbers(block);
+        
+        // Set up copy button
         if (pre && copyBtn && !pre.id) {
             pre.id = 'code-' + index;
             copyBtn.setAttribute('onclick', `copyCode(this, '${pre.id}')`);

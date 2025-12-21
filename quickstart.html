@@ -629,10 +629,10 @@
                     </div>
                 </div>
 
-                <div class="qs-code-block">
-                    <div class="qs-code-header">
-                        <span class="qs-code-label">Terminal</span>
-                        <button class="qs-copy-btn" id="copyBtn">
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Terminal</span>
+                        <button class="code-copy-btn" id="copyBtn">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
@@ -640,8 +640,8 @@
                             Copy
                         </button>
                     </div>
-                    <div class="qs-code-content">
-                        <pre id="curlCommand"><span class="token-url">curl</span> https://flow-platform-flow-platform-staging.up.railway.app/v1/yield/rates \
+                    <div class="code-block-content">
+                        <pre id="curlCommand"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-flow-platform-staging.up.railway.app/v1/yield/rates</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var" id="tokenPlaceholder">YOUR_API_KEY</span>"</span></pre>
                     </div>
                     
@@ -810,18 +810,9 @@
             }
         }
         
-        // Copy button
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const code = document.getElementById('curlCommand').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = document.getElementById('copyBtn');
-                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg> Copied!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy';
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
+        // Copy button - use unified copyCode function
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            copyCode(this, 'curlCommand');
         });
         
         // Try button
