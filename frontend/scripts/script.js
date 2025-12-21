@@ -30,6 +30,91 @@ function copyCode(button, codeId) {
     });
 }
 
+// Syntax highlighting for JavaScript/Node.js
+function highlightJavaScript(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight keywords
+    html = html.replace(/\b(const|let|var|await|async|function|return|if|else|for|while|import|require|export|default)\b/g, '<span class="token-cmd">$1</span>');
+    
+    // Highlight function calls
+    html = html.replace(/(\w+)\.(\w+)\(/g, '<span class="token-property">$1</span>.<span class="token-function">$2</span>(');
+    html = html.replace(/(\w+)\(/g, '<span class="token-function">$1</span>(');
+    
+    // Highlight strings
+    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
+    
+    // Highlight numbers
+    html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
+    
+    // Highlight comments
+    html = html.replace(/(\/\/.*$)/gm, '<span class="token-comment">$1</span>');
+    
+    // Highlight property access
+    html = html.replace(/\.(\w+)/g, '.<span class="token-property">$1</span>');
+    
+    return html;
+}
+
+// Syntax highlighting for Python
+function highlightPython(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight keywords
+    html = html.replace(/\b(import|from|def|class|if|else|elif|for|while|return|async|await|print|True|False|None)\b/g, '<span class="token-cmd">$1</span>');
+    
+    // Highlight function calls
+    html = html.replace(/(\w+)\(/g, '<span class="token-function">$1</span>(');
+    
+    // Highlight strings
+    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
+    
+    // Highlight numbers
+    html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
+    
+    // Highlight comments
+    html = html.replace(/(#.*$)/gm, '<span class="token-comment">$1</span>');
+    
+    return html;
+}
+
+// Syntax highlighting for Ruby
+function highlightRuby(text) {
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Highlight keywords
+    html = html.replace(/\b(require|def|class|if|else|elsif|end|return|puts|true|false|nil)\b/g, '<span class="token-cmd">$1</span>');
+    
+    // Highlight method calls
+    html = html.replace(/(\w+)\.(\w+)/g, '<span class="token-property">$1</span>.<span class="token-function">$2</span>');
+    
+    // Highlight strings
+    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
+    
+    // Highlight numbers
+    html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
+    
+    // Highlight comments
+    html = html.replace(/(#.*$)/gm, '<span class="token-comment">$1</span>');
+    
+    // Highlight symbols
+    html = html.replace(/:(\w+)/g, '<span class="token-property">:$1</span>');
+    
+    return html;
+}
+
 // Syntax highlighting for cURL commands
 function highlightCurl(text) {
     // Escape HTML first
@@ -44,7 +129,7 @@ function highlightCurl(text) {
     // Highlight URLs (http/https)
     html = html.replace(/(https?:\/\/[^\s\\]+)/g, '<span class="token-url">$1</span>');
     
-    // Highlight flags like -X, -H, -d
+    // Highlight flags like -X, -H, -d, -u
     html = html.replace(/(\s)(-[A-Za-z]+)(\s)/g, '$1<span class="token-flag">$2</span>$3');
     
     // Highlight header values in quotes
@@ -97,16 +182,26 @@ function highlightJson(text) {
 // Generate line numbers for code blocks
 function addLineNumbers(codeBlock) {
     const content = codeBlock.querySelector('.code-block-content');
-    const pre = codeBlock.querySelector('pre');
-    if (!content || !pre) return;
+    if (!content) return;
+    
+    // Skip if this is a language-switching code block (handled separately)
+    if (content.querySelector('.lang-code')) {
+        return;
+    }
+    
+    // Get pre element (single pre for non-language blocks)
+    const pre = content.querySelector('pre');
+    if (!pre) return;
+    
+    // Skip if line numbers already exist
+    if (pre.previousElementSibling && pre.previousElementSibling.classList.contains('code-line-numbers')) {
+        return;
+    }
     
     // Count lines
     const codeText = pre.textContent || '';
     const lines = codeText.split('\n');
     const lineCount = lines.length;
-    
-    // Check if line numbers already exist
-    if (content.querySelector('.code-line-numbers')) return;
     
     // Create line numbers element
     const lineNumbers = document.createElement('div');
@@ -126,32 +221,47 @@ function addLineNumbers(codeBlock) {
 document.addEventListener('DOMContentLoaded', function() {
     // Process all code blocks with syntax highlighting
     document.querySelectorAll('.code-block-unified').forEach((block, index) => {
-        const pre = block.querySelector('pre');
-        const code = pre ? pre.querySelector('code') : null;
+        const allPre = block.querySelectorAll('pre');
         const copyBtn = block.querySelector('.code-copy-btn');
         
-        // Apply syntax highlighting
-        if (code && !code.dataset.highlighted) {
-            const text = code.textContent || '';
-            const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
-            const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+        // Process each pre element (for language switching)
+        allPre.forEach((pre, preIndex) => {
+            const code = pre.querySelector('code');
             
-            if (isCurl) {
-                code.innerHTML = highlightCurl(text);
-            } else if (isJson) {
-                code.innerHTML = highlightJson(text);
+            // Apply syntax highlighting
+            if (code && !code.dataset.highlighted) {
+                const text = code.textContent || '';
+                const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
+                const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+                const isJavaScript = text.includes('require') || text.includes('const') || text.includes('await');
+                const isPython = text.includes('import ') || text.includes('print(') || text.includes('def ');
+                const isRuby = text.includes('require ') || text.includes('puts ') || text.includes('def ');
+                
+                if (isCurl) {
+                    code.innerHTML = highlightCurl(text);
+                } else if (isJson) {
+                    code.innerHTML = highlightJson(text);
+                } else if (isJavaScript) {
+                    code.innerHTML = highlightJavaScript(text);
+                } else if (isPython) {
+                    code.innerHTML = highlightPython(text);
+                } else if (isRuby) {
+                    code.innerHTML = highlightRuby(text);
+                }
+                code.dataset.highlighted = 'true';
             }
-            code.dataset.highlighted = 'true';
-        }
+            
+            // Set up copy button
+            if (pre && copyBtn && !pre.id) {
+                pre.id = 'code-' + index + '-' + preIndex;
+                if (preIndex === 0) {
+                    copyBtn.setAttribute('onclick', `copyCode(this, '${pre.id}')`);
+                }
+            }
+        });
         
-        // Add line numbers
+        // Add line numbers (for the active pre element)
         addLineNumbers(block);
-        
-        // Set up copy button
-        if (pre && copyBtn && !pre.id) {
-            pre.id = 'code-' + index;
-            copyBtn.setAttribute('onclick', `copyCode(this, '${pre.id}')`);
-        }
     });
     
     // Process response blocks
@@ -202,12 +312,76 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Tab switching in integration section
-const tabs = document.querySelectorAll('.tab');
-tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-        tabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab[data-lang]');
+    const codeBlocks = document.querySelectorAll('.lang-code');
+    
+    function updateLineNumbers(activePre, container) {
+        if (!activePre || !container) return;
+        
+        // Remove existing line numbers
+        const existing = container.querySelector('.code-line-numbers');
+        if (existing) {
+            existing.remove();
+        }
+        
+        // Count lines for active pre
+        const codeText = activePre.textContent || '';
+        const lines = codeText.split('\n');
+        const lineCount = lines.length;
+        
+        // Create line numbers
+        const lineNumbers = document.createElement('div');
+        lineNumbers.className = 'code-line-numbers';
+        
+        for (let i = 1; i <= lineCount; i++) {
+            const span = document.createElement('span');
+            span.textContent = i;
+            lineNumbers.appendChild(span);
+        }
+        
+        // Insert before active pre
+        const content = container.querySelector('.code-block-content');
+        if (content) {
+            content.insertBefore(lineNumbers, activePre);
+        }
+    }
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const lang = this.dataset.lang;
+            
+            // Update tab active state
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide code blocks
+            codeBlocks.forEach(block => {
+                if (block.id === `lang-code-${lang}`) {
+                    block.classList.add('active');
+                } else {
+                    block.classList.remove('active');
+                }
+            });
+            
+            // Update line numbers for active code block
+            const codeBlockContainer = tab.closest('.integration-visual')?.querySelector('.code-block-unified');
+            const activePre = codeBlockContainer?.querySelector('.lang-code.active');
+            if (codeBlockContainer && activePre) {
+                updateLineNumbers(activePre, codeBlockContainer);
+            }
+        });
     });
+    
+    // Initialize line numbers for default active tab
+    const activeTab = document.querySelector('.tab.active[data-lang]');
+    if (activeTab) {
+        const codeBlockContainer = activeTab.closest('.integration-visual')?.querySelector('.code-block-unified');
+        const activePre = codeBlockContainer?.querySelector('.lang-code.active');
+        if (codeBlockContainer && activePre) {
+            updateLineNumbers(activePre, codeBlockContainer);
+        }
+    }
 });
 
 // Add scroll animation

@@ -1368,6 +1368,15 @@ select option {
     color: rgba(255, 255, 255, 0.3);
 }
 
+/* Language code block switching */
+.lang-code {
+    display: none;
+}
+
+.lang-code.active {
+    display: block;
+}
+
 /* Alternative: CSS-only line numbers via counter */
 .code-block-content.with-lines pre {
     padding-left: 0;
@@ -1429,6 +1438,10 @@ select option {
 .token-comment {
     color: #64748b;
     font-style: italic;
+}
+
+.token-function {
+    color: #a78bfa;
 }
 
 /* JSON syntax highlighting */

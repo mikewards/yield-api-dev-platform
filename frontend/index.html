@@ -98,27 +98,22 @@
                 </div>
                 <!-- Code example - shows between CTA and stats on mobile -->
                 <div class="hero-code-mobile">
-                    <div class="code-window">
-                        <div class="code-header">
-                            <div class="code-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <div class="code-title">api.tbd.com</div>
+                    <div class="code-block-unified">
+                        <div class="code-block-header">
+                            <span class="code-block-label">Terminal</span>
                         </div>
-                        <div class="code-content">
-                            <pre><code><span class="code-keyword">curl</span> https://api.tbd.com/v1/yield/start \
-  -u <span class="code-string">sk_live_...</span> \
-  -d <span class="code-string">"amount=1000"</span> \
-  -d <span class="code-string">"currency=USDC"</span> \
-  -d <span class="code-string">"yield_rate=0.06"</span>
+                        <div class="code-block-content">
+                            <pre id="hero-curl-mobile"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
+  <span class="token-flag">-u</span> <span class="token-string">sk_live_...</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"yield_rate=0.06"</span>
 
-<span class="code-comment"># Response</span>
+<span class="token-comment"># Response</span>
 {
-  <span class="code-key">"yield_account_id"</span>: <span class="code-string">"ya_1234..."</span>,
-  <span class="code-key">"annual_yield"</span>: <span class="code-number">0.06</span>,
-  <span class="code-key">"status"</span>: <span class="code-string">"active"</span>
+  <span class="token-property">"yield_account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
+  <span class="token-property">"annual_yield"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>
 }</code></pre>
                         </div>
                     </div>
@@ -140,27 +135,22 @@
             </div>
             <!-- Desktop-only code visual -->
             <div class="hero-visual">
-                <div class="code-window">
-                    <div class="code-header">
-                        <div class="code-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="code-title">api.tbd.com</div>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Terminal</span>
                     </div>
-                    <div class="code-content">
-                        <pre><code><span class="code-keyword">curl</span> https://api.tbd.com/v1/yield/start \
-  -u <span class="code-string">sk_live_...</span> \
-  -d <span class="code-string">"amount=1000"</span> \
-  -d <span class="code-string">"currency=USDC"</span> \
-  -d <span class="code-string">"yield_rate=0.06"</span>
+                    <div class="code-block-content">
+                        <pre id="hero-curl-desktop"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
+  <span class="token-flag">-u</span> <span class="token-string">sk_live_...</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">"yield_rate=0.06"</span>
 
-<span class="code-comment"># Response</span>
+<span class="token-comment"># Response</span>
 {
-  <span class="code-key">"yield_account_id"</span>: <span class="code-string">"ya_1234..."</span>,
-  <span class="code-key">"annual_yield"</span>: <span class="code-number">0.06</span>,
-  <span class="code-key">"status"</span>: <span class="code-string">"active"</span>
+  <span class="token-property">"yield_account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
+  <span class="token-property">"annual_yield"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>
 }</code></pre>
                     </div>
                 </div>
@@ -288,24 +278,55 @@
                 </div>
                 <div class="integration-visual">
                     <div class="tabs">
-                        <div class="tab active">Node.js</div>
-                        <div class="tab">Python</div>
-                        <div class="tab">Ruby</div>
+                        <div class="tab active" data-lang="nodejs">Node.js</div>
+                        <div class="tab" data-lang="python">Python</div>
+                        <div class="tab" data-lang="ruby">Ruby</div>
                     </div>
-                    <div class="code-block">
-                        <pre><code><span class="code-keyword">const</span> tbd = <span class="code-function">require</span>(<span class="code-string">'@tbd/api'</span>);
+                    <div class="code-block-unified">
+                        <div class="code-block-header">
+                            <span class="code-block-label">Terminal</span>
+                        </div>
+                        <div class="code-block-content">
+                            <pre id="lang-code-nodejs" class="lang-code active"><code><span class="token-cmd">const</span> tbd = <span class="token-function">require</span>(<span class="token-string">'@tbd/api'</span>);
 
-tbd.<span class="code-property">apiKey</span> = <span class="code-string">'sk_live_...'</span>;
+tbd.<span class="token-property">apiKey</span> = <span class="token-string">'sk_live_...'</span>;
 
-<span class="code-comment">// Start earning yield</span>
-<span class="code-keyword">const</span> account = <span class="code-keyword">await</span> tbd.yield.<span class="code-function">create</span>({
-  amount: <span class="code-number">1000</span>,
-  currency: <span class="code-string">'USDC'</span>,
-  yieldRate: <span class="code-number">0.06</span>
+<span class="token-comment">// Start earning yield</span>
+<span class="token-cmd">const</span> account = <span class="token-cmd">await</span> tbd.yield.<span class="token-function">create</span>({
+  amount: <span class="token-number">1000</span>,
+  currency: <span class="token-string">'USDC'</span>,
+  yieldRate: <span class="token-number">0.06</span>
 });
 
-<span class="code-function">console</span>.<span class="code-function">log</span>(account.<span class="code-property">id</span>);
-<span class="code-comment">// => 'ya_1234...'</span></code></pre>
+<span class="token-function">console</span>.<span class="token-function">log</span>(account.<span class="token-property">id</span>);
+<span class="token-comment">// => 'ya_1234...'</span></code></pre>
+                            <pre id="lang-code-python" class="lang-code"><code><span class="token-cmd">import</span> tbd
+
+tbd.api_key = <span class="token-string">'sk_live_...'</span>
+
+<span class="token-comment"># Start earning yield</span>
+account = tbd.yield.create(
+    amount=<span class="token-number">1000</span>,
+    currency=<span class="token-string">'USDC'</span>,
+    yield_rate=<span class="token-number">0.06</span>
+)
+
+<span class="token-function">print</span>(account.id)
+<span class="token-comment"># => 'ya_1234...'</span></code></pre>
+                            <pre id="lang-code-ruby" class="lang-code"><code><span class="token-cmd">require</span> <span class="token-string">'tbd'</span>
+
+tbd.api_key = <span class="token-string">'sk_live_...'</span>
+
+<span class="token-comment"># Start earning yield</span>
+account = tbd.yield.create(
+    amount: <span class="token-number">1000</span>,
+    currency: <span class="token-string">'USDC'</span>,
+    yield_rate: <span class="token-number">0.06</span>
+)
+
+<span class="token-function">puts</span> account.id
+<span class="token-comment"># => 'ya_1234...'</span></code></pre>
+                        </div>
                     </div>
                 </div>
             </div>
