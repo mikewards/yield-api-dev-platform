@@ -266,8 +266,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Add line numbers (for the active pre element)
-        addLineNumbers(block);
+        // Add line numbers (skip for language code blocks - handled by tab switching)
+        if (!content || !content.querySelector('.lang-code')) {
+            addLineNumbers(block);
+        }
     });
     
     // Process response blocks
@@ -325,8 +327,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLineNumbers(activePre, container) {
         if (!activePre || !container) return;
         
+        const content = container.querySelector('.code-block-content');
+        if (!content) return;
+        
         // Remove existing line numbers
-        const existing = container.querySelector('.code-line-numbers');
+        const existing = content.querySelector('.code-line-numbers');
         if (existing) {
             existing.remove();
         }
@@ -346,10 +351,12 @@ document.addEventListener('DOMContentLoaded', function() {
             lineNumbers.appendChild(span);
         }
         
-        // Insert before active pre
-        const content = container.querySelector('.code-block-content');
-        if (content) {
-            content.insertBefore(lineNumbers, activePre);
+        // Insert at the beginning of content (before all pre elements)
+        const firstChild = content.firstChild;
+        if (firstChild) {
+            content.insertBefore(lineNumbers, firstChild);
+        } else {
+            content.appendChild(lineNumbers);
         }
     }
     

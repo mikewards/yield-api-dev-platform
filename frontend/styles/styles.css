@@ -1322,9 +1322,9 @@ select option {
     box-sizing: border-box;
 }
 
-/* When containing language code blocks, use block layout */
+/* When containing language code blocks, use flex layout but hide inactive blocks */
 .code-block-content:has(.lang-code) {
-    display: block;
+    display: flex;
     position: relative;
 }
 
@@ -1377,16 +1377,31 @@ select option {
 /* Language code block switching */
 .lang-code {
     display: none !important;
-    width: 100%;
+    width: 0;
+    min-width: 0;
+    flex: 0;
 }
 
 .lang-code.active {
     display: block !important;
+    width: auto;
+    flex: 1;
+    min-width: 0;
 }
 
-/* Ensure line numbers are positioned correctly for language blocks */
+/* Ensure line numbers and active code are positioned correctly for language blocks */
+.code-block-content:has(.lang-code) {
+    display: flex;
+    align-items: flex-start;
+}
+
 .code-block-content:has(.lang-code) .code-line-numbers {
-    display: block;
+    flex-shrink: 0;
+}
+
+.code-block-content:has(.lang-code) .lang-code.active {
+    flex: 1;
+    min-width: 0;
 }
 
 /* Alternative: CSS-only line numbers via counter */
