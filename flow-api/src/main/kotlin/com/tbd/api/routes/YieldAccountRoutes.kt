@@ -2,6 +2,9 @@ package com.tbd.api.routes
 
 import com.tbd.dto.*
 import com.tbd.service.YieldService
+import com.tbd.integration.ProtocolService
+import com.tbd.integration.morpho.MorphoMarket
+import com.tbd.integration.aave.AaveReserve
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -9,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -24,7 +28,7 @@ fun getYieldNetworkName(): String {
 
 fun Application.yieldAccountRoutes() {
     val yieldService = YieldService()
-    val protocolService = com.tbd.integration.ProtocolService()
+    val protocolService = ProtocolService()
     
     routing {
         route("/v1/yield/rates") {
@@ -45,39 +49,39 @@ fun Application.yieldAccountRoutes() {
                     
                     // Fetch ALL markets from both protocols in PARALLEL (2 API calls total)
                     coroutineScope {
-                        val morphoMarketsDeferred = if (protocolFilter == null || protocolFilter == "morpho") {
+                        val morphoMarketsDeferred: Deferred<List<MorphoMarket>>? = if (protocolFilter == null || protocolFilter == "morpho") {
                             async { 
                                 try {
                                     protocolService.listMorphoMarkets()
                                 } catch (e: Exception) {
                                     println("⚠️ Morpho API error: ${e.message}")
-                                    emptyList()
+                                    emptyList<MorphoMarket>()
                                 }
                             }
                         } else null
                         
-                        val aaveMarketsDeferred = if (protocolFilter == null || protocolFilter == "aave") {
+                        val aaveMarketsDeferred: Deferred<List<AaveReserve>>? = if (protocolFilter == null || protocolFilter == "aave") {
                             async {
                                 try {
                                     protocolService.listAaveMarkets()
                                 } catch (e: Exception) {
                                     println("⚠️ Aave API error: ${e.message}")
-                                    emptyList()
+                                    emptyList<AaveReserve>()
                                 }
                             }
                         } else null
                         
                         // Await both results (parallel execution)
-                        val morphoMarkets = morphoMarketsDeferred?.await() ?: emptyList()
-                        val aaveMarkets = aaveMarketsDeferred?.await() ?: emptyList()
+                        val morphoMarkets: List<MorphoMarket> = morphoMarketsDeferred?.await() ?: emptyList()
+                        val aaveMarkets: List<AaveReserve> = aaveMarketsDeferred?.await() ?: emptyList()
                         
                         // Extract rates for each currency from pre-fetched markets
                         for (curr in currencies) {
                             // Morpho rates
                             if (protocolFilter == null || protocolFilter == "morpho") {
                                 val matchingMarket = morphoMarkets
-                                    .filter { it.loanAsset?.symbol?.equals(curr, ignoreCase = true) == true }
-                                    .maxByOrNull { it.state?.supplyApy ?: 0.0 }
+                                    .filter { market -> market.loanAsset?.symbol?.equals(curr, ignoreCase = true) == true }
+                                    .maxByOrNull { market -> market.state?.supplyApy ?: 0.0 }
                                 
                                 val apy = matchingMarket?.state?.supplyApy ?: 0.0
                                 rates.add(YieldRate(
@@ -94,7 +98,7 @@ fun Application.yieldAccountRoutes() {
                             // Aave rates
                             if (protocolFilter == null || protocolFilter == "aave") {
                                 val matchingReserve = aaveMarkets
-                                    .find { it.symbol?.equals(curr, ignoreCase = true) == true }
+                                    .find { reserve -> reserve.symbol?.equals(curr, ignoreCase = true) == true }
                                 
                                 val apy = matchingReserve?.supplyApy ?: 0.0
                                 rates.add(YieldRate(
