@@ -586,14 +586,6 @@
         <!-- Hero Section -->
         <div class="qs-hero">
             <h1>Get started with TBD</h1>
-            <p>Make your first API call in under 2 minutes. No credit card required.</p>
-            <span class="qs-time-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                3 steps
-            </span>
         </div>
 
         <!-- Steps -->
@@ -672,22 +664,24 @@
                     </div>
                 </div>
 
-                <div class="qs-response">
-                    <p class="qs-response-label">Example Response</p>
-                    <div class="qs-response-content">
-<pre>{
-  "rates": [
+                <div class="code-block-unified" style="margin-top: 20px;">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Response</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre>{
+  <span class="token-property">"rates"</span>: [
     {
-      "currency": "USDC",
-      "protocol": "aave",
-      "network": "ethereum_sepolia",
-      "apy": 0.0523
+      <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+      <span class="token-property">"protocol"</span>: <span class="token-string-value">"aave"</span>,
+      <span class="token-property">"network"</span>: <span class="token-string-value">"ethereum_sepolia"</span>,
+      <span class="token-property">"apy"</span>: <span class="token-number">0.0523</span>
     },
     {
-      "currency": "DAI",
-      "protocol": "aave", 
-      "network": "ethereum_sepolia",
-      "apy": 0.0302
+      <span class="token-property">"currency"</span>: <span class="token-string-value">"DAI"</span>,
+      <span class="token-property">"protocol"</span>: <span class="token-string-value">"aave"</span>,
+      <span class="token-property">"network"</span>: <span class="token-string-value">"ethereum_sepolia"</span>,
+      <span class="token-property">"apy"</span>: <span class="token-number">0.0302</span>
     }
   ]
 }</pre>

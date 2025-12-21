@@ -1356,6 +1356,27 @@ select option {
     font-style: italic;
 }
 
+/* JSON syntax highlighting */
+.token-property {
+    color: #7dd3fc;
+}
+
+.token-string-value {
+    color: #4ade80;
+}
+
+.token-number {
+    color: #fbbf24;
+}
+
+.token-boolean {
+    color: #f472b6;
+}
+
+.token-null {
+    color: #94a3b8;
+}
+
 /* Response block styling */
 .response-block-unified {
     margin-top: 20px;

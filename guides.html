@@ -859,18 +859,20 @@
                 <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
                     When you exceed a rate limit, the API returns a <code>429 Too Many Requests</code> response:
                 </p>
-                <div class="response-block-unified">
-                    <p class="response-label">Error Response</p>
-                    <div class="response-content">
-<pre>{
-  "status": "error",
-  "code": 429,
-  "message": "Rate limit exceeded. Please retry after 45 seconds.",
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "You have exceeded the rate limit of 100 requests per minute.",
-    "type": "rate_limit_error",
-    "retry_after_seconds": 45
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Error Response</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre>{
+  <span class="token-property">"status"</span>: <span class="token-string-value">"error"</span>,
+  <span class="token-property">"code"</span>: <span class="token-number">429</span>,
+  <span class="token-property">"message"</span>: <span class="token-string-value">"Rate limit exceeded. Please retry after 45 seconds."</span>,
+  <span class="token-property">"error"</span>: {
+    <span class="token-property">"code"</span>: <span class="token-string-value">"RATE_LIMIT_EXCEEDED"</span>,
+    <span class="token-property">"message"</span>: <span class="token-string-value">"You have exceeded the rate limit of 100 requests per minute."</span>,
+    <span class="token-property">"type"</span>: <span class="token-string-value">"rate_limit_error"</span>,
+    <span class="token-property">"retry_after_seconds"</span>: <span class="token-number">45</span>
   }
 }</pre>
                     </div>
