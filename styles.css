@@ -1284,9 +1284,11 @@ select option {
 .code-block-content {
     padding: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     display: flex;
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
 }
 
@@ -1301,9 +1303,20 @@ select option {
     flex: 1;
     min-width: 0;
     max-width: 100%;
+    width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
     box-sizing: border-box;
     counter-reset: line;
+    display: block;
+}
+
+.code-block-content pre code {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* Line numbers */

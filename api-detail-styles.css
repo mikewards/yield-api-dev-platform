@@ -169,6 +169,8 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 32px;
+    min-width: 0; /* Prevent grid item from expanding beyond column */
+    overflow: hidden; /* Contain content */
 }
 
 /* Summary Section */
@@ -361,6 +363,9 @@
 /* Example Section (Right Column) */
 .example-section {
     margin-bottom: 48px;
+    width: 100%;
+    min-width: 0; /* Prevent expansion */
+    box-sizing: border-box;
 }
 
 .example-section h2 {
@@ -374,22 +379,30 @@
 .example-section .code-block-unified {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
+    overflow: hidden; /* Contain content */
 }
 
 .example-section .code-block-content {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .example-section .code-block-content pre {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
     overflow-x: auto;
     white-space: pre;
     word-wrap: normal;
+    margin: 0;
+    display: block;
 }
 
 .code-example-box {
