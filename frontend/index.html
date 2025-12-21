@@ -287,45 +287,45 @@
                             <span class="code-block-label">Terminal</span>
                         </div>
                         <div class="code-block-content">
-                            <pre id="lang-code-nodejs" class="lang-code active"><code><span class="token-cmd">const</span> tbd = <span class="token-function">require</span>(<span class="token-string">'@tbd/api'</span>);
+                            <pre id="lang-code-nodejs" class="lang-code active"><code>const tbd = require('@tbd/api');
 
-tbd.<span class="token-property">apiKey</span> = <span class="token-string">'sk_live_...'</span>;
+tbd.apiKey = 'sk_live_...';
 
-<span class="token-comment">// Start earning yield</span>
-<span class="token-cmd">const</span> account = <span class="token-cmd">await</span> tbd.yield.<span class="token-function">create</span>({
-  amount: <span class="token-number">1000</span>,
-  currency: <span class="token-string">'USDC'</span>,
-  yieldRate: <span class="token-number">0.06</span>
+// Start earning yield
+const account = await tbd.yield.create({
+  amount: 1000,
+  currency: 'USDC',
+  yieldRate: 0.06
 });
 
-<span class="token-function">console</span>.<span class="token-function">log</span>(account.<span class="token-property">id</span>);
-<span class="token-comment">// => 'ya_1234...'</span></code></pre>
-                            <pre id="lang-code-python" class="lang-code"><code><span class="token-cmd">import</span> tbd
+console.log(account.id);
+// => 'ya_1234...'</code></pre>
+                            <pre id="lang-code-python" class="lang-code"><code>import tbd
 
-tbd.api_key = <span class="token-string">'sk_live_...'</span>
+tbd.api_key = 'sk_live_...'
 
-<span class="token-comment"># Start earning yield</span>
+# Start earning yield
 account = tbd.yield.create(
-    amount=<span class="token-number">1000</span>,
-    currency=<span class="token-string">'USDC'</span>,
-    yield_rate=<span class="token-number">0.06</span>
+    amount=1000,
+    currency='USDC',
+    yield_rate=0.06
 )
 
-<span class="token-function">print</span>(account.id)
-<span class="token-comment"># => 'ya_1234...'</span></code></pre>
-                            <pre id="lang-code-ruby" class="lang-code"><code><span class="token-cmd">require</span> <span class="token-string">'tbd'</span>
+print(account.id)
+# => 'ya_1234...'</code></pre>
+                            <pre id="lang-code-ruby" class="lang-code"><code>require 'tbd'
 
-tbd.api_key = <span class="token-string">'sk_live_...'</span>
+tbd.api_key = 'sk_live_...'
 
-<span class="token-comment"># Start earning yield</span>
+# Start earning yield
 account = tbd.yield.create(
-    amount: <span class="token-number">1000</span>,
-    currency: <span class="token-string">'USDC'</span>,
-    yield_rate: <span class="token-number">0.06</span>
+    amount: 1000,
+    currency: 'USDC',
+    yield_rate: 0.06
 )
 
-<span class="token-function">puts</span> account.id
-<span class="token-comment"># => 'ya_1234...'</span></code></pre>
+puts account.id
+# => 'ya_1234...'</code></pre>
                         </div>
                     </div>
                 </div>
