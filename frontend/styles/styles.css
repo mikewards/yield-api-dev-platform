@@ -1507,6 +1507,13 @@ select option {
     max-height: 500px;
 }
 
+/* When response-content contains code-block-unified, remove wrapper styling */
+.response-content:has(.code-block-unified) {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
 .response-content pre {
     margin: 0;
     white-space: pre-wrap;

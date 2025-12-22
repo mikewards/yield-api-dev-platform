@@ -30,90 +30,82 @@ function copyCode(button, codeId) {
     });
 }
 
-// Syntax highlighting for JavaScript/Node.js
-function highlightJavaScript(text) {
-    // Escape HTML first
+// Simple syntax highlighting for JavaScript/Node.js (safe version)
+function highlightJavaScriptSimple(text) {
     let html = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     
-    // Highlight keywords
-    html = html.replace(/\b(const|let|var|await|async|function|return|if|else|for|while|import|require|export|default)\b/g, '<span class="token-cmd">$1</span>');
+    // Highlight comments first (so they don't get re-processed)
+    html = html.replace(/(\/\/[^\n]*)/g, '<span class="token-comment">$1</span>');
     
-    // Highlight function calls
-    html = html.replace(/(\w+)\.(\w+)\(/g, '<span class="token-property">$1</span>.<span class="token-function">$2</span>(');
-    html = html.replace(/(\w+)\(/g, '<span class="token-function">$1</span>(');
+    // Highlight strings (single and double quotes)
+    html = html.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="token-string">$1</span>');
+    html = html.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="token-string">$1</span>');
     
-    // Highlight strings
-    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
+    // Highlight keywords (word boundary safe)
+    html = html.replace(/\b(const|let|var|await|async|function|return|if|else|for|while|require|export|default)\b/g, '<span class="token-cmd">$1</span>');
     
     // Highlight numbers
     html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
     
-    // Highlight comments
-    html = html.replace(/(\/\/.*$)/gm, '<span class="token-comment">$1</span>');
-    
-    // Highlight property access
-    html = html.replace(/\.(\w+)/g, '.<span class="token-property">$1</span>');
-    
     return html;
 }
 
-// Syntax highlighting for Python
-function highlightPython(text) {
-    // Escape HTML first
+// Simple syntax highlighting for Python (safe version)
+function highlightPythonSimple(text) {
     let html = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
+    
+    // Highlight comments first
+    html = html.replace(/(#[^\n]*)/g, '<span class="token-comment">$1</span>');
+    
+    // Highlight strings
+    html = html.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="token-string">$1</span>');
+    html = html.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="token-string">$1</span>');
     
     // Highlight keywords
     html = html.replace(/\b(import|from|def|class|if|else|elif|for|while|return|async|await|print|True|False|None)\b/g, '<span class="token-cmd">$1</span>');
     
-    // Highlight function calls
-    html = html.replace(/(\w+)\(/g, '<span class="token-function">$1</span>(');
-    
-    // Highlight strings
-    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
-    
     // Highlight numbers
     html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
-    
-    // Highlight comments
-    html = html.replace(/(#.*$)/gm, '<span class="token-comment">$1</span>');
     
     return html;
 }
 
-// Syntax highlighting for Ruby
-function highlightRuby(text) {
-    // Escape HTML first
+// Simple syntax highlighting for Ruby (safe version)
+function highlightRubySimple(text) {
     let html = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     
+    // Highlight comments first
+    html = html.replace(/(#[^\n]*)/g, '<span class="token-comment">$1</span>');
+    
+    // Highlight strings
+    html = html.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="token-string">$1</span>');
+    html = html.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="token-string">$1</span>');
+    
     // Highlight keywords
     html = html.replace(/\b(require|def|class|if|else|elsif|end|return|puts|true|false|nil)\b/g, '<span class="token-cmd">$1</span>');
     
-    // Highlight method calls
-    html = html.replace(/(\w+)\.(\w+)/g, '<span class="token-property">$1</span>.<span class="token-function">$2</span>');
-    
-    // Highlight strings
-    html = html.replace(/(['"])([^'"]*)\1/g, '<span class="token-string">$1$2$1</span>');
+    // Highlight symbols
+    html = html.replace(/(\s):(\w+)/g, '$1<span class="token-property">:$2</span>');
     
     // Highlight numbers
     html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>');
     
-    // Highlight comments
-    html = html.replace(/(#.*$)/gm, '<span class="token-comment">$1</span>');
-    
-    // Highlight symbols
-    html = html.replace(/:(\w+)/g, '<span class="token-property">:$1</span>');
-    
     return html;
 }
+
+// Keep old functions for compatibility but don't use them
+function highlightJavaScript(text) { return highlightJavaScriptSimple(text); }
+function highlightPython(text) { return highlightPythonSimple(text); }
+function highlightRuby(text) { return highlightRubySimple(text); }
 
 // Syntax highlighting for cURL commands
 function highlightCurl(text) {
@@ -235,17 +227,30 @@ document.addEventListener('DOMContentLoaded', function() {
         allPre.forEach((pre, preIndex) => {
             const code = pre.querySelector('code');
             
-            // Apply syntax highlighting (only for cURL and JSON - others cause issues)
+            // Skip if already highlighted (has span tags or data attribute)
             if (code && !code.dataset.highlighted) {
-                const text = code.textContent || '';
-                const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
-                const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+                // Check if code already contains highlighting spans
+                const hasInlineHighlighting = code.innerHTML.includes('<span class="token-');
                 
-                // Only highlight cURL and JSON - language code blocks stay plain for now
-                if (isCurl) {
-                    code.innerHTML = highlightCurl(text);
-                } else if (isJson) {
-                    code.innerHTML = highlightJson(text);
+                if (!hasInlineHighlighting) {
+                    const text = code.textContent || '';
+                    const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
+                    const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+                    const isJavaScript = pre.classList.contains('lang-code') && pre.id && pre.id.includes('nodejs');
+                    const isPython = pre.classList.contains('lang-code') && pre.id && pre.id.includes('python');
+                    const isRuby = pre.classList.contains('lang-code') && pre.id && pre.id.includes('ruby');
+                    
+                    if (isCurl) {
+                        code.innerHTML = highlightCurl(text);
+                    } else if (isJson) {
+                        code.innerHTML = highlightJson(text);
+                    } else if (isJavaScript) {
+                        code.innerHTML = highlightJavaScriptSimple(text);
+                    } else if (isPython) {
+                        code.innerHTML = highlightPythonSimple(text);
+                    } else if (isRuby) {
+                        code.innerHTML = highlightRubySimple(text);
+                    }
                 }
                 code.dataset.highlighted = 'true';
             }
