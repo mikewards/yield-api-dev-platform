@@ -179,8 +179,8 @@ fun Application.yieldAccountRoutes() {
                                     yieldAccountId = yieldAccountId.toString(),
                                     amount = request.amount,
                                     currency = request.currency,
-                                    protocol = transaction.protocol ?: "unknown",
-                                    transactionId = transaction.id
+                                    protocol = "auto",
+                                    transactionId = transaction.transaction_id
                                 )
                             }
                         }
@@ -210,8 +210,8 @@ fun Application.yieldAccountRoutes() {
                                     accountId = accountId,
                                     yieldAccountId = yieldAccountId.toString(),
                                     amount = request.amount,
-                                    currency = transaction.currency ?: "USDC",
-                                    transactionId = transaction.id
+                                    currency = request.currency,
+                                    transactionId = transaction.transaction_id
                                 )
                             }
                         }

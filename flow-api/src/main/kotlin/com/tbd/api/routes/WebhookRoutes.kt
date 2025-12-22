@@ -62,7 +62,7 @@ fun Application.webhookRoutes() {
                     val response = endpoints.map { endpoint ->
                         WebhookEndpointResponse(
                             id = endpoint.id,
-                            url = endpoint.url,
+                            url = endpoint.url?.toString() ?: "",
                             description = endpoint.description,
                             filterTypes = endpoint.filterTypes?.toList(),
                             createdAt = endpoint.createdAt?.toString(),
@@ -125,7 +125,7 @@ fun Application.webhookRoutes() {
                         HttpStatusCode.Created,
                         WebhookEndpointResponse(
                             id = endpoint.id,
-                            url = endpoint.url,
+                            url = endpoint.url?.toString() ?: "",
                             description = endpoint.description,
                             filterTypes = endpoint.filterTypes?.toList(),
                             createdAt = endpoint.createdAt?.toString(),
@@ -151,7 +151,7 @@ fun Application.webhookRoutes() {
                         HttpStatusCode.OK,
                         WebhookEndpointResponse(
                             id = endpoint.id,
-                            url = endpoint.url,
+                            url = endpoint.url?.toString() ?: "",
                             description = endpoint.description,
                             filterTypes = endpoint.filterTypes?.toList(),
                             createdAt = endpoint.createdAt?.toString(),
