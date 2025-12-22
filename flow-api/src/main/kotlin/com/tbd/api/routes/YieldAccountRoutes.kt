@@ -2,6 +2,7 @@ package com.tbd.api.routes
 
 import com.tbd.dto.*
 import com.tbd.service.YieldService
+import com.tbd.service.WebhookService
 import com.tbd.integration.ProtocolService
 import com.tbd.integration.morpho.MorphoMarket
 import com.tbd.integration.aave.AaveReserve
@@ -15,6 +16,7 @@ import java.util.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 // Get network name based on environment
 fun getYieldNetworkName(): String {
@@ -168,6 +170,21 @@ fun Application.yieldAccountRoutes() {
                     
                     try {
                         val transaction = yieldService.deposit(accountId, yieldAccountId, request)
+                        
+                        // Fire webhook event asynchronously
+                        coroutineScope {
+                            launch {
+                                WebhookService.sendDepositCompleted(
+                                    accountId = accountId,
+                                    yieldAccountId = yieldAccountId.toString(),
+                                    amount = request.amount,
+                                    currency = request.currency,
+                                    protocol = transaction.protocol ?: "unknown",
+                                    transactionId = transaction.id
+                                )
+                            }
+                        }
+                        
                         call.respond(HttpStatusCode.Created, transaction)
                     } catch (e: IllegalArgumentException) {
                         call.respond(
@@ -185,6 +202,20 @@ fun Application.yieldAccountRoutes() {
                     
                     try {
                         val transaction = yieldService.withdraw(accountId, yieldAccountId, request)
+                        
+                        // Fire webhook event asynchronously
+                        coroutineScope {
+                            launch {
+                                WebhookService.sendWithdrawalCompleted(
+                                    accountId = accountId,
+                                    yieldAccountId = yieldAccountId.toString(),
+                                    amount = request.amount,
+                                    currency = transaction.currency ?: "USDC",
+                                    transactionId = transaction.id
+                                )
+                            }
+                        }
+                        
                         call.respond(HttpStatusCode.Created, transaction)
                     } catch (e: IllegalArgumentException) {
                         call.respond(

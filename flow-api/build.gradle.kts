@@ -62,6 +62,9 @@ dependencies {
     // Error Tracking
     implementation("io.sentry:sentry:6.34.0")
     
+    // Svix Webhooks
+    implementation("com.svix:svix:1.16.0")
+    
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
