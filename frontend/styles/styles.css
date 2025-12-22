@@ -33,6 +33,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     max-width: 100vw;
+    background: var(--bg-white);
+}
+
+main {
+    background: var(--bg-white);
 }
 
 /* Content Links - Blue text, underline on hover

@@ -18,7 +18,7 @@
         }
         
         .qs-hero {
-            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            background: var(--bg-white);
             padding: 48px 24px 32px;
             text-align: center;
         }
@@ -514,10 +514,8 @@
     </style>
 </head>
 <body>
-    <!-- Scroll Progress Bar -->
-    <div class="scroll-progress-container">
-        <div class="scroll-progress-bar" id="scrollProgress"></div>
-    </div>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
 
     <nav class="navbar">
         <div class="container">
