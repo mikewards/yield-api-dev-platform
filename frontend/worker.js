@@ -10,7 +10,8 @@ export default {
     const routes = {
       '/signin': '/signin.html',
       '/account': '/account.html',
-      '/dashboard': '/dashboard.html'
+      '/dashboard': '/dashboard.html',
+      '/dashboard-webhooks': '/dashboard-webhooks.html'
     };
     
     // If this is a known route, redirect to the .html file

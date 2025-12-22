@@ -3,6 +3,7 @@ package com.tbd.api.routes
 import com.tbd.dto.*
 import com.tbd.service.ApplicationService
 import com.tbd.service.SandboxService
+import com.tbd.service.WebhookService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -10,6 +11,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 fun Application.applicationRoutes() {
     val applicationService = ApplicationService()
@@ -25,6 +28,22 @@ fun Application.applicationRoutes() {
                     
                     try {
                         val app = applicationService.createApplication(accountId, request)
+                        
+                        // Fire webhook event asynchronously
+                        coroutineScope {
+                            launch {
+                                WebhookService.sendEvent(
+                                    accountId = accountId,
+                                    eventType = WebhookService.EventTypes.APPLICATION_CREATED,
+                                    payload = mapOf(
+                                        "application_id" to app.id,
+                                        "name" to app.name,
+                                        "timestamp" to System.currentTimeMillis()
+                                    )
+                                )
+                            }
+                        }
+                        
                         call.respond(HttpStatusCode.Created, app)
                     } catch (e: IllegalArgumentException) {
                         call.respond(
@@ -130,6 +149,23 @@ fun Application.applicationRoutes() {
                         try {
                             val request = call.receive<CreateAppTokenRequest>()
                             val token = applicationService.createAppToken(accountId, applicationId, request)
+                            
+                            // Fire webhook event asynchronously
+                            coroutineScope {
+                                launch {
+                                    WebhookService.sendEvent(
+                                        accountId = accountId,
+                                        eventType = WebhookService.EventTypes.API_KEY_CREATED,
+                                        payload = mapOf(
+                                            "application_id" to applicationId.toString(),
+                                            "token_id" to token.id,
+                                            "environment" to token.environment,
+                                            "timestamp" to System.currentTimeMillis()
+                                        )
+                                    )
+                                }
+                            }
+                            
                             call.respond(HttpStatusCode.Created, token)
                         } catch (e: IllegalArgumentException) {
                             call.respond(

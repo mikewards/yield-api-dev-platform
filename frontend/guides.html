@@ -451,6 +451,7 @@
             <ul>
                 <li><a href="#environments">Environments</a></li>
                 <li><a href="#rate-limits">Rate Limits</a></li>
+                <li><a href="#webhooks">Webhooks</a></li>
                 <li><a href="#best-practices">Best Practices</a></li>
             </ul>
         </aside>
@@ -822,6 +823,143 @@
                 <p style="font-size: 16px; color: var(--text-secondary);">
                     The <code>Retry-After</code> header indicates how long to wait before retrying. 
                     Implement exponential backoff in your code to gracefully handle rate limits.
+                </p>
+            </section>
+
+            <!-- Webhooks -->
+            <section id="webhooks" class="guide-section">
+                <h2>Webhooks</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px;">
+                    Receive real-time notifications when events happen in your account. Webhooks are delivered via Svix with automatic retries, signature verification, and delivery guarantees.
+                </p>
+                
+                <h3>Event Types</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Subscribe to the following events:
+                </p>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Event</th>
+                            <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>deposit.completed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Funds deposited to yield account</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>withdrawal.completed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Funds withdrawn from yield account</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>yield.accrued</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield accrued to account (daily)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>rate.changed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield rate changed significantly (&gt;0.5%)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>account.status.changed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield account status changed</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Registering Endpoints</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Register a webhook endpoint via the API or <a href="dashboard-webhooks.html" class="text-link">dashboard</a>:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Create Webhook Endpoint</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-webhook-create')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-webhook-create">curl https://api.tbd.com/v1/webhooks \
+  -X POST \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-server.com/webhooks",
+    "description": "Production webhook",
+    "filter_types": ["deposit.completed", "withdrawal.completed"]
+  }'</pre>
+                    </div>
+                </div>
+                
+                <h3>Webhook Payload</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Webhook payloads are sent as POST requests with a JSON body:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Example Payload</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre>{
+  "event_type": "deposit.completed",
+  "event_id": "evt_abc123def456",
+  "timestamp": 1701456789000,
+  "data": {
+    "yield_account_id": "ya_1234567890",
+    "amount": "1000.00",
+    "currency": "USDC",
+    "protocol": "aave",
+    "transaction_id": "txn_abc123"
+  }
+}</pre>
+                    </div>
+                </div>
+                
+                <h3>Verifying Signatures</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    All webhooks include a signature header for verification. Use the Svix SDK to verify:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Node.js</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-webhook-verify')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-webhook-verify">import { Webhook } from 'svix';
+
+const wh = new Webhook(process.env.WEBHOOK_SECRET);
+
+app.post('/webhooks', (req, res) => {
+  try {
+    const payload = wh.verify(req.body, req.headers);
+    // Process the webhook
+    console.log('Received event:', payload.event_type);
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error('Webhook verification failed:', err);
+    res.status(400).send('Invalid signature');
+  }
+});</pre>
+                    </div>
+                </div>
+                
+                <h3>Retry Policy</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Failed deliveries are automatically retried with exponential backoff:
+                </p>
+                <ul>
+                    <li>Immediate retry on 5xx errors</li>
+                    <li>Up to 5 retry attempts over 24 hours</li>
+                    <li>Backoff intervals: 5min, 30min, 2hr, 8hr, 24hr</li>
+                    <li>Endpoints disabled after consecutive failures</li>
+                </ul>
+                <p style="font-size: 14px; color: var(--text-tertiary); margin-top: 16px;">
+                    View delivery history and debug failed webhooks in your <a href="dashboard-webhooks.html" class="text-link">dashboard</a>.
                 </p>
             </section>
 
