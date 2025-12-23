@@ -23,7 +23,11 @@ object WebhookService {
     private val logger = LoggerFactory.getLogger(WebhookService::class.java)
     private val config = ConfigFactory.load()
     
-    private val svixApiKey: String? = config.getString("svix.apiKey").takeIf { it.isNotBlank() }
+    private val svixApiKey: String? = try {
+        config.getString("svix.apiKey").takeIf { it.isNotBlank() }
+    } catch (e: Exception) {
+        null
+    }
     private val svix: Svix? = svixApiKey?.let { Svix(it) }
     
     // Event type constants
@@ -66,10 +70,10 @@ object WebhookService {
         } catch (e: Exception) {
             // Create new app if doesn't exist
             try {
-                svix.application.create(ApplicationIn(
-                    name = "TBD Account $accountId",
-                    uid = appId
-                ))
+                val appIn = ApplicationIn()
+                appIn.name = "TBD Account $accountId"
+                appIn.uid = appId
+                svix.application.create(appIn)
                 logger.info("Created Svix application: $appId")
             } catch (createError: Exception) {
                 logger.error("Failed to create Svix application: ${createError.message}")
@@ -96,14 +100,14 @@ object WebhookService {
         val appId = ensureApplication(accountId)
         
         return try {
-            val endpoint = svix.endpoint.create(
-                appId,
-                EndpointIn(
-                    url = url,
-                    description = description,
-                    filterTypes = filterTypes?.toSet()
-                )
-            )
+            val endpointIn = EndpointIn()
+            endpointIn.url = java.net.URI.create(url)
+            endpointIn.description = description
+            if (filterTypes != null) {
+                endpointIn.filterTypes = filterTypes.toSet()
+            }
+            
+            val endpoint = svix.endpoint.create(appId, endpointIn)
             logger.info("Created webhook endpoint for account $accountId: ${endpoint.id}")
             endpoint
         } catch (e: Exception) {
@@ -181,14 +185,12 @@ object WebhookService {
         val eventId = "evt_${UUID.randomUUID().toString().replace("-", "").take(16)}"
         
         return try {
-            svix.message.create(
-                appId,
-                MessageIn(
-                    eventType = eventType,
-                    eventId = eventId,
-                    payload = payload
-                )
-            )
+            val messageIn = MessageIn()
+            messageIn.eventType = eventType
+            messageIn.eventId = eventId
+            messageIn.payload = payload
+            
+            svix.message.create(appId, messageIn)
             logger.info("Sent webhook event: $eventType to account $accountId")
             true
         } catch (e: Exception) {
@@ -297,4 +299,3 @@ object WebhookService {
      */
     fun isEnabled(): Boolean = svix != null
 }
-

@@ -36,7 +36,7 @@ fun Application.applicationRoutes() {
                                     accountId = accountId,
                                     eventType = WebhookService.EventTypes.APPLICATION_CREATED,
                                     payload = mapOf(
-                                        "application_id" to app.id,
+                                        "application_id" to app.application_id,
                                         "name" to app.name,
                                         "timestamp" to System.currentTimeMillis()
                                     )
@@ -158,7 +158,7 @@ fun Application.applicationRoutes() {
                                         eventType = WebhookService.EventTypes.API_KEY_CREATED,
                                         payload = mapOf(
                                             "application_id" to applicationId.toString(),
-                                            "token_id" to token.id,
+                                            "token_id" to token.token_id,
                                             "environment" to token.environment,
                                             "timestamp" to System.currentTimeMillis()
                                         )
