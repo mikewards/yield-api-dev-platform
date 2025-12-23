@@ -473,9 +473,29 @@
         let eventTypes = [];
         let currentTestEndpointId = null;
 
-        // Check authentication
+        // Check authentication (use same token key as other dashboard pages)
+        const token = localStorage.getItem('tbd_token');
+        const username = localStorage.getItem('tbd_username');
+        const tokenExpires = localStorage.getItem('tbd_token_expires');
+        
+        // Check if token exists and is not expired
+        if (!token) {
+            window.location.href = 'signin.html';
+        } else if (tokenExpires && parseInt(tokenExpires) < Date.now()) {
+            localStorage.removeItem('tbd_token');
+            localStorage.removeItem('tbd_token_expires');
+            localStorage.removeItem('tbd_account_id');
+            localStorage.removeItem('tbd_username');
+            alert('Your session has expired. Please sign in again.');
+            window.location.href = 'signin.html';
+        }
+
+        // Update user info display
+        if (document.getElementById('userInfo')) {
+            document.getElementById('userInfo').textContent = username || 'Account';
+        }
+
         function checkAuth() {
-            const token = localStorage.getItem('tbd_access_token');
             if (!token) {
                 window.location.href = 'signin.html';
                 return null;
@@ -766,9 +786,34 @@
             });
         });
 
+        // Dashboard dropdown toggle
+        const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
+        const dashboardDropdown = document.getElementById('dashboardDropdown');
+        
+        if (dashboardDropdownBtn && dashboardDropdown) {
+            dashboardDropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dashboardDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!dashboardDropdown.contains(e.target) && !dashboardDropdownBtn.contains(e.target)) {
+                    dashboardDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+        // Sign out
+        const signOutBtn = document.getElementById('signOutBtn');
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', function() {
+                localStorage.clear();
+                window.location.href = 'signin.html';
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
             loadEventTypes();
             loadWebhooks();
         });
