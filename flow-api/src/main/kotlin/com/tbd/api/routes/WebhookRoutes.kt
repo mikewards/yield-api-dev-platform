@@ -5,7 +5,6 @@ import com.tbd.service.WebhookService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -53,9 +52,9 @@ fun Application.webhookRoutes() {
             authenticate("bearer-auth") {
                 // List all webhook endpoints
                 get {
-                    val principal = call.principal<JWTPrincipal>()
-                    val accountId = principal?.payload?.getClaim("account_id")?.asString()
+                    val principal = call.principal<UserIdPrincipal>()
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
                     
                     val endpoints = WebhookService.listEndpoints(UUID.fromString(accountId))
                     
@@ -79,9 +78,9 @@ fun Application.webhookRoutes() {
                 
                 // Create a new webhook endpoint
                 post {
-                    val principal = call.principal<JWTPrincipal>()
-                    val accountId = principal?.payload?.getClaim("account_id")?.asString()
+                    val principal = call.principal<UserIdPrincipal>()
                         ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
                     
                     val request = call.receive<CreateWebhookEndpointRequest>()
                     
@@ -137,9 +136,9 @@ fun Application.webhookRoutes() {
                 
                 // Get a specific endpoint
                 get("/{endpointId}") {
-                    val principal = call.principal<JWTPrincipal>()
-                    val accountId = principal?.payload?.getClaim("account_id")?.asString()
+                    val principal = call.principal<UserIdPrincipal>()
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
@@ -163,9 +162,9 @@ fun Application.webhookRoutes() {
                 
                 // Delete an endpoint
                 delete("/{endpointId}") {
-                    val principal = call.principal<JWTPrincipal>()
-                    val accountId = principal?.payload?.getClaim("account_id")?.asString()
+                    val principal = call.principal<UserIdPrincipal>()
                         ?: return@delete call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@delete call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
@@ -181,9 +180,9 @@ fun Application.webhookRoutes() {
                 
                 // Test a webhook endpoint
                 post("/{endpointId}/test") {
-                    val principal = call.principal<JWTPrincipal>()
-                    val accountId = principal?.payload?.getClaim("account_id")?.asString()
+                    val principal = call.principal<UserIdPrincipal>()
                         ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
