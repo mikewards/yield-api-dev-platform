@@ -469,7 +469,7 @@
     <script src="scripts/script.js"></script>
     <script src="scripts/nav-auth.js"></script>
     <script>
-        const API_BASE = window.CONFIG?.API_BASE || 'https://flow-platform-production.up.railway.app';
+        const API_BASE = window.API_BASE_URL || 'https://flow-platform-production.up.railway.app';
         let eventTypes = [];
         let currentTestEndpointId = null;
 
@@ -572,7 +572,11 @@
                 });
 
                 if (response.status === 401) {
-                    localStorage.removeItem('tbd_access_token');
+                    localStorage.removeItem('tbd_token');
+                    localStorage.removeItem('tbd_token_expires');
+                    localStorage.removeItem('tbd_account_id');
+                    localStorage.removeItem('tbd_username');
+                    alert('Your session has expired. Please sign in again.');
                     window.location.href = 'signin.html';
                     return;
                 }
