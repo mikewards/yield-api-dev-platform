@@ -127,8 +127,7 @@ object WebhookService {
         val appId = "app_$accountId"
         
         return try {
-            val options = com.svix.models.EndpointListOptions()
-            svix.endpoint.list(appId, options).data ?: emptyList()
+            svix.endpoint.list(appId, null).data ?: emptyList()
         } catch (e: Exception) {
             logger.error("Failed to list endpoints: ${e.message}")
             emptyList()
