@@ -13,6 +13,12 @@ import java.util.*
 fun Application.webhookRoutes() {
     routing {
         route("/v1/webhooks") {
+            // Get webhook service status (for debugging)
+            get("/status") {
+                val status = WebhookService.getStatus()
+                call.respond(HttpStatusCode.OK, status)
+            }
+            
             // Get available event types (public)
             get("/event-types") {
                 val eventTypes = listOf(

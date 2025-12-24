@@ -24,11 +24,34 @@ object WebhookService {
     private val config = ConfigFactory.load()
     
     private val svixApiKey: String? = try {
-        config.getString("svix.apiKey").takeIf { it.isNotBlank() }
+        val key = config.getString("svix.apiKey").takeIf { it.isNotBlank() }
+        if (key != null) {
+            logger.info("Svix API key configured (length: ${key.length}, prefix: ${key.take(10)}...)")
+        } else {
+            logger.warn("Svix API key is blank or empty")
+        }
+        key
     } catch (e: Exception) {
-        null
+        logger.warn("Svix API key not found in config: ${e.message}")
+        // Try direct environment variable as fallback
+        val envKey = System.getenv("SVIX_API_KEY")?.takeIf { it.isNotBlank() }
+        if (envKey != null) {
+            logger.info("Using SVIX_API_KEY from environment (length: ${envKey.length})")
+        } else {
+            logger.error("SVIX_API_KEY not found in environment either - webhooks will be disabled")
+        }
+        envKey
     }
-    private val svix: Svix? = svixApiKey?.let { Svix(it) }
+    private val svix: Svix? = svixApiKey?.let { 
+        try {
+            val client = Svix(it)
+            logger.info("Svix client initialized successfully")
+            client
+        } catch (e: Exception) {
+            logger.error("Failed to initialize Svix client: ${e.message}")
+            null
+        }
+    }
     
     // Event type constants
     object EventTypes {
@@ -50,6 +73,20 @@ object WebhookService {
             API_KEY_CREATED
         )
     }
+    
+    /**
+     * Check if webhook service is available
+     */
+    fun isAvailable(): Boolean = svix != null
+    
+    /**
+     * Get webhook service status for debugging
+     */
+    fun getStatus(): Map<String, Any> = mapOf(
+        "available" to (svix != null),
+        "apiKeyConfigured" to (svixApiKey != null),
+        "apiKeyLength" to (svixApiKey?.length ?: 0)
+    )
     
     /**
      * Ensure a Svix application exists for this account
