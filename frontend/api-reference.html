@@ -529,23 +529,38 @@
                         <div class="api-resource" id="webhooks">
                             <div class="resource-header">
                                 <h3>Webhooks</h3>
-                                <p>Subscribe to real-time events for yield accruals, position updates, and transaction notifications.</p>
+                                <p>Receive real-time notifications for deposits, withdrawals, yield accruals, and rate changes. Powered by Svix with automatic retries and signature verification.</p>
                             </div>
                             <div class="resource-actions">
+                                <a href="api-detail.html?resource=webhooks&action=event-types" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/webhooks/event-types</span>
+                                    <span class="action-desc">List available event types</span>
+                                </a>
                                 <a href="api-detail.html?resource=webhooks&action=create" class="action-link">
                                     <span class="action-method">POST</span>
                                     <span class="action-path">/v1/webhooks</span>
-                                    <span class="action-desc">Create a webhook subscription</span>
+                                    <span class="action-desc">Create a webhook endpoint</span>
                                 </a>
                                 <a href="api-detail.html?resource=webhooks&action=list" class="action-link">
                                     <span class="action-method">GET</span>
                                     <span class="action-path">/v1/webhooks</span>
-                                    <span class="action-desc">List all webhook subscriptions</span>
+                                    <span class="action-desc">List webhook endpoints</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/webhooks/{id}</span>
+                                    <span class="action-desc">Get webhook endpoint details</span>
                                 </a>
                                 <a href="api-detail.html?resource=webhooks&action=delete" class="action-link">
                                     <span class="action-method">DELETE</span>
-                                    <span class="action-path">/v1/webhooks/{webhook_id}</span>
-                                    <span class="action-desc">Delete a webhook subscription</span>
+                                    <span class="action-path">/v1/webhooks/{id}</span>
+                                    <span class="action-desc">Delete a webhook endpoint</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=test" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/webhooks/{id}/test</span>
+                                    <span class="action-desc">Send a test webhook event</span>
                                 </a>
                             </div>
                         </div>

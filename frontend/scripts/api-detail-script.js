@@ -816,6 +816,213 @@ const apiData = {
   -H "Authorization: Bearer sk_live_1234567890abcdef" \\
   -H "Content-Type: application/json"`
         }
+    },
+    
+    // Webhooks endpoints
+    webhooks: {
+        'event-types': {
+            method: 'GET',
+            path: '/v1/webhooks/event-types',
+            title: 'List event types',
+            summary: 'Get a list of all available webhook event types you can subscribe to.',
+            description: 'Returns all event types that can trigger webhook notifications. This endpoint is public and does not require authentication.',
+            permissions: 'PUBLIC',
+            requestBody: [],
+            successResponse: {
+                event_types: [
+                    { name: 'deposit.completed', description: 'Triggered when funds are successfully deposited to a yield account' },
+                    { name: 'withdrawal.completed', description: 'Triggered when funds are successfully withdrawn from a yield account' },
+                    { name: 'yield.accrued', description: 'Triggered when yield is accrued to an account (daily)' },
+                    { name: 'rate.changed', description: 'Triggered when yield rates change significantly (>0.5%)' },
+                    { name: 'account.status.changed', description: 'Triggered when a yield account status changes' },
+                    { name: 'application.created', description: 'Triggered when a new application is created' },
+                    { name: 'api_key.created', description: 'Triggered when a new API key is generated' }
+                ]
+            },
+            errorResponse: {
+                error: {
+                    code: 'INTERNAL_ERROR',
+                    message: 'Failed to fetch event types',
+                    type: 'server_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks/event-types`
+        },
+        create: {
+            method: 'POST',
+            path: '/v1/webhooks',
+            title: 'Create webhook endpoint',
+            summary: 'Register a new webhook endpoint to receive real-time event notifications.',
+            description: 'Creates a webhook endpoint that will receive HTTP POST requests when specified events occur. Webhooks are delivered via Svix with automatic retries and signature verification.',
+            permissions: 'WEBHOOK_WRITE',
+            requestBody: [
+                {
+                    name: 'url',
+                    type: 'string',
+                    required: true,
+                    description: 'The HTTPS URL where webhook events will be sent. Must use HTTPS.',
+                    constraints: [
+                        { type: 'pattern', value: '^https://.*' }
+                    ]
+                },
+                {
+                    name: 'description',
+                    type: 'string',
+                    required: false,
+                    description: 'A human-readable description for this webhook endpoint.'
+                },
+                {
+                    name: 'filter_types',
+                    type: 'array',
+                    required: false,
+                    description: 'Array of event types to subscribe to. If omitted, the endpoint receives all events.',
+                    constraints: [
+                        { type: 'enum', values: ['deposit.completed', 'withdrawal.completed', 'yield.accrued', 'rate.changed', 'account.status.changed', 'application.created', 'api_key.created'] }
+                    ]
+                }
+            ],
+            successResponse: {
+                id: 'ep_1234567890abcdef',
+                url: 'https://your-server.com/webhooks',
+                description: 'Production webhook endpoint',
+                filter_types: ['deposit.completed', 'withdrawal.completed'],
+                created_at: '2025-01-15T10:30:00Z',
+                updated_at: '2025-01-15T10:30:00Z',
+                disabled: false
+            },
+            errorResponse: {
+                error: {
+                    code: 'INVALID_URL',
+                    message: 'Webhook URL must use HTTPS',
+                    type: 'invalid_request_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks \\
+  -X POST \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "url": "https://your-server.com/webhooks",
+    "description": "Production webhook endpoint",
+    "filter_types": ["deposit.completed", "withdrawal.completed"]
+  }'`
+        },
+        list: {
+            method: 'GET',
+            path: '/v1/webhooks',
+            title: 'List webhook endpoints',
+            summary: 'List all webhook endpoints registered for your account.',
+            description: 'Returns a list of all webhook endpoints associated with your account.',
+            permissions: 'WEBHOOK_READ',
+            requestBody: [],
+            successResponse: {
+                endpoints: [
+                    {
+                        id: 'ep_1234567890abcdef',
+                        url: 'https://your-server.com/webhooks',
+                        description: 'Production webhook endpoint',
+                        filter_types: ['deposit.completed', 'withdrawal.completed'],
+                        created_at: '2025-01-15T10:30:00Z',
+                        updated_at: '2025-01-15T10:30:00Z',
+                        disabled: false
+                    }
+                ],
+                total: 1
+            },
+            errorResponse: {
+                error: {
+                    code: 'UNAUTHORIZED',
+                    message: 'Invalid or missing authentication token',
+                    type: 'authentication_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef"`
+        },
+        get: {
+            method: 'GET',
+            path: '/v1/webhooks/{id}',
+            title: 'Get webhook endpoint',
+            summary: 'Retrieve details of a specific webhook endpoint.',
+            description: 'Returns the details of a webhook endpoint by its ID.',
+            permissions: 'WEBHOOK_READ',
+            requestBody: [],
+            successResponse: {
+                id: 'ep_1234567890abcdef',
+                url: 'https://your-server.com/webhooks',
+                description: 'Production webhook endpoint',
+                filter_types: ['deposit.completed', 'withdrawal.completed'],
+                created_at: '2025-01-15T10:30:00Z',
+                updated_at: '2025-01-15T10:30:00Z',
+                disabled: false
+            },
+            errorResponse: {
+                error: {
+                    code: 'NOT_FOUND',
+                    message: 'Endpoint not found',
+                    type: 'not_found_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks/ep_1234567890abcdef \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef"`
+        },
+        delete: {
+            method: 'DELETE',
+            path: '/v1/webhooks/{id}',
+            title: 'Delete webhook endpoint',
+            summary: 'Delete a webhook endpoint.',
+            description: 'Permanently deletes a webhook endpoint. This action cannot be undone.',
+            permissions: 'WEBHOOK_WRITE',
+            requestBody: [],
+            successResponse: null,
+            errorResponse: {
+                error: {
+                    code: 'NOT_FOUND',
+                    message: 'Endpoint not found or could not be deleted',
+                    type: 'not_found_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks/ep_1234567890abcdef \\
+  -X DELETE \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef"`
+        },
+        test: {
+            method: 'POST',
+            path: '/v1/webhooks/{id}/test',
+            title: 'Test webhook endpoint',
+            summary: 'Send a test event to a webhook endpoint.',
+            description: 'Sends a test webhook event to verify your endpoint is configured correctly and can receive events.',
+            permissions: 'WEBHOOK_WRITE',
+            requestBody: [
+                {
+                    name: 'event_type',
+                    type: 'string',
+                    required: true,
+                    description: 'The type of test event to send.',
+                    constraints: [
+                        { type: 'enum', values: ['deposit.completed', 'withdrawal.completed', 'yield.accrued', 'rate.changed', 'account.status.changed', 'application.created', 'api_key.created'] }
+                    ]
+                }
+            ],
+            successResponse: {
+                success: true,
+                message: 'Test webhook sent successfully'
+            },
+            errorResponse: {
+                error: {
+                    code: 'INVALID_EVENT_TYPE',
+                    message: 'Invalid event type specified',
+                    type: 'invalid_request_error'
+                }
+            },
+            curlExample: `curl {{API_URL}}/v1/webhooks/ep_1234567890abcdef/test \\
+  -X POST \\
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "event_type": "deposit.completed"
+  }'`
+        }
     }
 };
 

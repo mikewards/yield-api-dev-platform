@@ -444,7 +444,6 @@
                 <li><a href="#markets">Markets</a></li>
                 <li><a href="#positions">Positions</a></li>
                 <li><a href="#transactions">Transactions</a></li>
-                <li><a href="#webhooks">Webhooks</a></li>
             </ul>
             
             <h3>Going to Production</h3>
@@ -681,43 +680,6 @@
                         <td>Get transaction</td>
                     </tr>
                 </table>
-            </section>
-
-            <!-- Webhooks -->
-            <section id="webhooks" class="guide-section">
-                <h2>Webhooks</h2>
-                <p>Subscribe to real-time events for yield accruals, deposits, withdrawals, and errors.</p>
-                
-                <h3>Event Types</h3>
-                <ul>
-                    <li><code>yield.accrued</code> - Interest earned on a position</li>
-                    <li><code>deposit.completed</code> - Deposit confirmed</li>
-                    <li><code>withdrawal.completed</code> - Withdrawal confirmed</li>
-                    <li><code>transaction.failed</code> - Transaction error</li>
-                </ul>
-                
-                <table class="api-table">
-                    <tr>
-                        <th>Endpoint</th>
-                        <th>Description</th>
-                    </tr>
-                    <tr>
-                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/webhooks</span></td>
-                        <td>Create webhook</td>
-                    </tr>
-                    <tr>
-                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/webhooks</span></td>
-                        <td>List webhooks</td>
-                    </tr>
-                    <tr>
-                        <td><span class="method-badge delete">DELETE</span><span class="endpoint-text">/v1/webhooks/{id}</span></td>
-                        <td>Delete webhook</td>
-                    </tr>
-                </table>
-                
-                <div class="callout">
-                    <p><strong>Security:</strong> Always verify webhook signatures using your webhook secret to prevent spoofing.</p>
-                </div>
             </section>
 
             <!-- Environments -->
