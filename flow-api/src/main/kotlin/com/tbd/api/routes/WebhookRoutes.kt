@@ -115,20 +115,21 @@ fun Application.webhookRoutes() {
                         }
                     }
                     
-                    val endpoint = WebhookService.createEndpoint(
+                    val result = WebhookService.createEndpoint(
                         accountId = UUID.fromString(accountId),
                         url = request.url,
                         description = request.description,
                         filterTypes = request.filterTypes
                     )
                     
-                    if (endpoint == null) {
+                    if (result.endpoint == null) {
                         return@post call.respond(
                             HttpStatusCode.ServiceUnavailable,
-                            mapOf("error" to "Webhook service unavailable. Please try again later.")
+                            mapOf("error" to "Webhook service error: ${result.error ?: "Unknown error"}")
                         )
                     }
                     
+                    val endpoint = result.endpoint
                     call.respond(
                         HttpStatusCode.Created,
                         WebhookEndpointResponse(
