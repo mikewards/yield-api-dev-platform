@@ -121,6 +121,14 @@ object WebhookService {
     }
     
     /**
+     * Result class for endpoint creation
+     */
+    data class CreateEndpointResult(
+        val endpoint: EndpointOut? = null,
+        val error: String? = null
+    )
+    
+    /**
      * Register a webhook endpoint for an account
      */
     suspend fun createEndpoint(
@@ -128,10 +136,10 @@ object WebhookService {
         url: String,
         description: String? = null,
         filterTypes: List<String>? = null
-    ): EndpointOut? {
+    ): CreateEndpointResult {
         if (svix == null) {
             logger.warn("Svix not configured - cannot create endpoint")
-            return null
+            return CreateEndpointResult(error = "Svix not configured")
         }
         
         val appId = ensureApplication(accountId)
@@ -146,10 +154,10 @@ object WebhookService {
             
             val endpoint = svix.endpoint.create(appId, endpointIn)
             logger.info("Created webhook endpoint for account $accountId: ${endpoint.id}")
-            endpoint
+            CreateEndpointResult(endpoint = endpoint)
         } catch (e: Exception) {
-            logger.error("Failed to create webhook endpoint: ${e.message}")
-            null
+            logger.error("Failed to create webhook endpoint: ${e.message}", e)
+            CreateEndpointResult(error = e.message ?: "Unknown error creating endpoint")
         }
     }
     
