@@ -15,8 +15,11 @@ fun Application.webhookRoutes() {
         route("/v1/webhooks") {
             // Get webhook service status (for debugging)
             get("/status") {
-                val status = WebhookService.getStatus()
-                call.respond(HttpStatusCode.OK, status)
+                val available = WebhookService.isAvailable()
+                call.respond(HttpStatusCode.OK, WebhookStatusResponse(
+                    available = available,
+                    message = if (available) "Webhook service is configured and ready" else "Webhook service is not configured - check SVIX_API_KEY"
+                ))
             }
             
             // Get available event types (public)

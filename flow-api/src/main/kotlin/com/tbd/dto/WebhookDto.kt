@@ -55,3 +55,8 @@ data class TestWebhookResponse(
     val message: String
 )
 
+@Serializable
+data class WebhookStatusResponse(
+    val available: Boolean,
+    val message: String
+)
