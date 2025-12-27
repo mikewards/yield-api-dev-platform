@@ -183,6 +183,7 @@ object WebhookService {
         }
         
         val appId = ensureApplication(accountId)
+        logger.info("createEndpoint: Using appId=$appId for accountId=$accountId")
         
         return try {
             val endpointIn = EndpointIn()
@@ -195,8 +196,9 @@ object WebhookService {
                 endpointIn.filterTypes = filterTypes.toSet()
             }
             
+            logger.info("createEndpoint: Creating endpoint with url=$url, filterTypes=$filterTypes")
             val endpoint = svix.endpoint.create(appId, endpointIn)
-            logger.info("Created webhook endpoint for account $accountId: ${endpoint.id}")
+            logger.info("createEndpoint: SUCCESS - Created endpoint ${endpoint.id} for appId=$appId")
             CreateEndpointResult(endpoint = endpoint)
         } catch (e: Exception) {
             logger.error("Failed to create webhook endpoint: ${e.message}", e)
@@ -213,16 +215,24 @@ object WebhookService {
             return emptyList()
         }
         
-        // Ensure the application exists first
-        val appId = ensureApplication(accountId)
-        logger.debug("listEndpoints: Looking up endpoints for appId=$appId")
+        // Use the same appId format as createEndpoint
+        val appId = "app_$accountId"
+        logger.info("listEndpoints: Looking up endpoints for accountId=$accountId, appId=$appId")
         
         return try {
             val result = svix.endpoint.list(appId, null)
             val endpoints = result.data ?: emptyList()
-            logger.info("listEndpoints: Found ${endpoints.size} endpoints for account $accountId")
+            logger.info("listEndpoints: Found ${endpoints.size} endpoints for appId=$appId")
+            endpoints.forEach { ep ->
+                logger.info("  - Endpoint: id=${ep.id}, url=${ep.url}")
+            }
             endpoints
         } catch (e: Exception) {
+            // If app doesn't exist, that's ok - just return empty
+            if (e.message?.contains("404") == true || e.message?.contains("not found") == true) {
+                logger.info("listEndpoints: No Svix app found for $appId - returning empty list")
+                return emptyList()
+            }
             logger.error("Failed to list endpoints for appId=$appId: ${e.message}", e)
             emptyList()
         }
