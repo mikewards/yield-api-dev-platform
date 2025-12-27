@@ -10,6 +10,7 @@ import com.tbd.middleware.requestLogging
 import com.tbd.middleware.sentry
 import com.tbd.middleware.statusPages
 import com.tbd.service.LogCleanupJob
+import com.tbd.service.WebhookService
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -32,6 +33,14 @@ fun Application.module() {
         println("❌ CRITICAL: Database initialization failed: ${e.message}")
         e.printStackTrace()
         // Continue anyway - health check will show DB status
+    }
+    
+    // Initialize Svix webhook event types
+    try {
+        WebhookService.initializeEventTypes()
+    } catch (e: Exception) {
+        println("⚠️ Webhook event type initialization failed: ${e.message}")
+        // Continue anyway - webhooks may still work for existing event types
     }
     
     // Configure content negotiation (JSON)

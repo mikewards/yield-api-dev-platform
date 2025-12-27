@@ -4,6 +4,7 @@ import com.svix.Svix
 import com.svix.models.ApplicationIn
 import com.svix.models.EndpointIn
 import com.svix.models.EndpointOut
+import com.svix.models.EventTypeIn
 import com.svix.models.MessageIn
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -87,6 +88,45 @@ object WebhookService {
         "apiKeyConfigured" to (svixApiKey != null),
         "apiKeyLength" to (svixApiKey?.length ?: 0)
     )
+    
+    /**
+     * Initialize Svix event types - must be called on startup
+     */
+    fun initializeEventTypes() {
+        if (svix == null) {
+            logger.warn("Svix not configured - skipping event type registration")
+            return
+        }
+        
+        val eventTypeDescriptions = mapOf(
+            EventTypes.DEPOSIT_COMPLETED to "Triggered when funds are successfully deposited to a yield account",
+            EventTypes.WITHDRAWAL_COMPLETED to "Triggered when funds are successfully withdrawn from a yield account",
+            EventTypes.YIELD_ACCRUED to "Triggered when yield is accrued to an account (daily)",
+            EventTypes.RATE_CHANGED to "Triggered when yield rates change significantly (>0.5%)",
+            EventTypes.ACCOUNT_STATUS_CHANGED to "Triggered when a yield account status changes",
+            EventTypes.APPLICATION_CREATED to "Triggered when a new application is created",
+            EventTypes.API_KEY_CREATED to "Triggered when a new API key is generated"
+        )
+        
+        eventTypeDescriptions.forEach { (eventType, description) ->
+            try {
+                val eventTypeIn = EventTypeIn()
+                eventTypeIn.name = eventType
+                eventTypeIn.description = description
+                svix.eventType.create(eventTypeIn)
+                logger.info("Registered Svix event type: $eventType")
+            } catch (e: Exception) {
+                // Event type might already exist - that's fine
+                if (e.message?.contains("409") == true || e.message?.contains("already exists") == true) {
+                    logger.debug("Event type already exists: $eventType")
+                } else {
+                    logger.warn("Failed to register event type $eventType: ${e.message}")
+                }
+            }
+        }
+        
+        logger.info("Svix event types initialization complete")
+    }
     
     /**
      * Ensure a Svix application exists for this account
