@@ -334,6 +334,8 @@ object WebhookService {
             ensureApplicationSync(accountId)
             
             val accessIn = AppPortalAccessIn()
+            // Must set featureFlags to empty set, not null
+            accessIn.featureFlags = emptySet()
             val accessOut = svix.authentication.appPortalAccess(appId, accessIn)
             logger.info("Generated App Portal URL for account $accountId")
             PortalResult(url = accessOut.url?.toString())
