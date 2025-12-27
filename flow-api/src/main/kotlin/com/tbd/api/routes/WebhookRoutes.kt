@@ -22,10 +22,10 @@ fun Application.webhookRoutes() {
                 ))
             }
             
-            // Debug endpoint to test list functionality
-            get("/debug/{accountId}") {
-                val accountId = call.parameters["accountId"] 
-                    ?: return@get call.respond(HttpStatusCode.BadRequest, WebhookStatusResponse(false, "Missing accountId"))
+            // Debug endpoint to test list functionality - uses query param instead of path
+            get("/debug") {
+                val accountId = call.request.queryParameters["id"]
+                    ?: return@get call.respond(HttpStatusCode.BadRequest, WebhookStatusResponse(false, "Missing id query param"))
                 
                 try {
                     val uuid = UUID.fromString(accountId)
