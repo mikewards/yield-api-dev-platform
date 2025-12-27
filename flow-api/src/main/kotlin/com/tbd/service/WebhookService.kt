@@ -311,12 +311,20 @@ object WebhookService {
     }
     
     /**
+     * Result class for portal URL
+     */
+    data class PortalResult(
+        val url: String? = null,
+        val error: String? = null
+    )
+    
+    /**
      * Get App Portal access URL for a user to view their webhook logs
      */
-    fun getAppPortalUrl(accountId: UUID): String? {
+    fun getAppPortalUrl(accountId: UUID): PortalResult {
         if (svix == null) {
             logger.warn("Svix not configured - cannot get portal URL")
-            return null
+            return PortalResult(error = "Svix not configured")
         }
         
         val appId = "app_$accountId"
@@ -328,10 +336,10 @@ object WebhookService {
             val accessIn = AppPortalAccessIn()
             val accessOut = svix.authentication.appPortalAccess(appId, accessIn)
             logger.info("Generated App Portal URL for account $accountId")
-            accessOut.url?.toString()
+            PortalResult(url = accessOut.url?.toString())
         } catch (e: Exception) {
-            logger.error("Failed to get App Portal URL: ${e.message}")
-            null
+            logger.error("Failed to get App Portal URL: ${e.message}", e)
+            PortalResult(error = e.message ?: "Unknown error")
         }
     }
     

@@ -271,17 +271,17 @@ fun Application.webhookRoutes() {
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
                     val accountId = principal.name
                     
-                    val portalUrl = WebhookService.getAppPortalUrl(UUID.fromString(accountId))
+                    val result = WebhookService.getAppPortalUrl(UUID.fromString(accountId))
                     
-                    if (portalUrl != null) {
+                    if (result.url != null) {
                         call.respond(HttpStatusCode.OK, WebhookPortalResponse(
-                            url = portalUrl,
+                            url = result.url,
                             recentMessages = WebhookService.getRecentMessageCount(UUID.fromString(accountId))
                         ))
                     } else {
                         call.respond(
                             HttpStatusCode.ServiceUnavailable,
-                            mapOf("error" to "Webhook portal unavailable")
+                            mapOf("error" to "Webhook portal unavailable: ${result.error}")
                         )
                     }
                 }
