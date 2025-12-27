@@ -187,8 +187,11 @@ object WebhookService {
         return try {
             val endpointIn = EndpointIn()
             endpointIn.url = java.net.URI.create(url)
-            endpointIn.description = description
-            if (filterTypes != null) {
+            // Only set description if it's not null/blank - Svix doesn't accept null
+            if (!description.isNullOrBlank()) {
+                endpointIn.description = description
+            }
+            if (filterTypes != null && filterTypes.isNotEmpty()) {
                 endpointIn.filterTypes = filterTypes.toSet()
             }
             
