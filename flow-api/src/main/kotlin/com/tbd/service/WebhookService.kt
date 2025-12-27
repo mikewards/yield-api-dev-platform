@@ -3,6 +3,7 @@ package com.tbd.service
 import com.svix.Svix
 import com.svix.models.ApplicationIn
 import com.svix.models.EndpointIn
+import com.svix.models.EndpointListOptions
 import com.svix.models.EndpointOut
 import com.svix.models.EventTypeIn
 import com.svix.models.MessageIn
@@ -227,7 +228,7 @@ object WebhookService {
             val appInfo = "App found: id=${app.id}, uid=${app.uid}, name=${app.name}"
             
             // Now try to list endpoints - must pass empty options, not null
-            val options = com.svix.models.EndpointListOptions()
+            val options = EndpointListOptions()
             val result = svix.endpoint.list(appId, options)
             val endpoints = result.data ?: emptyList()
             val hasMore = result.iterator != null
@@ -254,7 +255,7 @@ object WebhookService {
         logger.info("listEndpoints: Looking up endpoints for accountId=$accountId, appId=$appId")
         
         return try {
-            val options = com.svix.models.EndpointListOptions()
+            val options = EndpointListOptions()
             val result = svix.endpoint.list(appId, options)
             val endpoints = result.data ?: emptyList()
             logger.info("listEndpoints: Found ${endpoints.size} endpoints for appId=$appId")
