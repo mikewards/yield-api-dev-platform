@@ -207,6 +207,39 @@ object WebhookService {
     }
     
     /**
+     * Debug method to see raw Svix response
+     */
+    fun debugListEndpoints(accountId: UUID): String {
+        if (svix == null) {
+            return "Svix not configured"
+        }
+        
+        val appId = "app_$accountId"
+        
+        return try {
+            // First check if app exists
+            val app = try {
+                svix.application.get(appId)
+            } catch (e: Exception) {
+                return "App not found: ${e.message}"
+            }
+            
+            val appInfo = "App found: id=${app.id}, uid=${app.uid}, name=${app.name}"
+            
+            // Now try to list endpoints
+            val result = svix.endpoint.list(appId, null)
+            val endpoints = result.data ?: emptyList()
+            val hasMore = result.iterator != null
+            
+            val endpointInfo = endpoints.map { "id=${it.id}, url=${it.url}" }.joinToString("; ")
+            
+            "$appInfo | Endpoints: count=${endpoints.size}, hasMore=$hasMore, data=[$endpointInfo]"
+        } catch (e: Exception) {
+            "Error: ${e.javaClass.simpleName}: ${e.message}"
+        }
+    }
+    
+    /**
      * List all webhook endpoints for an account
      */
     suspend fun listEndpoints(accountId: UUID): List<EndpointOut> {

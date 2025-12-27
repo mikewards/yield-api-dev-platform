@@ -30,13 +30,13 @@ fun Application.webhookRoutes() {
                 try {
                     val uuid = UUID.fromString(accountId)
                     val appId = "app_$accountId"
-                    val endpoints = WebhookService.listEndpoints(uuid)
                     
-                    // Use serializable response
-                    val endpointInfo = endpoints.joinToString("; ") { "${it.id}|${it.url}" }
+                    // Call the raw debug method
+                    val debugResult = WebhookService.debugListEndpoints(uuid)
+                    
                     call.respond(HttpStatusCode.OK, WebhookStatusResponse(
                         available = true,
-                        message = "appId=$appId, count=${endpoints.size}, endpoints=[$endpointInfo]"
+                        message = debugResult
                     ))
                 } catch (e: Exception) {
                     call.respond(HttpStatusCode.InternalServerError, WebhookStatusResponse(
