@@ -25,23 +25,23 @@ fun Application.webhookRoutes() {
             // Debug endpoint to test list functionality
             get("/debug/{accountId}") {
                 val accountId = call.parameters["accountId"] 
-                    ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing accountId"))
+                    ?: return@get call.respond(HttpStatusCode.BadRequest, WebhookStatusResponse(false, "Missing accountId"))
                 
                 try {
                     val uuid = UUID.fromString(accountId)
                     val appId = "app_$accountId"
                     val endpoints = WebhookService.listEndpoints(uuid)
                     
-                    call.respond(HttpStatusCode.OK, mapOf(
-                        "accountId" to accountId,
-                        "appId" to appId,
-                        "endpointCount" to endpoints.size,
-                        "endpoints" to endpoints.map { mapOf("id" to it.id, "url" to it.url?.toString()) }
+                    // Use serializable response
+                    val endpointInfo = endpoints.joinToString("; ") { "${it.id}|${it.url}" }
+                    call.respond(HttpStatusCode.OK, WebhookStatusResponse(
+                        available = true,
+                        message = "appId=$appId, count=${endpoints.size}, endpoints=[$endpointInfo]"
                     ))
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.InternalServerError, mapOf(
-                        "error" to e.message,
-                        "type" to e.javaClass.simpleName
+                    call.respond(HttpStatusCode.InternalServerError, WebhookStatusResponse(
+                        available = false,
+                        message = "Error: ${e.message} (${e.javaClass.simpleName})"
                     ))
                 }
             }
