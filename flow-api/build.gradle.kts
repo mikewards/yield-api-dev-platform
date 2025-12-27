@@ -63,7 +63,7 @@ dependencies {
     implementation("io.sentry:sentry:6.34.0")
     
     // Svix Webhooks
-    implementation("com.svix:svix:1.16.0")
+    implementation("com.svix:svix:1.30.0")
     implementation("org.threeten:threetenbp:1.6.8") // Required by Svix SDK
     
     // Testing
