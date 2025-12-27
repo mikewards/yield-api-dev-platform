@@ -22,6 +22,30 @@ fun Application.webhookRoutes() {
                 ))
             }
             
+            // Debug endpoint to test list functionality
+            get("/debug/{accountId}") {
+                val accountId = call.parameters["accountId"] 
+                    ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing accountId"))
+                
+                try {
+                    val uuid = UUID.fromString(accountId)
+                    val appId = "app_$accountId"
+                    val endpoints = WebhookService.listEndpoints(uuid)
+                    
+                    call.respond(HttpStatusCode.OK, mapOf(
+                        "accountId" to accountId,
+                        "appId" to appId,
+                        "endpointCount" to endpoints.size,
+                        "endpoints" to endpoints.map { mapOf("id" to it.id, "url" to it.url?.toString()) }
+                    ))
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, mapOf(
+                        "error" to e.message,
+                        "type" to e.javaClass.simpleName
+                    ))
+                }
+            }
+            
             // Get available event types (public)
             get("/event-types") {
                 val eventTypes = listOf(
