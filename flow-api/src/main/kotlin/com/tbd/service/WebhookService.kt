@@ -1,9 +1,9 @@
 package com.tbd.service
 
+import com.svix.EndpointListOptions
 import com.svix.Svix
 import com.svix.models.ApplicationIn
 import com.svix.models.EndpointIn
-import com.svix.models.EndpointListOptions
 import com.svix.models.EndpointOut
 import com.svix.models.EventTypeIn
 import com.svix.models.MessageIn
