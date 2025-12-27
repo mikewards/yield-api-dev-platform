@@ -328,7 +328,7 @@ object WebhookService {
             val accessIn = AppPortalAccessIn()
             val accessOut = svix.authentication.appPortalAccess(appId, accessIn)
             logger.info("Generated App Portal URL for account $accountId")
-            accessOut.url
+            accessOut.url?.toString()
         } catch (e: Exception) {
             logger.error("Failed to get App Portal URL: ${e.message}")
             null
