@@ -264,6 +264,27 @@ fun Application.webhookRoutes() {
                         )
                     }
                 }
+                
+                // Get App Portal URL for viewing webhook logs
+                get("/portal") {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val portalUrl = WebhookService.getAppPortalUrl(UUID.fromString(accountId))
+                    
+                    if (portalUrl != null) {
+                        call.respond(HttpStatusCode.OK, WebhookPortalResponse(
+                            url = portalUrl,
+                            recentMessages = WebhookService.getRecentMessageCount(UUID.fromString(accountId))
+                        ))
+                    } else {
+                        call.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            mapOf("error" to "Webhook portal unavailable")
+                        )
+                    }
+                }
             }
         }
     }
