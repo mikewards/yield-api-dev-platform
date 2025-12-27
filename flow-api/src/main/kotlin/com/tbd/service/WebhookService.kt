@@ -226,9 +226,8 @@ object WebhookService {
             
             val appInfo = "App found: id=${app.id}, uid=${app.uid}, name=${app.name}"
             
-            // Now try to list endpoints using getEndpoint()
-            val endpointApi = svix.getEndpoint()
-            val result = endpointApi.list(appId)
+            // Now try to list endpoints - pass null iterator for first page
+            val result = svix.endpoint.list(appId, null as String?)
             val endpoints = result.data ?: emptyList()
             val hasMore = result.iterator != null
             
@@ -254,8 +253,7 @@ object WebhookService {
         logger.info("listEndpoints: Looking up endpoints for accountId=$accountId, appId=$appId")
         
         return try {
-            val endpointApi = svix.getEndpoint()
-            val result = endpointApi.list(appId)
+            val result = svix.endpoint.list(appId, null as String?)
             val endpoints = result.data ?: emptyList()
             logger.info("listEndpoints: Found ${endpoints.size} endpoints for appId=$appId")
             endpoints.forEach { ep ->
