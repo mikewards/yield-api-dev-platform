@@ -94,7 +94,7 @@
                     focus on building.
                 </p>
                 <div class="hero-cta">
-                    <a href="account.html" class="btn-primary btn-large">Start Building</a>
+                    <a href="account.html" class="btn-primary btn-large" id="startBuildingBtn">Start Building</a>
                     <a href="api-reference.html" class="btn-secondary btn-large">View Documentation</a>
                 </div>
                 <!-- Code example - shows between CTA and stats on mobile -->
@@ -104,7 +104,7 @@
                             <span class="code-block-label">Terminal</span>
                         </div>
                         <div class="code-block-content">
-                            <pre id="hero-curl-mobile"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
+                            <pre id="hero-curl-mobile"><code><span class="token-cmd">curl</span> <span class="token-url">{API_URL}/v1/yield/start</span> \
   <span class="token-flag">-u</span> <span class="token-string">sk_live_...</span> \
   <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
   <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
@@ -141,7 +141,7 @@
                         <span class="code-block-label">Terminal</span>
                     </div>
                     <div class="code-block-content">
-                        <pre id="hero-curl-desktop"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
+                        <pre id="hero-curl-desktop"><code><span class="token-cmd">curl</span> <span class="token-url">{API_URL}/v1/yield/start</span> \
   <span class="token-flag">-u</span> <span class="token-string">sk_live_...</span> \
   <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
   <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
@@ -448,5 +448,15 @@ puts account.id
     <script src="scripts/script.js"></script>
     <script src="scripts/nav-auth.js"></script>
     <script src="scripts/tooltip.js"></script>
+    <script>
+        // Smart "Start Building" button - go to dashboard if logged in
+        (function() {
+            const token = localStorage.getItem('tbd_token');
+            const startBtn = document.getElementById('startBuildingBtn');
+            if (token && startBtn) {
+                startBtn.href = 'dashboard.html';
+            }
+        })();
+    </script>
 </body>
 </html>
