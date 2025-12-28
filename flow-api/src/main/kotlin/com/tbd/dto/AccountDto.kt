@@ -27,7 +27,21 @@ data class AuthenticateRequest(
 @Serializable
 data class AuthenticateResponse(
     val access_token: String,
+    val refresh_token: String,
     val token_type: String,
     val expires_in: Int,
     val account_id: String
+)
+
+@Serializable
+data class RefreshTokenRequest(
+    val refresh_token: String
+)
+
+@Serializable
+data class RefreshTokenResponse(
+    val access_token: String,
+    val refresh_token: String,
+    val token_type: String,
+    val expires_in: Int
 )

@@ -191,14 +191,19 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Store token and user info
+                    // Store tokens and user info
                     localStorage.setItem('tbd_token', data.access_token);
+                    localStorage.setItem('tbd_refresh_token', data.refresh_token);
                     localStorage.setItem('tbd_account_id', data.account_id);
                     localStorage.setItem('tbd_username', formData.username);
                     localStorage.setItem('tbd_token_expires', Date.now() + (data.expires_in * 1000));
                     
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
+                    // Check if we need to redirect to a specific page after login
+                    const redirectPath = localStorage.getItem('tbd_redirect_after_login');
+                    localStorage.removeItem('tbd_redirect_after_login');
+                    
+                    // Redirect to saved path or dashboard
+                    window.location.href = redirectPath || 'dashboard.html';
                 } else {
                     showErrorMessage(data.error?.message || 'Invalid username or password');
                 }

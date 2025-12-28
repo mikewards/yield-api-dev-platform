@@ -34,14 +34,20 @@
         });
     }
     
-    // Sign out handler
+    // Sign out handler - use TokenManager if available (properly revokes refresh tokens)
     if (signOutBtn) {
         signOutBtn.addEventListener('click', function() {
-            localStorage.removeItem('tbd_token');
-            localStorage.removeItem('tbd_account_id');
-            localStorage.removeItem('tbd_username');
-            localStorage.removeItem('tbd_token_expires');
-            window.location.href = 'signin.html';
+            if (window.TokenManager) {
+                TokenManager.logout();
+            } else {
+                // Fallback for pages without TokenManager
+                localStorage.removeItem('tbd_token');
+                localStorage.removeItem('tbd_refresh_token');
+                localStorage.removeItem('tbd_account_id');
+                localStorage.removeItem('tbd_username');
+                localStorage.removeItem('tbd_token_expires');
+                window.location.href = 'signin.html';
+            }
         });
     }
 })();
