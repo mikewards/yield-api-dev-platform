@@ -88,6 +88,47 @@
             color: var(--primary);
             margin-bottom: 8px;
         }
+        .portal-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+        .portal-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .portal-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0284c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .portal-text h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .portal-text p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .portal-text p span {
+            font-weight: 600;
+            color: #0284c7;
+        }
         .event-types-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -312,6 +353,33 @@
                 <p>Receive real-time notifications when events happen in your account.</p>
             </div>
 
+            <!-- Webhook Logs Portal Card -->
+            <div class="portal-card" id="portalCard" style="display: none;">
+                <div class="portal-info">
+                    <div class="portal-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="portal-text">
+                        <h4>Webhook Delivery Logs</h4>
+                        <p><span id="recentMessageCount">0</span> recent messages delivered</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" id="viewLogsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    View Logs
+                </button>
+            </div>
+
             <!-- Info Box -->
             <div class="webhook-info">
                 <h4>
@@ -505,6 +573,39 @@
             }
             return token;
         }
+
+        // Load webhook portal info
+        let portalUrl = null;
+        async function loadPortalInfo() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks/portal`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    portalUrl = data.url;
+                    document.getElementById('recentMessageCount').textContent = data.recent_messages || 0;
+                    document.getElementById('portalCard').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Failed to load portal info:', error);
+            }
+        }
+
+        // View logs button handler
+        document.getElementById('viewLogsBtn').addEventListener('click', function() {
+            if (portalUrl) {
+                window.open(portalUrl, '_blank');
+            } else {
+                alert('Webhook portal is not available. Please try again later.');
+            }
+        });
 
         // Load event types
         async function loadEventTypes() {
@@ -823,6 +924,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadEventTypes();
             loadWebhooks();
+            loadPortalInfo();
         });
     </script>
 </body>

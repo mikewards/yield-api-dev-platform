@@ -60,3 +60,10 @@ data class WebhookStatusResponse(
     val available: Boolean,
     val message: String
 )
+
+@Serializable
+data class WebhookPortalResponse(
+    val url: String,
+    @SerialName("recent_messages")
+    val recentMessages: Int
+)

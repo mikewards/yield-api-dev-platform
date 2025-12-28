@@ -1,8 +1,10 @@
 package com.tbd.service
 
 import com.svix.EndpointListOptions
+import com.svix.MessageListOptions
 import com.svix.Svix
 import com.svix.models.ApplicationIn
+import com.svix.models.AppPortalAccessIn
 import com.svix.models.EndpointIn
 import com.svix.models.EndpointOut
 import com.svix.models.EventTypeIn
@@ -305,6 +307,78 @@ object WebhookService {
         } catch (e: Exception) {
             logger.error("Failed to delete endpoint: ${e.message}")
             false
+        }
+    }
+    
+    /**
+     * Get App Portal access URL for a user to view their webhook logs
+     */
+    fun getAppPortalUrl(accountId: UUID): String? {
+        if (svix == null) {
+            logger.warn("Svix not configured - cannot get portal URL")
+            return null
+        }
+        
+        val appId = "app_$accountId"
+        
+        return try {
+            // Ensure app exists first
+            ensureApplicationSync(accountId)
+            
+            val accessIn = AppPortalAccessIn()
+            val accessOut = svix.authentication.appPortalAccess(appId, accessIn)
+            logger.info("Generated App Portal URL for account $accountId")
+            accessOut.url
+        } catch (e: Exception) {
+            logger.error("Failed to get App Portal URL: ${e.message}")
+            null
+        }
+    }
+    
+    /**
+     * Synchronous version of ensureApplication for non-suspend contexts
+     */
+    private fun ensureApplicationSync(accountId: UUID): String {
+        if (svix == null) {
+            return accountId.toString()
+        }
+        
+        val appId = "app_$accountId"
+        
+        try {
+            svix.application.get(appId)
+        } catch (e: Exception) {
+            try {
+                val appIn = ApplicationIn()
+                appIn.name = "TBD Account $accountId"
+                appIn.uid = appId
+                svix.application.create(appIn)
+            } catch (createError: Exception) {
+                logger.error("Failed to create Svix application: ${createError.message}")
+            }
+        }
+        
+        return appId
+    }
+    
+    /**
+     * Get recent message count for an account
+     */
+    fun getRecentMessageCount(accountId: UUID): Int {
+        if (svix == null) {
+            return 0
+        }
+        
+        val appId = "app_$accountId"
+        
+        return try {
+            val options = MessageListOptions()
+            options.limit = 100 // Get up to 100 recent messages
+            val result = svix.message.list(appId, options)
+            result.data?.size ?: 0
+        } catch (e: Exception) {
+            logger.error("Failed to get message count: ${e.message}")
+            0
         }
     }
     
