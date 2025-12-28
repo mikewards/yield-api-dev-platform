@@ -2012,7 +2012,7 @@ function populatePage(endpoint) {
     
     if (endpoint.requestBody && endpoint.requestBody.length > 0) {
         endpoint.requestBody.forEach(param => {
-            const paramItem = createParamElement(param);
+            const paramItem = createParamElement(param, isWebhookEvent);
             requestBody.appendChild(paramItem);
         });
     } else {
@@ -2022,30 +2022,31 @@ function populatePage(endpoint) {
         requestBody.innerHTML = emptyMessage;
     }
     
-    // Populate responses with syntax highlighting
-    // For webhook events, show the payload as the success response
-    const successJson = JSON.stringify(endpoint.successResponse, null, 2);
-    const errorJson = endpoint.errorResponse ? JSON.stringify(endpoint.errorResponse, null, 2) : null;
-    document.getElementById('success-response').innerHTML = highlightJsonLocal(successJson);
+    // Update example section header for webhook events
+    const exampleHeader = document.querySelector('.example-section .code-block-header .code-block-label');
+    if (exampleHeader) {
+        exampleHeader.textContent = isWebhookEvent ? 'Example Payload' : 'Example request';
+    }
     
-    // For webhook events, update response labels
-    const successTab = document.querySelector('[data-tab="success-tab"]');
-    const errorTab = document.querySelector('[data-tab="error-tab"]');
-    if (isWebhookEvent) {
-        if (successTab) successTab.textContent = 'Example Payload';
-        if (errorTab) errorTab.style.display = 'none';
-    } else {
+    // Hide entire response section for webhook events
+    const responseSectionRight = document.querySelector('.response-section-right');
+    if (responseSectionRight) {
+        responseSectionRight.style.display = isWebhookEvent ? 'none' : '';
+    }
+    
+    // Populate responses with syntax highlighting (only for non-webhook events)
+    if (!isWebhookEvent) {
+        const successJson = JSON.stringify(endpoint.successResponse, null, 2);
+        const errorJson = endpoint.errorResponse ? JSON.stringify(endpoint.errorResponse, null, 2) : null;
+        document.getElementById('success-response').innerHTML = highlightJsonLocal(successJson);
+        
+        const successTab = document.querySelector('[data-tab="success-tab"]');
+        const errorTab = document.querySelector('[data-tab="error-tab"]');
         if (successTab) successTab.textContent = 'Success';
         if (errorTab) errorTab.style.display = '';
         if (errorJson) {
             document.getElementById('error-response').innerHTML = highlightJsonLocal(errorJson);
         }
-    }
-    
-    // Update example section header for webhook events
-    const exampleHeader = document.querySelector('.example-section .code-block-header .code-block-label');
-    if (exampleHeader) {
-        exampleHeader.textContent = isWebhookEvent ? 'Webhook Payload' : 'Example request';
     }
     
     // Hide environment toggle for webhook events
@@ -2072,7 +2073,7 @@ function populatePage(endpoint) {
     }
 }
 
-function createParamElement(param) {
+function createParamElement(param, isWebhookEvent = false) {
     const paramItem = document.createElement('div');
     paramItem.className = 'param-item';
     
@@ -2124,12 +2125,15 @@ function createParamElement(param) {
                                 return '';
                             }).filter(c => c).join(', ');
                         }
+                        // Hide Required/Optional tags for webhook events
+                        const requiredTag = isWebhookEvent ? '' : 
+                            (nestedParam.required ? '<span class="param-required">Required</span>' : '<span class="param-optional">Optional</span>');
                         return `
                             <div class="param-item" style="margin-top: 12px;">
                                 <div class="param-header">
                                     <span class="param-name">${nestedParam.name}</span>
                                     <span class="param-type">${nestedParam.type}</span>
-                                    ${nestedParam.required ? '<span class="param-required">Required</span>' : '<span class="param-optional">Optional</span>'}
+                                    ${requiredTag}
                                 </div>
                                 <div class="param-description">${nestedParam.description}</div>
                                 ${nestedConstraints ? `<div class="param-constraints"><div class="param-constraint">${nestedConstraints}</div></div>` : ''}
@@ -2141,11 +2145,15 @@ function createParamElement(param) {
         `;
     }
     
+    // Hide Required/Optional tags for webhook events
+    const requiredTag = isWebhookEvent ? '' : 
+        (param.required ? '<span class="param-required">Required</span>' : '<span class="param-optional">Optional</span>');
+    
     paramItem.innerHTML = `
         <div class="param-header">
             <span class="param-name">${param.name}</span>
             <span class="param-type">${param.type}</span>
-            ${param.required ? '<span class="param-required">Required</span>' : '<span class="param-optional">Optional</span>'}
+            ${requiredTag}
         </div>
         <div class="param-description">${param.description}</div>
         ${constraintsHtml}
