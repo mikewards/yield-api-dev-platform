@@ -1,35 +1,45 @@
-# Flow API Specification
+# TBD API Specification
 
-## Base URL
-```
-https://api.flow.com
-```
+**Last Updated**: December 2025  
+**API Version**: v1
 
-## API Version
-Current version: `2025-01-15`
+## Base URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://flow-platform-production.up.railway.app` |
+| Sandbox | `https://flow-platform-staging.up.railway.app` |
+| Local | `http://localhost:8080` |
 
 All endpoints are prefixed with `/v1/`
 
 ## Authentication
 
-All API requests (except account creation and authentication) require a Personal Access Token in the Authorization header:
+TBD uses OAuth 2.0-style authentication with short-lived access tokens and long-lived refresh tokens.
 
-```
-Authorization: Bearer sk_live_1234567890abcdef
+### Token Types
+
+| Token | Lifetime | Purpose |
+|-------|----------|---------|
+| Access Token | 15 minutes | API request authentication (JWT) |
+| Refresh Token | 30 days | Obtaining new access tokens |
+| Personal Access Token (PAT) | Configurable | Application-scoped API keys |
+
+### Using Tokens
+
+```http
+Authorization: Bearer <access_token>
 ```
 
 ---
 
-## API Endpoints
+## Authentication Endpoints
 
-### Dev Essentials
+### POST `/v1/auth/authenticate`
 
-#### Authentication
+Authenticate with username and password. Returns access and refresh tokens.
 
-**POST** `/v1/auth/authenticate`
-Authenticate with username and password to receive a temporary access token.
-
-**Request Body:**
+**Request:**
 ```json
 {
   "username": "string (required)",
@@ -40,219 +50,138 @@ Authenticate with username and password to receive a temporary access token.
 **Response:**
 ```json
 {
-  "access_token": "sk_live_temp_...",
+  "access_token": "eyJhbGciOiJIUzUxMiJ9...",
+  "refresh_token": "tbd_refresh_abc123...",
   "token_type": "Bearer",
-  "expires_in": 3600,
-  "account_id": "acc_1234567890"
+  "expires_in": 900,
+  "account_id": "461c224b-1dc1-415a-8221-1a9543ec332e"
 }
 ```
 
-**POST** `/v1/auth/refresh`
-Refresh an access token.
+### POST `/v1/auth/refresh`
 
-**POST** `/v1/auth/revoke`
-Revoke an access token.
+Exchange a refresh token for new access and refresh tokens.
+
+**Request:**
+```json
+{
+  "refresh_token": "tbd_refresh_abc123..."
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzUxMiJ9...",
+  "refresh_token": "tbd_refresh_def456...",
+  "token_type": "Bearer",
+  "expires_in": 900
+}
+```
+
+**Notes:**
+- Old refresh token is revoked (token rotation)
+- Returns new refresh token for security
+
+### POST `/v1/auth/logout`
+
+Revoke all refresh tokens for the authenticated user.
+
+**Headers:**
+```http
+Authorization: Bearer <access_token>
+```
+
+**Response:**
+```json
+{
+  "message": "Successfully logged out"
+}
+```
 
 ---
 
-#### Accounts
+## Account Endpoints
 
-**POST** `/v1/accounts`
+### POST `/v1/accounts`
+
 Create a new developer account.
 
-**Request Body:**
+**Request:**
 ```json
 {
   "username": "string (required, 3-50 chars, alphanumeric + underscore)",
   "password": "string (required, min 8 chars)",
-  "email": "string (optional, email format)"
+  "email": "string (optional)"
 }
 ```
 
 **Response:**
 ```json
 {
-  "account_id": "acc_1234567890abcdef",
+  "account_id": "461c224b-1dc1-415a-8221-1a9543ec332e",
   "username": "developer123",
-  "created_at": "2025-01-15T10:30:00Z",
+  "created_at": "2025-12-03T10:30:00Z",
   "status": "active"
 }
 ```
 
-**GET** `/v1/accounts/{account_id}`
-Get account details.
+### GET `/v1/accounts/{account_id}`
 
-**PATCH** `/v1/accounts/{account_id}`
-Update account information.
+Get account details. Requires authentication.
 
 ---
 
-#### Access Tokens
+## Application Endpoints
 
-**POST** `/v1/access-tokens`
-Create a new Personal Access Token.
+### POST `/v1/applications`
 
-**Request Body:**
+Create a new application.
+
+**Request:**
 ```json
 {
-  "name": "string (required, 1-100 chars)",
-  "expires_in": "integer (optional, seconds, 3600-31536000)"
+  "name": "string (required)",
+  "description": "string (optional)"
 }
 ```
 
 **Response:**
 ```json
 {
-  "token_id": "tok_1234567890abcdef",
-  "access_token": "sk_live_1234567890abcdef",
-  "name": "Production API Key",
-  "created_at": "2025-01-15T10:30:00Z",
-  "expires_at": null
-}
-```
-
-**GET** `/v1/access-tokens`
-List all access tokens for your account.
-
-**DELETE** `/v1/access-tokens/{token_id}`
-Revoke an access token.
-
----
-
-#### Applications
-
-**POST** `/v1/applications`
-Create a new application. Automatically generates an Ethereum wallet for the application.
-
-**Request Body:**
-```json
-{
-  "name": "string (required, 1-100 chars)",
-  "description": "string (optional, max 500 chars)",
-  "environment": "string (required, enum: sandbox, production)",
-  "webhook_url": "string (optional, valid URL)",
-  "allowed_origins": ["array of allowed CORS origins"],
-  "permissions": ["array of permission strings"],
-  "sandbox_rpc_url": "string (required, valid HTTPS URL)",
-  "production_rpc_url": "string (required, valid HTTPS URL)"
-}
-```
-
-**Note:** RPC URLs are required for blockchain interactions. Get free API keys from:
-- **Infura**: https://infura.io → Create project → Copy API key → Use `https://sepolia.infura.io/v3/YOUR_KEY` (sandbox) or `https://mainnet.infura.io/v3/YOUR_KEY` (production)
-- **Alchemy**: https://alchemy.com → Create app → Copy API key → Use `https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY` (sandbox) or `https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY` (production)
-
-**Response:**
-```json
-{
-  "application_id": "app_1234567890abcdef",
+  "application_id": "app_abc123...",
   "name": "My Production App",
-  "description": "Production application for mainnet",
-  "environment": "production",
+  "description": "Production application",
   "status": "active",
-  "webhook_url": "https://myapp.com/webhooks",
-  "webhook_secret": "whsec_...",
-  "allowed_origins": ["https://myapp.com"],
-  "permissions": ["yield:read", "yield:write"],
-  "sandbox_rpc_url": "https://sepolia.infura.io/v3/...",
-  "production_rpc_url": "https://mainnet.infura.io/v3/...",
-  "created_at": "2025-01-15T10:30:00Z",
-  "updated_at": "2025-01-15T10:30:00Z"
+  "created_at": "2025-12-03T10:30:00Z"
 }
 ```
 
-**GET** `/v1/applications`
+### GET `/v1/applications`
+
 List all applications for your account.
 
-**Response:**
-```json
-{
-  "applications": [
-    {
-      "application_id": "app_1234567890abcdef",
-      "name": "My Production App",
-      "environment": "production",
-      "status": "active",
-      "created_at": "2025-01-15T10:30:00Z"
-    }
-  ]
-}
-```
+### GET `/v1/applications/{application_id}`
 
-**GET** `/v1/applications/{application_id}`
 Get application details.
 
-**PATCH** `/v1/applications/{application_id}`
-Update application settings.
+### DELETE `/v1/applications/{application_id}`
 
-**Request Body:**
-```json
-{
-  "name": "string (optional)",
-  "description": "string (optional)",
-  "webhook_url": "string (optional)",
-  "allowed_origins": ["array (optional)"],
-  "permissions": ["array (optional)"],
-  "status": "string (optional, enum: active, inactive, suspended)",
-  "sandbox_rpc_url": "string (optional, valid HTTPS URL)",
-  "production_rpc_url": "string (optional, valid HTTPS URL)"
-}
-```
-
-**DELETE** `/v1/applications/{application_id}`
-Delete an application and all associated wallets/tokens.
-
-**POST** `/v1/applications/{application_id}/webhook-secret/regenerate`
-Regenerate webhook secret for an application.
+Delete an application and all associated tokens/wallets.
 
 ---
 
-#### Application Wallets
+## Application Token Endpoints
 
-**POST** `/v1/applications/{application_id}/wallets`
-Create a new Ethereum wallet for an application. Applications can have multiple wallets.
+### POST `/v1/applications/{application_id}/tokens`
 
-**Request Body:**
-```json
-{
-  "label": "string (optional, max 100 chars)",
-  "chain": "string (optional, default: ethereum, enum: ethereum, polygon, arbitrum)"
-}
-```
-
-**Response:**
-```json
-{
-  "wallet_id": "wal_1234567890abcdef",
-  "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-  "environment": "sandbox",
-  "chain": "ethereum",
-  "label": "Secondary Wallet",
-  "status": "active",
-  "created_at": "2025-01-15T10:30:00Z"
-}
-```
-
-**GET** `/v1/applications/{application_id}/wallets`
-List all wallets for an application.
-
-**GET** `/v1/applications/{application_id}/wallets/{wallet_id}`
-Get wallet details.
-
-**DELETE** `/v1/applications/{application_id}/wallets/{wallet_id}`
-Archive a wallet (soft delete).
-
----
-
-#### Application Tokens
-
-**POST** `/v1/applications/{application_id}/tokens`
 Create a new API key scoped to an application.
 
-**Request Body:**
+**Request:**
 ```json
 {
-  "name": "string (required, 1-100 chars)",
+  "name": "string (required)",
+  "environment": "string (sandbox or production)",
   "expires_in": "integer (optional, seconds)"
 }
 ```
@@ -260,171 +189,228 @@ Create a new API key scoped to an application.
 **Response:**
 ```json
 {
-  "token_id": "tok_1234567890abcdef",
-  "application_id": "app_1234567890abcdef",
-  "access_token": "flow_prod_1234567890abcdef",
+  "token_id": "tok_abc123...",
+  "application_id": "app_abc123...",
+  "access_token": "tbd_prod_abc123...",
   "name": "Production Server Key",
   "environment": "production",
-  "permissions": null,
-  "created_at": "2025-01-15T10:30:00Z",
-  "expires_at": null,
-  "last_used_at": null
+  "created_at": "2025-12-03T10:30:00Z",
+  "expires_at": null
 }
 ```
 
-**GET** `/v1/applications/{application_id}/tokens`
+### GET `/v1/applications/{application_id}/tokens`
+
 List all API keys for an application.
 
-**DELETE** `/v1/applications/{application_id}/tokens/{token_id}`
+### DELETE `/v1/applications/{application_id}/tokens/{token_id}`
+
 Revoke an API key.
 
 ---
 
-#### Webhooks
+## Webhook Endpoints
 
-**POST** `/v1/webhooks`
-Create a webhook subscription.
+Webhooks are powered by Svix for reliable delivery with automatic retries.
 
-**Request Body:**
+### GET `/v1/webhooks/event-types`
+
+List all available webhook event types.
+
+**Response:**
 ```json
 {
-  "url": "string (required, valid URL)",
-  "events": ["array of event types"],
-  "secret": "string (optional, for signature verification)"
+  "event_types": [
+    {
+      "name": "deposit.completed",
+      "description": "Triggered when funds are successfully deposited"
+    },
+    {
+      "name": "withdrawal.completed",
+      "description": "Triggered when funds are successfully withdrawn"
+    }
+  ]
 }
 ```
 
-**GET** `/v1/webhooks`
-List all webhook subscriptions.
+### POST `/v1/webhooks`
 
-**DELETE** `/v1/webhooks/{webhook_id}`
-Delete a webhook subscription.
+Create a new webhook endpoint.
 
----
-
-### Yield
-
-#### Yield Accounts
-
-**POST** `/v1/yield/accounts`
-Create a new yield account.
-
-**Request Body:**
+**Request:**
 ```json
 {
-  "currency": "string (required, enum: USDC, USDT, DAI, ETH, WBTC)",
-  "initial_deposit": {
-    "amount": "string (required)",
-    "currency": "string (required)"
-  },
-  "protocol_preference": "string (optional, enum: auto, morpho, aave, default: auto)"
+  "url": "https://your-app.com/webhooks",
+  "description": "Production webhook",
+  "events": ["deposit.completed", "withdrawal.completed"]
 }
 ```
 
 **Response:**
 ```json
 {
-  "account_id": "ya_1234567890abcdef",
-  "currency": "USDC",
-  "protocol": "morpho",
-  "annual_yield_rate": 0.06,
+  "id": "ep_abc123...",
+  "url": "https://your-app.com/webhooks",
+  "description": "Production webhook",
+  "events": ["deposit.completed", "withdrawal.completed"],
   "status": "active",
-  "created_at": "2025-01-15T10:30:00Z",
-  "balance": {
+  "created_at": "2025-12-03T10:30:00Z"
+}
+```
+
+### GET `/v1/webhooks`
+
+List all webhook endpoints.
+
+### GET `/v1/webhooks/{id}`
+
+Get webhook endpoint details.
+
+### DELETE `/v1/webhooks/{id}`
+
+Delete a webhook endpoint.
+
+### POST `/v1/webhooks/{id}/test`
+
+Send a test event to a webhook endpoint.
+
+**Request:**
+```json
+{
+  "event_type": "deposit.completed"
+}
+```
+
+### GET `/v1/webhooks/portal`
+
+Get a magic link to the Svix App Portal for webhook debugging.
+
+**Response:**
+```json
+{
+  "url": "https://app.svix.com/login#key=...",
+  "recent_messages": 5
+}
+```
+
+---
+
+## Webhook Event Types
+
+| Event | Description |
+|-------|-------------|
+| `deposit.completed` | Funds deposited to yield account |
+| `withdrawal.completed` | Funds withdrawn from yield account |
+| `yield.accrued` | Yield accrued to account (daily) |
+| `rate.changed` | Yield rate changed significantly (>0.5%) |
+| `account.status.changed` | Yield account status changed |
+| `application.created` | New application created |
+| `api_key.created` | New API key generated |
+
+### Webhook Payload Format
+
+```json
+{
+  "event_type": "deposit.completed",
+  "application_id": "app_abc123...",
+  "application_name": "My App",
+  "environment": "production",
+  "data": {
+    "yield_account_id": "ya_abc123...",
     "amount": "1000.00",
-    "currency": "USDC"
+    "currency": "USDC",
+    "timestamp": "2025-12-03T10:30:00Z"
   }
 }
 ```
 
-**GET** `/v1/yield/accounts`
-List all yield accounts.
-
-**Query Parameters:**
-- `currency` (optional): Filter by currency
-- `protocol` (optional): Filter by protocol (morpho, aave)
-- `status` (optional): Filter by status
-- `limit` (optional): Number of results (default: 20, max: 100)
-- `cursor` (optional): Pagination cursor
-
-**GET** `/v1/yield/accounts/{account_id}`
-Get yield account details.
-
-**POST** `/v1/yield/accounts/{account_id}/deposit`
-Deposit funds into a yield account.
-
-**Request Body:**
-```json
-{
-  "amount": "string (required)",
-  "currency": "string (required)"
-}
-```
-
-**POST** `/v1/yield/accounts/{account_id}/withdraw`
-Withdraw funds from a yield account.
-
-**Request Body:**
-```json
-{
-  "amount": "string (required)",
-  "currency": "string (required)",
-  "destination_address": "string (required, wallet address)"
-}
-```
-
 ---
 
-#### Positions
+## Yield Account Endpoints
 
-**GET** `/v1/yield/positions`
-List all yield positions.
+### POST `/v1/yield/accounts`
 
-**Query Parameters:**
-- `account_id` (optional): Filter by account
-- `currency` (optional): Filter by currency
-- `protocol` (optional): Filter by protocol
-- `limit` (optional): Number of results
-- `cursor` (optional): Pagination cursor
+Create a new yield account.
+
+**Request:**
+```json
+{
+  "currency": "USDC",
+  "initial_deposit": {
+    "amount": "1000.00",
+    "currency": "USDC"
+  },
+  "protocol_preference": "auto"
+}
+```
 
 **Response:**
 ```json
 {
-  "positions": [
-    {
-      "position_id": "pos_1234567890abcdef",
-      "account_id": "ya_1234567890abcdef",
-      "currency": "USDC",
-      "protocol": "morpho",
-      "principal": {
-        "amount": "1000.00",
-        "currency": "USDC"
-      },
-      "accrued_yield": {
-        "amount": "5.00",
-        "currency": "USDC"
-      },
-      "annual_yield_rate": 0.06,
-      "created_at": "2025-01-15T10:30:00Z"
-    }
-  ],
-  "cursor": "cursor_string"
+  "account_id": "ya_abc123...",
+  "currency": "USDC",
+  "protocol": "morpho",
+  "annual_yield_rate": 0.06,
+  "status": "active",
+  "balance": {
+    "amount": "1000.00",
+    "currency": "USDC"
+  },
+  "created_at": "2025-12-03T10:30:00Z"
 }
 ```
 
-**GET** `/v1/yield/positions/{position_id}`
-Get position details.
+### GET `/v1/yield/accounts`
+
+List all yield accounts.
+
+### GET `/v1/yield/accounts/{account_id}`
+
+Get yield account details.
+
+### POST `/v1/yield/accounts/{account_id}/deposit`
+
+Deposit funds into a yield account.
+
+### POST `/v1/yield/accounts/{account_id}/withdraw`
+
+Withdraw funds from a yield account.
 
 ---
 
-#### Yield Rates
+## Market Endpoints
 
-**GET** `/v1/yield/rates`
-Get current yield rates for all supported currencies and protocols.
+### GET `/v1/markets`
+
+List all available markets across Morpho and Aave protocols.
 
 **Query Parameters:**
+- `protocol` (optional): Filter by protocol (`morpho`, `aave`)
 - `currency` (optional): Filter by currency
-- `protocol` (optional): Filter by protocol
+
+**Response:**
+```json
+{
+  "markets": [
+    {
+      "currency": "USDC",
+      "protocol": "morpho",
+      "network": "ethereum_mainnet",
+      "annual_yield_rate": 0.06,
+      "apy": 0.0618,
+      "updated_at": "2025-12-03T10:30:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## Rate Endpoints
+
+### GET `/v1/yield/rates`
+
+Get current yield rates for all supported currencies and protocols.
 
 **Response:**
 ```json
@@ -433,140 +419,49 @@ Get current yield rates for all supported currencies and protocols.
     {
       "currency": "USDC",
       "protocol": "morpho",
+      "network": "ethereum_mainnet",
       "annual_yield_rate": 0.06,
       "apy": 0.0618,
-      "updated_at": "2025-01-15T10:30:00Z"
-    },
-    {
-      "currency": "USDC",
-      "protocol": "aave",
-      "annual_yield_rate": 0.06,
-      "apy": 0.0612,
-      "updated_at": "2025-01-15T10:30:00Z"
+      "updated_at": "2025-12-03T10:30:00Z"
     }
   ]
 }
 ```
 
-**GET** `/v1/yield/rates/history`
-Get historical yield rates.
-
-**Query Parameters:**
-- `currency` (optional): Filter by currency
-- `protocol` (optional): Filter by protocol
-- `start_date` (optional): Start date (ISO 8601)
-- `end_date` (optional): End date (ISO 8601)
-- `granularity` (optional): hourly, daily, weekly (default: daily)
-
 ---
 
-#### Yield History
+## Rate Limiting
 
-**GET** `/v1/yield/history`
-Get yield accrual history.
+Rate limits are configurable per endpoint.
 
-**Query Parameters:**
-- `account_id` (optional): Filter by account
-- `position_id` (optional): Filter by position
-- `start_date` (optional): Start date (ISO 8601)
-- `end_date` (optional): End date (ISO 8601)
-- `limit` (optional): Number of results
-- `cursor` (optional): Pagination cursor
+| Endpoint | Limit |
+|----------|-------|
+| Default | 100 requests/minute |
+| `GET /v1/markets` | 75 requests/minute |
+| `GET /v1/yield/rates` | 75 requests/minute |
+| `GET /health` | 300 requests/minute |
 
-**Response:**
-```json
-{
-  "history": [
-    {
-      "entry_id": "hist_1234567890abcdef",
-      "account_id": "ya_1234567890abcdef",
-      "position_id": "pos_1234567890abcdef",
-      "yield_amount": {
-        "amount": "0.16",
-        "currency": "USDC"
-      },
-      "period_start": "2025-01-15T00:00:00Z",
-      "period_end": "2025-01-15T23:59:59Z",
-      "created_at": "2025-01-16T00:00:00Z"
-    }
-  ],
-  "cursor": "cursor_string"
-}
+### Headers
+
+All responses include rate limit headers:
+
+```http
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1701590400
 ```
 
----
+### Rate Limit Exceeded
 
-### Markets
-
-**GET** `/v1/markets`
-List all available markets across Morpho and Aave protocols.
-
-**Query Parameters:**
-- `protocol` (optional): Filter by protocol (morpho, aave)
-- `currency` (optional): Filter by currency
-- `status` (optional): Filter by status (active, paused)
-
-**Response:**
 ```json
 {
-  "markets": [
-    {
-      "market_id": "mkt_1234567890abcdef",
-      "currency": "USDC",
-      "protocol": "morpho",
-      "name": "USDC Market (Morpho)",
-      "current_apy": 0.0618,
-      "tvl": "1000000.00",
-      "available_capacity": "500000.00",
-      "status": "active",
-      "updated_at": "2025-01-15T10:30:00Z"
-    }
-  ]
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests. Please retry after X seconds.",
+    "type": "rate_limit_error"
+  }
 }
 ```
-
-**GET** `/v1/markets/{market_id}`
-Get market details.
-
----
-
-### Transactions
-
-**GET** `/v1/transactions`
-List all transactions.
-
-**Query Parameters:**
-- `account_id` (optional): Filter by account
-- `type` (optional): Filter by type (deposit, withdraw, yield_accrual)
-- `status` (optional): Filter by status (pending, completed, failed)
-- `start_date` (optional): Start date (ISO 8601)
-- `end_date` (optional): End date (ISO 8601)
-- `limit` (optional): Number of results
-- `cursor` (optional): Pagination cursor
-
-**Response:**
-```json
-{
-  "transactions": [
-    {
-      "transaction_id": "txn_1234567890abcdef",
-      "account_id": "ya_1234567890abcdef",
-      "type": "deposit",
-      "status": "completed",
-      "amount": {
-        "amount": "1000.00",
-        "currency": "USDC"
-      },
-      "created_at": "2025-01-15T10:30:00Z",
-      "completed_at": "2025-01-15T10:30:05Z"
-    }
-  ],
-  "cursor": "cursor_string"
-}
-```
-
-**GET** `/v1/transactions/{transaction_id}`
-Get transaction details.
 
 ---
 
@@ -579,71 +474,70 @@ All errors follow this format:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error message",
-    "type": "error_type",
-    "param": "field_name (optional)"
+    "type": "error_type"
   }
 }
 ```
 
 ### Common Error Codes
 
-- `INVALID_REQUEST` - Invalid request parameters
-- `UNAUTHORIZED` - Authentication required or invalid
-- `FORBIDDEN` - Insufficient permissions
-- `NOT_FOUND` - Resource not found
-- `RATE_LIMIT_EXCEEDED` - Too many requests
-- `SERVER_ERROR` - Internal server error
-- `INSUFFICIENT_FUNDS` - Insufficient funds for operation
-- `INVALID_CREDENTIALS` - Invalid username or password
-- `USERNAME_TAKEN` - Username already exists
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `INVALID_REQUEST` | 400 | Invalid request parameters |
+| `UNAUTHORIZED` | 401 | Authentication required or invalid |
+| `INVALID_CREDENTIALS` | 401 | Invalid username or password |
+| `INVALID_TOKEN` | 401 | Refresh token expired or invalid |
+| `FORBIDDEN` | 403 | Insufficient permissions |
+| `NOT_FOUND` | 404 | Resource not found |
+| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
+| `SERVER_ERROR` | 500 | Internal server error |
 
 ---
 
-## Rate Limiting
+## Health Check
 
-- **Rate Limit**: 100 requests per minute per access token
-- **Headers**: Rate limit information is included in response headers:
-  - `X-RateLimit-Limit`: Maximum requests allowed
-  - `X-RateLimit-Remaining`: Remaining requests
-  - `X-RateLimit-Reset`: Time when limit resets (Unix timestamp)
+### GET `/health`
 
----
+Check API health status.
 
-## Webhook Events
-
-Flow sends webhooks for the following events:
-
-- `yield_account.created`
-- `yield_account.updated`
-- `yield_account.deposit`
-- `yield_account.withdraw`
-- `position.created`
-- `position.updated`
-- `yield.accrued`
-- `transaction.completed`
-- `transaction.failed`
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
 
 ---
 
-## Protocol Integration
+## SDKs & Integration
 
-Flow wraps the following DeFi protocols:
+### JavaScript/TypeScript
 
-### Morpho
-- Markets API: https://docs.morpho.org/tools/offchain/api/get-started/
-- Flow automatically routes to Morpho markets when optimal
+```javascript
+// Using TokenManager for automatic refresh
+const response = await TokenManager.apiCall(
+  `${API_BASE_URL}/v1/yield/accounts`,
+  { method: 'GET' }
+);
+```
 
-### Aave
-- API: https://aave-api-v2.aave.com/
-- Flow automatically routes to Aave markets when optimal
+### cURL Examples
 
-Flow ensures 6% annual yield by intelligently routing between protocols and managing positions across both platforms.
+```bash
+# Authenticate
+curl -X POST https://flow-platform-production.up.railway.app/v1/auth/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{"username": "your_username", "password": "your_password"}'
+
+# Get markets (with API key)
+curl https://flow-platform-production.up.railway.app/v1/markets \
+  -H "Authorization: Bearer tbd_prod_your_api_key"
+```
 
 ---
 
 ## Support
 
-For API support, visit:
-- Documentation: https://flow.com/api-reference
-- Getting Started: https://flow.com/getting-started
-- Support: support@flow.com
+- Documentation: [/guides](/guides)
+- API Reference: [/api-reference](/api-reference)
+- Quick Start: [/quickstart](/quickstart)

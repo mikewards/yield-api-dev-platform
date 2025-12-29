@@ -10,10 +10,12 @@ TBD provides a single, beautiful REST API that wraps multiple DeFi protocols (Mo
 
 **Key Features:**
 - **Unified API** - Single interface for multiple DeFi protocols
-- **Secure** - JWT authentication, encrypted wallet storage
+- **OAuth 2.0 Authentication** - Short-lived access tokens with automatic refresh
+- **Real-time Webhooks** - Svix-powered event delivery with retries
+- **Rate Limiting** - Configurable per-endpoint limits
 - **Real-time Rates** - Current APY from Morpho and Aave
-- **Developer-Focused** - Complete documentation, interactive examples
-- **Fast** - Optimized for performance with parallel protocol calls
+- **Developer Dashboard** - Application, API key, and webhook management
+- **Request Logging** - 7-day API request/response logging
 
 ## Quick Start
 
@@ -42,10 +44,10 @@ cp .env.example .env
 ./gradlew run
 
 # Start frontend (in another terminal)
-python3 -m http.server 3000
+cd frontend && npx wrangler dev
 ```
 
-Visit `http://localhost:3000` for the frontend and `http://localhost:8080` for the API.
+Visit `http://localhost:8787` for the frontend and `http://localhost:8080` for the API.
 
 **For detailed setup instructions, see [Development Setup](./docs/development/setup.md)**
 
@@ -55,11 +57,19 @@ Visit `http://localhost:3000` for the frontend and `http://localhost:8080` for t
 flow-platform/
 ├── flow-api/              # Kotlin backend (Ktor)
 │   ├── src/main/kotlin/   # Source code
+│   │   └── com/tbd/
+│   │       ├── api/routes/     # API endpoints
+│   │       ├── dto/            # Data transfer objects
+│   │       ├── middleware/     # Auth, rate limiting, logging
+│   │       ├── model/          # Database models
+│   │       ├── service/        # Business logic
+│   │       └── integration/    # Morpho/Aave clients
 │   └── build.gradle.kts   # Build configuration
 ├── frontend/              # Frontend application
-│   ├── *.html            # HTML pages (root of frontend/)
+│   ├── pages/            # HTML pages
 │   ├── styles/           # CSS files
 │   ├── scripts/          # JavaScript files
+│   │   └── token-manager.js  # OAuth token management
 │   ├── sdk-demos/        # SDK demo pages
 │   ├── worker.js         # Cloudflare Worker entry point
 │   └── wrangler.jsonc    # Cloudflare Worker config
@@ -79,14 +89,16 @@ flow-platform/
 - PostgreSQL
 - Exposed (SQL framework)
 - Web3j (Ethereum integration)
+- Svix (Webhooks)
 
 **Frontend:**
 - Vanilla HTML/CSS/JavaScript
-- Cloudflare Pages (hosting)
+- Cloudflare Workers (hosting)
+- TokenManager.js (OAuth 2.0 token refresh)
 
 **Infrastructure:**
 - Railway.app (backend hosting)
-- Cloudflare Pages (frontend hosting)
+- Cloudflare Workers (frontend hosting)
 - PostgreSQL (database)
 
 ## Documentation
@@ -97,6 +109,7 @@ All documentation is organized in the [`docs/`](./docs/) directory:
 - **[API Specification](./docs/api/specification.md)** - Complete API reference
 - **[Deployment Guide](./docs/deployment/railway.md)** - Production deployment
 - **[Architecture Overview](./docs/architecture/overview.md)** - System design
+- **[Environment Variables](./docs/development/environment-variables.md)** - Configuration reference
 
 ## API Examples
 
@@ -112,7 +125,7 @@ curl -X POST http://localhost:8080/v1/accounts \
   }'
 ```
 
-### Authenticate
+### Authenticate (Returns Access + Refresh Tokens)
 
 ```bash
 curl -X POST http://localhost:8080/v1/auth/authenticate \
@@ -120,6 +133,20 @@ curl -X POST http://localhost:8080/v1/auth/authenticate \
   -d '{
     "username": "developer",
     "password": "secure_password"
+  }'
+
+# Response includes:
+# - access_token (15 min)
+# - refresh_token (30 days)
+```
+
+### Refresh Token
+
+```bash
+curl -X POST http://localhost:8080/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "tbd_refresh_..."
   }'
 ```
 
@@ -139,16 +166,17 @@ curl -X GET http://localhost:8080/v1/yield/rates \
 1. Push code to GitHub
 2. Connect repository to Railway
 3. Add PostgreSQL database
-4. Set environment variables
+4. Set environment variables (see below)
 5. Deploy!
 
 **See [Railway Deployment Guide](./docs/deployment/railway.md) for detailed instructions**
 
-### Cloudflare Pages (Frontend)
+### Cloudflare Workers (Frontend)
 
-1. Connect GitHub repository
-2. Configure build settings (no build needed)
-3. Deploy!
+```bash
+cd frontend
+npx wrangler deploy
+```
 
 **See [Cloudflare Deployment Guide](./docs/deployment/cloudflare.md) for detailed instructions**
 
@@ -159,6 +187,7 @@ Required variables:
 - `JWT_SECRET` - JWT signing secret (min 32 chars)
 - `MASTER_ENCRYPTION_KEY` - Wallet encryption key (32 bytes hex)
 - `ENVIRONMENT` - `development`, `sandbox`, or `production`
+- `SVIX_API_KEY` - Svix webhook service API key
 
 **See [Environment Variables Reference](./docs/development/environment-variables.md) for complete list**
 

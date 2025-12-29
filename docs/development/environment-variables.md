@@ -2,6 +2,8 @@
 
 Complete reference for all environment variables used in the TBD platform.
 
+**Last Updated**: December 2025
+
 ## Required Variables
 
 ### Database
@@ -27,6 +29,12 @@ Complete reference for all environment variables used in the TBD platform.
 |----------|-------------|--------|
 | `ENVIRONMENT` | Current environment | `development`, `sandbox`, `production` |
 
+### Webhooks
+
+| Variable | Description | How to Get |
+|----------|-------------|------------|
+| `SVIX_API_KEY` | Svix webhook service API key | Create account at [svix.com](https://svix.com), copy API key from dashboard |
+
 ## Optional Variables
 
 ### Error Tracking
@@ -41,15 +49,6 @@ Complete reference for all environment variables used in the TBD platform.
 |----------|-------------|--------|---------|
 | `LOG_LEVEL` | Logging verbosity | `DEBUG`, `INFO`, `WARN`, `ERROR` | `INFO` |
 
-### Blockchain RPC (Deprecated)
-
-These are no longer required as RPC is handled internally:
-
-| Variable | Description | Status |
-|----------|-------------|--------|
-| `ETH_SANDBOX_RPC_URL` | Sepolia testnet RPC URL | Deprecated |
-| `ETH_PRODUCTION_RPC_URL` | Mainnet RPC URL | Deprecated |
-
 ## Environment-Specific Configuration
 
 ### Development
@@ -59,8 +58,9 @@ ENVIRONMENT=development
 DATABASE_URL=jdbc:postgresql://localhost:5432/flow_api
 DATABASE_USER=postgres
 DATABASE_PASSWORD=local_password
-JWT_SECRET=<generate>
-MASTER_ENCRYPTION_KEY=<generate>
+JWT_SECRET=<generate with: openssl rand -hex 32>
+MASTER_ENCRYPTION_KEY=<generate with: openssl rand -hex 32>
+SVIX_API_KEY=<optional for local dev>
 LOG_LEVEL=DEBUG
 ```
 
@@ -73,6 +73,7 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=<from Railway database>
 JWT_SECRET=<different from production>
 MASTER_ENCRYPTION_KEY=<different from production>
+SVIX_API_KEY=<from Svix dashboard>
 LOG_LEVEL=INFO
 ```
 
@@ -85,6 +86,7 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=<from Railway database>
 JWT_SECRET=<strong, unique secret>
 MASTER_ENCRYPTION_KEY=<strong, unique key>
+SVIX_API_KEY=<from Svix dashboard>
 SENTRY_DSN=<your Sentry DSN>
 LOG_LEVEL=WARN
 ```
@@ -121,9 +123,17 @@ echo "MASTER_ENCRYPTION_KEY=$(openssl rand -hex 32)"
 
 ## Railway Configuration
 
-Railway automatically sets `DATABASE_URL` when you link a database. You only need to set:
-- `DATABASE_USER` (usually `postgres`)
-- `DATABASE_PASSWORD` (from database settings)
+Railway automatically sets `DATABASE_URL` when you link a database. You need to manually set:
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `DATABASE_USER` | Yes | Usually `postgres` |
+| `DATABASE_PASSWORD` | Yes | From database settings |
+| `JWT_SECRET` | Yes | Generate unique for each environment |
+| `MASTER_ENCRYPTION_KEY` | Yes | Generate unique for each environment |
+| `ENVIRONMENT` | Yes | `sandbox` for staging, `production` for prod |
+| `SVIX_API_KEY` | Yes | From Svix dashboard |
+| `SENTRY_DSN` | Optional | Production only |
 
 ## Local Development
 
@@ -134,14 +144,27 @@ ENVIRONMENT=development
 DATABASE_URL=jdbc:postgresql://localhost:5432/flow_api
 DATABASE_USER=postgres
 DATABASE_PASSWORD=your_local_password
-JWT_SECRET=<generate>
-MASTER_ENCRYPTION_KEY=<generate>
+JWT_SECRET=dev_secret_at_least_32_characters_long
+MASTER_ENCRYPTION_KEY=dev_key_at_least_32_characters_long
+# SVIX_API_KEY=optional_for_local
 ```
 
 The application reads from `.env` file in development mode.
+
+## Svix Setup
+
+1. Create account at [svix.com](https://www.svix.com/)
+2. Create a new application in the Svix dashboard
+3. Copy the API key (starts with `svix_sk_...`)
+4. Set `SVIX_API_KEY` in your environment
+
+The backend will automatically:
+- Register event types on startup
+- Create Svix applications per user account
+- Handle webhook delivery and retries
 
 ## Related Documentation
 
 - [Development Setup](./setup.md)
 - [Railway Deployment](../deployment/railway.md)
-
+- [Architecture Overview](../architecture/overview.md)

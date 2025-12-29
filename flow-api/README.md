@@ -1,18 +1,20 @@
-# Flow API Gateway
+# TBD API Gateway
 
-Kotlin REST API gateway for Flow DeFi platform, wrapping Morpho and Aave protocols.
+Kotlin REST API gateway for the TBD DeFi platform, wrapping Morpho and Aave protocols.
+
+**Last Updated**: December 2025
 
 ## Features
 
-- ✅ Account creation and authentication
-- ✅ Personal Access Token management
-- ✅ Yield account creation and management
-- ✅ Deposit and withdrawal operations
-- ✅ Integration stubs for Morpho and Aave
-- ✅ PostgreSQL database with Exposed ORM
-- ✅ JWT authentication
-- ✅ CORS support
-- ✅ Error handling
+- OAuth 2.0-style authentication (access + refresh tokens)
+- Personal Access Token (PAT) management
+- Multi-application support with environment-specific credentials
+- Webhook delivery via Svix
+- Configurable per-endpoint rate limiting
+- Request/response logging (7-day retention)
+- Morpho and Aave protocol integration
+- PostgreSQL database with Exposed ORM
+- Encrypted wallet storage
 
 ## Tech Stack
 
@@ -22,6 +24,8 @@ Kotlin REST API gateway for Flow DeFi platform, wrapping Morpho and Aave protoco
 - **PostgreSQL** (database)
 - **JWT** (authentication)
 - **BCrypt** (password hashing)
+- **Web3j** (Ethereum integration)
+- **Svix** (webhook delivery)
 
 ## Setup
 
@@ -34,22 +38,24 @@ Kotlin REST API gateway for Flow DeFi platform, wrapping Morpho and Aave protoco
 ### Local Development
 
 1. **Set up PostgreSQL database:**
-```bash
-createdb flow_api
-```
+   ```bash
+   createdb flow_api
+   ```
 
 2. **Set environment variables:**
-```bash
-export DATABASE_URL="jdbc:postgresql://localhost:5432/flow_api"
-export DATABASE_USER="your_username"
-export DATABASE_PASSWORD="your_password"
-export JWT_SECRET="your-secret-key-min-32-chars"
-```
+   ```bash
+   export DATABASE_URL="jdbc:postgresql://localhost:5432/flow_api"
+   export DATABASE_USER="your_username"
+   export DATABASE_PASSWORD="your_password"
+   export JWT_SECRET="your-secret-key-min-32-chars"
+   export MASTER_ENCRYPTION_KEY="your-32-byte-hex-key"
+   # export SVIX_API_KEY="optional-for-local"
+   ```
 
 3. **Run the application:**
-```bash
-./gradlew run
-```
+   ```bash
+   ./gradlew run
+   ```
 
 The API will be available at `http://localhost:8080`
 
@@ -62,88 +68,79 @@ docker run -p 8080:8080 \
   -e DATABASE_USER="your_username" \
   -e DATABASE_PASSWORD="your_password" \
   -e JWT_SECRET="your-secret-key" \
+  -e MASTER_ENCRYPTION_KEY="your-encryption-key" \
   flow-api
 ```
 
 ## API Endpoints
 
 ### Authentication
-- `POST /v1/auth/authenticate` - Authenticate with username/password
+| Endpoint | Description |
+|----------|-------------|
+| `POST /v1/auth/authenticate` | Login, returns access + refresh tokens |
+| `POST /v1/auth/refresh` | Exchange refresh token for new tokens |
+| `POST /v1/auth/logout` | Revoke all refresh tokens |
 
 ### Accounts
-- `POST /v1/accounts` - Create account
-- `GET /v1/accounts/{accountId}` - Get account details
+| Endpoint | Description |
+|----------|-------------|
+| `POST /v1/accounts` | Create account |
+| `GET /v1/accounts/{accountId}` | Get account details |
 
-### Access Tokens
-- `POST /v1/access-tokens` - Create Personal Access Token
-- `GET /v1/access-tokens` - List tokens
-- `DELETE /v1/access-tokens/{tokenId}` - Revoke token
+### Applications
+| Endpoint | Description |
+|----------|-------------|
+| `POST /v1/applications` | Create application |
+| `GET /v1/applications` | List applications |
+| `GET /v1/applications/{id}` | Get application |
+| `DELETE /v1/applications/{id}` | Delete application |
+| `POST /v1/applications/{id}/tokens` | Create API key |
+| `GET /v1/applications/{id}/tokens` | List API keys |
+| `DELETE /v1/applications/{id}/tokens/{tokenId}` | Revoke API key |
 
-### Yield Accounts
-- `POST /v1/yield/accounts` - Create yield account
-- `GET /v1/yield/accounts` - List yield accounts
-- `GET /v1/yield/accounts/{yieldAccountId}` - Get yield account
-- `POST /v1/yield/accounts/{yieldAccountId}/deposit` - Deposit funds
-- `POST /v1/yield/accounts/{yieldAccountId}/withdraw` - Withdraw funds
+### Webhooks
+| Endpoint | Description |
+|----------|-------------|
+| `GET /v1/webhooks/event-types` | List event types |
+| `POST /v1/webhooks` | Create endpoint |
+| `GET /v1/webhooks` | List endpoints |
+| `DELETE /v1/webhooks/{id}` | Delete endpoint |
+| `POST /v1/webhooks/{id}/test` | Send test event |
+| `GET /v1/webhooks/portal` | Get Svix portal link |
 
-## Example Usage
+### Yield
+| Endpoint | Description |
+|----------|-------------|
+| `POST /v1/yield/accounts` | Create yield account |
+| `GET /v1/yield/accounts` | List yield accounts |
+| `POST /v1/yield/accounts/{id}/deposit` | Deposit funds |
+| `POST /v1/yield/accounts/{id}/withdraw` | Withdraw funds |
+| `GET /v1/yield/rates` | Get current rates |
 
-### 1. Create Account
-```bash
-curl -X POST http://localhost:8080/v1/accounts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "developer123",
-    "password": "secure_password_123",
-    "email": "developer@example.com"
-  }'
-```
+### Markets
+| Endpoint | Description |
+|----------|-------------|
+| `GET /v1/markets` | List all markets (Morpho + Aave) |
 
-### 2. Authenticate
-```bash
-curl -X POST http://localhost:8080/v1/auth/authenticate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "developer123",
-    "password": "secure_password_123"
-  }'
-```
-
-### 3. Create Access Token
-```bash
-curl -X POST http://localhost:8080/v1/access-tokens \
-  -H "Authorization: Bearer <temp_token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Production API Key",
-    "expires_in": 31536000
-  }'
-```
-
-### 4. Create Yield Account
-```bash
-curl -X POST http://localhost:8080/v1/yield/accounts \
-  -H "Authorization: Bearer <access_token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "currency": "USDC",
-    "initial_deposit": {
-      "amount": "1000.00",
-      "currency": "USDC"
-    },
-    "protocol_preference": "auto"
-  }'
-```
+### Logs
+| Endpoint | Description |
+|----------|-------------|
+| `GET /v1/logs` | Get request logs |
+| `GET /v1/logs/stats` | Get log statistics |
 
 ## Database Schema
 
-The application automatically creates the following tables:
+Auto-created tables:
 - `accounts` - User accounts
-- `access_tokens` - Personal access tokens
+- `applications` - Developer applications
+- `access_tokens` - API keys (PATs)
+- `refresh_tokens` - OAuth refresh tokens
 - `yield_accounts` - Yield accounts
 - `positions` - Yield positions
 - `transactions` - Transaction history
-- `webhooks` - Webhook subscriptions
+- `application_wallets` - Ethereum wallets
+- `webhooks` - Webhook metadata
+- `request_logs` - API logs (7-day retention)
 
 ## Configuration
 
@@ -151,22 +148,7 @@ Edit `src/main/resources/application.conf` to configure:
 - Server port and host
 - Database connection
 - JWT settings
-- Morpho/Aave API URLs
-
-## Deployment
-
-### Railway
-1. Connect your GitHub repo
-2. Add PostgreSQL service
-3. Set environment variables
-4. Deploy!
-
-### Render
-1. Create new Web Service
-2. Connect GitHub repo
-3. Add PostgreSQL database
-4. Set environment variables
-5. Deploy!
+- Protocol API URLs
 
 ## Development
 
@@ -180,17 +162,32 @@ Edit `src/main/resources/application.conf` to configure:
 ./gradlew build
 ```
 
-## Next Steps
+### Building Docker Image
+```bash
+docker build -t flow-api .
+```
 
-- [ ] Implement Morpho GraphQL integration
-- [ ] Implement Aave REST API integration
-- [ ] Add rate limiting
-- [ ] Add webhook delivery system
-- [ ] Add transaction monitoring
-- [ ] Add blockchain wallet integration
-- [ ] Add comprehensive error handling
-- [ ] Add request validation
-- [ ] Add API documentation (OpenAPI/Swagger)
+## Deployment
+
+See [Railway Deployment Guide](../docs/deployment/railway.md) for production deployment.
+
+## Project Structure
+
+```
+flow-api/
+├── src/main/kotlin/com/tbd/
+│   ├── api/routes/          # API endpoints
+│   ├── dto/                 # Data transfer objects
+│   ├── middleware/          # Auth, rate limiting, logging
+│   ├── model/               # Database models
+│   ├── service/             # Business logic
+│   ├── integration/         # Morpho/Aave clients
+│   └── Application.kt       # Entry point
+├── src/main/resources/
+│   └── application.conf     # Configuration
+├── build.gradle.kts         # Build config
+└── Dockerfile               # Container config
+```
 
 ## License
 

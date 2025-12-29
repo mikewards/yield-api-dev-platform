@@ -1,139 +1,245 @@
-# Cloudflare Pages Deployment Guide
+# Cloudflare Workers Deployment Guide
 
-Complete guide for deploying the TBD frontend to Cloudflare Pages.
+Complete guide for deploying the TBD frontend to Cloudflare Workers.
+
+**Last Updated**: December 2025
 
 ## Overview
 
-Cloudflare Pages provides:
-- Global CDN distribution
-- Automatic deployments from GitHub
-- Free SSL certificates
-- Custom domain support
-- Fast, reliable hosting
+The TBD frontend is deployed as a Cloudflare Worker with static assets. This provides:
+- Global edge deployment
+- Clean URLs (no `.html` extensions)
+- Fast performance
+- Easy custom domain setup
 
 ## Prerequisites
 
-- Cloudflare account (free tier works)
-- GitHub repository with frontend code
-- Railway API deployed (for backend)
+- Cloudflare account (https://cloudflare.com)
+- Node.js 18+ installed
+- Wrangler CLI installed (`npm install -g wrangler`)
 
-## Initial Setup
+## Project Structure
 
-### 1. Sign Up / Log In
+```
+frontend/
+├── pages/              # HTML pages
+│   ├── index.html
+│   ├── dashboard.html
+│   └── ...
+├── styles/             # CSS files
+├── scripts/            # JavaScript files
+│   ├── token-manager.js   # OAuth token management
+│   ├── config.js          # API configuration
+│   └── ...
+├── sdk-demos/          # SDK demo pages
+├── worker.js           # Cloudflare Worker (URL routing)
+├── wrangler.jsonc      # Cloudflare Worker config
+└── favicon.svg         # Site favicon
+```
 
-1. Go to https://pages.cloudflare.com
-2. Sign up or log in with your Cloudflare account
-3. Click **"Create a project"**
+## Deployment
 
-### 2. Connect GitHub Repository
+### First-Time Setup
 
-1. Click **"Connect to Git"**
-2. Authorize Cloudflare to access your GitHub account
-3. Select repository: `wardmic4/flow-platform` (or your repo)
-4. Click **"Begin setup"**
+1. **Login to Cloudflare:**
+   ```bash
+   npx wrangler login
+   ```
 
-### 3. Configure Build Settings
+2. **Navigate to frontend directory:**
+   ```bash
+   cd frontend
+   ```
 
-**Project name:** `tbd-platform` (or your preferred name)
+3. **Deploy:**
+   ```bash
+   npx wrangler deploy
+   ```
 
-**Build settings:**
-- **Framework preset:** None (or "Plain HTML")
-- **Build command:** (leave empty - no build needed)
-- **Build output directory:** `/` (root of frontend directory)
-- **Root directory:** `frontend` (set to frontend directory)
+### Subsequent Deployments
 
-**Environment variables:** (Optional)
-- None needed for static site
+```bash
+cd frontend
+npx wrangler deploy
+```
 
-### 4. Deploy
+## Configuration
 
-1. Click **"Save and Deploy"**
-2. Cloudflare will automatically deploy your site
-3. Wait 1-2 minutes for deployment to complete
-4. Your site will be available at `tbd-platform.pages.dev`
+### wrangler.jsonc
 
-## Automatic Deployments
+```jsonc
+{
+  "name": "tbd",
+  "main": "worker.js",
+  "compatibility_date": "2024-01-01",
+  "assets": {
+    "directory": "."
+  }
+}
+```
 
-Cloudflare Pages automatically deploys:
-- **Production**: Deploys from `main` branch
-- **Preview**: Creates preview deployments for pull requests
+### worker.js
 
-### Branch Configuration
+The worker handles clean URL routing:
 
-1. Go to project **Settings** → **Builds & deployments**
-2. Configure which branches trigger deployments
-3. Set production branch (usually `main`)
+```javascript
+// /dashboard → /pages/dashboard.html
+// /api-reference → /pages/api-reference.html
+// etc.
+```
 
-## Custom Domain
+## URL Routing
 
-### Setup Custom Domain
+| Clean URL | Actual File |
+|-----------|-------------|
+| `/` | `pages/index.html` |
+| `/dashboard` | `pages/dashboard.html` |
+| `/dashboard-yield` | `pages/dashboard-yield.html` |
+| `/dashboard-webhooks` | `pages/dashboard-webhooks.html` |
+| `/dashboard-logs` | `pages/dashboard-logs.html` |
+| `/api-reference` | `pages/api-reference.html` |
+| `/guides` | `pages/guides.html` |
+| `/quickstart` | `pages/quickstart.html` |
+| `/signin` | `pages/signin.html` |
+| `/account` | `pages/account.html` |
+| `/sdks` | `pages/sdks.html` |
 
-1. Go to your project → **"Custom domains"**
-2. Click **"Set up a custom domain"**
-3. Enter your domain (e.g., `tbd.com`)
-4. Follow DNS setup instructions
+## Local Development
 
-### DNS Configuration
+### Start Development Server
 
-Cloudflare will provide DNS records to add:
-- **CNAME**: `tbd.com` → `tbd-platform.pages.dev`
-- **CNAME**: `www.tbd.com` → `tbd-platform.pages.dev`
+```bash
+cd frontend
+npx wrangler dev
+```
 
-Add these records in your domain's DNS settings.
+This starts a local server at `http://localhost:8787` with:
+- Hot reloading
+- Clean URL routing
+- Same behavior as production
 
-## Environment Variables
+### Alternative: Simple HTTP Server
 
-For static sites, environment variables are typically not needed. If you need to configure API URLs:
+For quick testing without clean URLs:
 
-1. Go to **Settings** → **Environment variables**
-2. Add variables (e.g., `API_BASE_URL`)
-3. Access in JavaScript via `process.env.API_BASE_URL` (if using build tools)
+```bash
+cd frontend
+python3 -m http.server 3000
+```
 
-## Updating API URLs
+## Custom Domains
 
-If your frontend references the Railway API URL, ensure it's correct:
+### Via Cloudflare Dashboard
 
-1. Check `config.js` for API base URL
-2. Update to match your Railway deployment:
-   - Production: `https://flow-platform-production.up.railway.app`
-   - Staging: `https://flow-platform-staging.up.railway.app`
+1. Go to Workers & Pages
+2. Select your worker (`tbd`)
+3. Settings → Triggers → Custom Domains
+4. Add your domain
+
+### Via wrangler.jsonc
+
+```jsonc
+{
+  "name": "tbd",
+  "routes": [
+    { "pattern": "your-domain.com", "zone_name": "your-domain.com" }
+  ]
+}
+```
+
+## Environment Detection
+
+The frontend automatically detects the environment:
+
+```javascript
+// config.js
+const hostname = window.location.hostname;
+const isSandboxDomain = hostname.includes('staging');
+
+// API URLs
+const API_URLS = {
+  local: 'http://localhost:8080',
+  sandbox: 'https://flow-platform-staging.up.railway.app',
+  production: 'https://flow-platform-production.up.railway.app'
+};
+```
+
+## Token Management
+
+The frontend includes `token-manager.js` for OAuth 2.0 token handling:
+
+- **Automatic refresh**: Silently refreshes tokens before expiration
+- **Session modal**: Graceful handling of expired sessions
+- **Token rotation**: Works with backend token rotation
+
+### Usage
+
+```javascript
+// Check if authenticated
+if (TokenManager.isAuthenticated()) {
+  // User is logged in
+}
+
+// Make authenticated API call
+const response = await TokenManager.apiCall('/v1/yield/accounts');
+
+// Logout
+TokenManager.logout();
+```
 
 ## Troubleshooting
 
-### Deployment Fails
+### Deployment Not Updating
 
-1. Check **Deployments** tab for error messages
-2. Verify build settings are correct
-3. Ensure all required files are in repository
+1. Clear Cloudflare cache:
+   ```bash
+   npx wrangler pages deployment tail
+   ```
 
-### Custom Domain Not Working
+2. Check deployment status in Cloudflare dashboard
 
-1. Verify DNS records are correct
-2. Wait for DNS propagation (can take up to 24 hours)
-3. Check domain is verified in Cloudflare dashboard
+3. Verify correct directory:
+   ```bash
+   pwd  # Should be in frontend/
+   ```
 
-### Site Not Updating
+### 404 Errors
 
-1. Verify code is pushed to correct branch
-2. Check deployment logs for errors
-3. Manually trigger deployment if needed
+1. Check `worker.js` has route defined
+2. Verify file exists in correct location
+3. Check file name matches route
 
-## Performance Optimization
+### API Connection Issues
 
-Cloudflare Pages automatically provides:
-- Global CDN distribution
-- Automatic compression
-- HTTP/2 and HTTP/3 support
-- Image optimization (if enabled)
+1. Check `config.js` has correct API URLs
+2. Verify CORS is configured on backend
+3. Check browser console for errors
 
-### Cache Settings
+## Best Practices
 
-1. Go to **Settings** → **Cache**
-2. Configure cache rules if needed
-3. Default settings work well for most sites
+1. **Test locally first**: Use `npx wrangler dev` before deploying
+2. **Keep assets small**: Optimize images and CSS
+3. **Use clean URLs**: All routes should work without `.html`
+4. **Check console**: Browser console shows API errors
+
+## Deployment Workflow
+
+After making changes:
+
+```bash
+# 1. Test locally
+cd frontend
+npx wrangler dev
+
+# 2. Deploy to Cloudflare
+npx wrangler deploy
+
+# 3. Verify deployment
+# Visit your Cloudflare Workers URL
+```
 
 ## Related Documentation
 
-- [Railway Deployment](./railway.md) - Backend API deployment
+- [Railway Deployment](./railway.md) - Backend deployment
 - [Development Setup](../development/setup.md) - Local development
-
+- [Architecture Overview](../architecture/overview.md) - System design
