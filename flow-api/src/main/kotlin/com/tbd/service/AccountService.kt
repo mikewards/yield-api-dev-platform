@@ -63,15 +63,21 @@ class AccountService {
                 throw IllegalArgumentException("Invalid username or password")
             }
             
-            // Generate temporary token (valid for 1 hour)
+            val accountId = account[Accounts.id].value
             val tokenService = TokenService()
-            val tempToken = tokenService.generateTempToken(account[Accounts.id].value)
+            
+            // Generate short-lived access token (15 min) and long-lived refresh token (30 days)
+            val accessToken = tokenService.generateAccessToken(accountId)
+            val refreshToken = tokenService.generateRefreshToken(accountId)
+            
+            println("🔐 User authenticated: $accountId")
             
             AuthenticateResponse(
-                access_token = tempToken,
+                access_token = accessToken,
+                refresh_token = refreshToken,
                 token_type = "Bearer",
-                expires_in = 3600,
-                account_id = account[Accounts.id].value.toString()
+                expires_in = TokenService.ACCESS_TOKEN_LIFETIME_SEC,
+                account_id = accountId.toString()
             )
         }
     }

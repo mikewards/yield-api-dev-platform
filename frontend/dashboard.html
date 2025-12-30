@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
 </head>
 <body>
     <!-- Scroll Progress Bar (Mobile) -->
@@ -343,46 +344,16 @@
         let currentAppData = null;
         let webhookSecretVisible = false;
         
-        // Check authentication
-        const token = localStorage.getItem('tbd_token');
-        const username = localStorage.getItem('tbd_username');
-        const tokenExpires = localStorage.getItem('tbd_token_expires');
-        
-        // Check if token exists and is not expired
-        if (!token) {
-            window.location.href = 'signin.html';
-        } else if (tokenExpires && parseInt(tokenExpires) < Date.now()) {
-            // Token expired, clear and redirect
-            localStorage.removeItem('tbd_token');
-            localStorage.removeItem('tbd_token_expires');
-            localStorage.removeItem('tbd_account_id');
-            localStorage.removeItem('tbd_username');
-            alert('Your session has expired. Please sign in again.');
+        // Check authentication using TokenManager
+        if (!TokenManager.isAuthenticated()) {
             window.location.href = 'signin.html';
         }
         
-        // Helper function to handle 401 errors (token expired)
+        const username = localStorage.getItem('tbd_username');
+        
+        // Helper function to handle API calls with automatic token refresh
         async function handleApiCall(url, options = {}) {
-            const response = await fetch(url, {
-                ...options,
-                headers: {
-                    ...options.headers,
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (response.status === 401) {
-                // Token expired or invalid
-                localStorage.removeItem('tbd_token');
-                localStorage.removeItem('tbd_token_expires');
-                localStorage.removeItem('tbd_account_id');
-                localStorage.removeItem('tbd_username');
-                alert('Your session has expired. Please sign in again.');
-                window.location.href = 'signin.html';
-                return null;
-            }
-            
-            return response;
+            return await TokenManager.apiCall(url, options);
         }
         
         document.getElementById('userInfo').textContent = username || 'Account';
@@ -402,10 +373,9 @@
             }
         });
         
-        // Sign out
+        // Sign out using TokenManager (properly revokes refresh tokens)
         document.getElementById('signOutBtn').addEventListener('click', function() {
-            localStorage.clear();
-            window.location.href = 'signin.html';
+            TokenManager.logout();
         });
         
         // Load data on page load

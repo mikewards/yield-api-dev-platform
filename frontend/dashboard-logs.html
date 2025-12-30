@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
     <style>
         /* Logs Page Specific Styles */
         .logs-stats {
@@ -689,13 +690,12 @@
     </section>
 
     <script>
-        // Check authentication
-        const token = localStorage.getItem('tbd_token');
-        const username = localStorage.getItem('tbd_username');
-        
-        if (!token) {
+        // Check authentication using TokenManager
+        if (!TokenManager.isAuthenticated()) {
             window.location.href = 'signin.html';
         }
+        
+        const username = localStorage.getItem('tbd_username');
         
         document.getElementById('userInfo').textContent = username || 'Account';
         
@@ -714,10 +714,9 @@
             }
         });
         
-        // Sign out
+        // Sign out using TokenManager (properly revokes refresh tokens)
         document.getElementById('signOutBtn').addEventListener('click', function() {
-            localStorage.clear();
-            window.location.href = 'signin.html';
+            TokenManager.logout();
         });
         
         
