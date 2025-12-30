@@ -94,7 +94,7 @@ class AccountService {
             // If lockout has expired, reset the counter
             if (lockedUntil != null && now.isAfter(lockedUntil)) {
                 Accounts.update({ Accounts.id eq account[Accounts.id] }) {
-                    it[failedLoginAttempts] = 0
+                    it[Accounts.failedLoginAttempts] = 0
                     it[Accounts.lockedUntil] = null
                 }
             }
@@ -111,14 +111,14 @@ class AccountService {
                     // Lock the account
                     val lockUntil = now.plusSeconds(LOCKOUT_DURATION_MINUTES * 60)
                     Accounts.update({ Accounts.id eq account[Accounts.id] }) {
-                        it[failedLoginAttempts] = newAttempts
-                        it[lockedUntil] = lockUntil
+                        it[Accounts.failedLoginAttempts] = newAttempts
+                        it[Accounts.lockedUntil] = lockUntil
                     }
                     println("🔒 Account locked after $newAttempts failed attempts: $accountId")
                     throw AccountLockedException("Too many failed login attempts. Account locked for $LOCKOUT_DURATION_MINUTES minutes.")
                 } else {
                     Accounts.update({ Accounts.id eq account[Accounts.id] }) {
-                        it[failedLoginAttempts] = newAttempts
+                        it[Accounts.failedLoginAttempts] = newAttempts
                     }
                     val remaining = MAX_FAILED_ATTEMPTS - newAttempts
                     println("⚠️ Failed login attempt $newAttempts/$MAX_FAILED_ATTEMPTS for account: $accountId")
@@ -128,9 +128,9 @@ class AccountService {
             
             // Successful login - reset failed attempts
             Accounts.update({ Accounts.id eq account[Accounts.id] }) {
-                it[failedLoginAttempts] = 0
-                it[lockedUntil] = null
-                it[updatedAt] = now
+                it[Accounts.failedLoginAttempts] = 0
+                it[Accounts.lockedUntil] = null
+                it[Accounts.updatedAt] = now
             }
             
             val tokenService = TokenService()
