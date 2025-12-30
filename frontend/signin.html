@@ -159,11 +159,47 @@
             alert('Configuration error: API URL not set. Please refresh the page.');
         }
         
-        // Check if already logged in
-        const existingToken = localStorage.getItem('tbd_token');
-        if (existingToken) {
-            window.location.href = 'dashboard.html';
-        }
+        // Check if already logged in with valid session
+        (async function checkExistingSession() {
+            const existingToken = localStorage.getItem('tbd_token');
+            const refreshToken = localStorage.getItem('tbd_refresh_token');
+            
+            if (existingToken && refreshToken) {
+                // Have tokens - check if session is still valid
+                const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
+                
+                if (expiresAt > Date.now()) {
+                    // Access token still valid - redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                // Access token expired but have refresh token - try to refresh
+                try {
+                    const response = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refresh_token: refreshToken })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('tbd_token', data.access_token);
+                        localStorage.setItem('tbd_refresh_token', data.refresh_token);
+                        localStorage.setItem('tbd_token_expires', (Date.now() + (data.expires_in * 1000)).toString());
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Session refresh failed, showing login form');
+                }
+                
+                // Refresh failed - clear old tokens so user can log in fresh
+                localStorage.removeItem('tbd_token');
+                localStorage.removeItem('tbd_refresh_token');
+                localStorage.removeItem('tbd_token_expires');
+            }
+        })();
         
         document.getElementById('signinForm').addEventListener('submit', async function(e) {
             e.preventDefault();

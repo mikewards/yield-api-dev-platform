@@ -510,6 +510,49 @@ const TokenManager = {
     }
 };
 
+// Listen for storage changes from other tabs
+window.addEventListener('storage', (event) => {
+    if (event.key === 'tbd_token' && event.newValue === null) {
+        // Token was cleared in another tab - user logged out
+        console.log('🔄 Detected logout in another tab');
+        TokenManager.sessionExpired = true;
+        clearTimeout(TokenManager.refreshTimer);
+        clearInterval(TokenManager.activityTimer);
+        // Don't show modal - just redirect since user intentionally logged out
+        window.location.href = 'signin.html';
+    } else if (event.key === 'tbd_token' && event.newValue && !TokenManager.sessionExpired) {
+        // Token was refreshed in another tab - update our state
+        console.log('🔄 Token updated in another tab, syncing...');
+        // Re-schedule refresh based on new token
+        TokenManager.scheduleRefresh();
+    } else if (event.key === 'tbd_refresh_token' && event.newValue === null && !TokenManager.sessionExpired) {
+        // Refresh token was revoked - session expired
+        console.log('🔄 Refresh token revoked in another tab');
+        TokenManager.markSessionExpired();
+    }
+});
+
+// Handle page visibility changes (tab switching, sleep/wake)
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !TokenManager.sessionExpired) {
+        // Tab became visible - check if tokens are still valid
+        console.log('👁️ Tab became visible, checking token validity...');
+        const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
+        const refreshToken = localStorage.getItem('tbd_refresh_token');
+        
+        if (!refreshToken) {
+            // No refresh token anymore - another tab may have logged out
+            TokenManager.markSessionExpired();
+        } else if (expiresAt < Date.now()) {
+            // Access token expired while tab was hidden - refresh now
+            TokenManager.refresh();
+        } else {
+            // Token still valid - reschedule refresh
+            TokenManager.scheduleRefresh();
+        }
+    }
+});
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => TokenManager.init());
