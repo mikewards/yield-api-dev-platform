@@ -7,18 +7,35 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
 
+/**
+ * AccountSettingsService handles account settings, sessions, and soft delete.
+ * 
+ * Soft Delete:
+ * - Accounts are marked as "deleted" with anonymized PII
+ * - Scheduled for permanent deletion after 30 days
+ * - Data can be recovered within the 30-day window (admin only)
+ */
 class AccountSettingsService {
+    
+    companion object {
+        // Soft delete retention period: 30 days
+        const val RETENTION_DAYS = 30L
+    }
     
     private val tokenService = TokenService()
     
     /**
-     * Get account settings for display
+     * Get account settings for display (excludes deleted accounts)
      */
     fun getAccountSettings(accountId: UUID): AccountSettingsResponse? {
         return transaction {
-            Accounts.select { Accounts.id eq accountId }
+            Accounts.select { 
+                (Accounts.id eq accountId) and 
+                (Accounts.status neq "deleted")
+            }
                 .firstOrNull()
                 ?.let { row ->
                     AccountSettingsResponse(
@@ -37,8 +54,11 @@ class AccountSettingsService {
      */
     fun updateEmail(accountId: UUID, request: UpdateEmailRequest): UpdateEmailResponse {
         return transaction {
-            // Get current account
-            val account = Accounts.select { Accounts.id eq accountId }.firstOrNull()
+            // Get current account (exclude deleted)
+            val account = Accounts.select { 
+                (Accounts.id eq accountId) and 
+                (Accounts.status neq "deleted")
+            }.firstOrNull()
                 ?: throw IllegalArgumentException("Account not found")
             
             // Verify current password
@@ -52,9 +72,11 @@ class AccountSettingsService {
                 throw IllegalArgumentException("Invalid email format")
             }
             
-            // Check if email is already in use by another account
+            // Check if email is already in use by another active account
             val existingEmail = Accounts.select { 
-                (Accounts.email eq request.email) and (Accounts.id neq accountId)
+                (Accounts.email eq request.email) and 
+                (Accounts.id neq accountId) and
+                (Accounts.status neq "deleted")
             }.firstOrNull()
             
             if (existingEmail != null) {
@@ -63,8 +85,8 @@ class AccountSettingsService {
             
             // Update email
             Accounts.update({ Accounts.id eq accountId }) {
-                it[email] = request.email
-                it[updatedAt] = Instant.now()
+                it[Accounts.email] = request.email
+                it[Accounts.updatedAt] = Instant.now()
             }
             
             UpdateEmailResponse(
@@ -80,8 +102,11 @@ class AccountSettingsService {
      */
     fun changePassword(accountId: UUID, request: ChangePasswordRequest): ChangePasswordResponse {
         return transaction {
-            // Get current account
-            val account = Accounts.select { Accounts.id eq accountId }.firstOrNull()
+            // Get current account (exclude deleted)
+            val account = Accounts.select { 
+                (Accounts.id eq accountId) and 
+                (Accounts.status neq "deleted")
+            }.firstOrNull()
                 ?: throw IllegalArgumentException("Account not found")
             
             // Verify current password
@@ -103,8 +128,8 @@ class AccountSettingsService {
             // Hash and update password
             val newPasswordHash = BCrypt.hashpw(request.new_password, BCrypt.gensalt())
             Accounts.update({ Accounts.id eq accountId }) {
-                it[passwordHash] = newPasswordHash
-                it[updatedAt] = Instant.now()
+                it[Accounts.passwordHash] = newPasswordHash
+                it[Accounts.updatedAt] = Instant.now()
             }
             
             // SECURITY: Revoke ALL refresh tokens (force re-login on all devices)
@@ -114,7 +139,7 @@ class AccountSettingsService {
             // Also revoke all sessions
             val now = Instant.now()
             UserSessions.update({ UserSessions.accountId eq accountId }) {
-                it[revokedAt] = now
+                it[UserSessions.revokedAt] = now
             }
             
             println("🔐 Password changed and all sessions revoked for account: $accountId")
@@ -196,14 +221,14 @@ class AccountSettingsService {
             
             // Revoke the session
             UserSessions.update({ UserSessions.id eq sessionId }) {
-                it[revokedAt] = now
+                it[UserSessions.revokedAt] = now
             }
             
             // Also revoke the associated refresh token
             val refreshTokenId = session[UserSessions.refreshTokenId]
             if (refreshTokenId != null) {
                 RefreshTokens.update({ RefreshTokens.id eq refreshTokenId }) {
-                    it[revokedAt] = now
+                    it[RefreshTokens.revokedAt] = now
                 }
             }
             
@@ -233,14 +258,14 @@ class AccountSettingsService {
             sessionsToRevoke.forEach { session ->
                 // Revoke the session
                 UserSessions.update({ UserSessions.id eq session[UserSessions.id] }) {
-                    it[revokedAt] = now
+                    it[UserSessions.revokedAt] = now
                 }
                 
                 // Revoke the associated refresh token
                 val refreshTokenId = session[UserSessions.refreshTokenId]
                 if (refreshTokenId != null) {
                     RefreshTokens.update({ RefreshTokens.id eq refreshTokenId }) {
-                        it[revokedAt] = now
+                        it[RefreshTokens.revokedAt] = now
                     }
                 }
                 
@@ -256,7 +281,19 @@ class AccountSettingsService {
     }
     
     /**
-     * Delete account (requires password verification and confirmation)
+     * Soft delete account with 30-day retention.
+     * 
+     * This function:
+     * 1. Verifies password and confirmation
+     * 2. Revokes all sessions and tokens
+     * 3. Anonymizes PII (username, email)
+     * 4. Sets status to "deleted"
+     * 5. Schedules permanent deletion after 30 days
+     * 
+     * User data is NOT immediately deleted - it's retained for 30 days to allow:
+     * - Account recovery if deleted accidentally
+     * - Fraud investigation if needed
+     * - Compliance with data retention requirements
      */
     fun deleteAccount(accountId: UUID, request: DeleteAccountRequest): DeleteAccountResponse {
         return transaction {
@@ -265,8 +302,11 @@ class AccountSettingsService {
                 throw IllegalArgumentException("Please type DELETE to confirm account deletion")
             }
             
-            // Get current account
-            val account = Accounts.select { Accounts.id eq accountId }.firstOrNull()
+            // Get current account (exclude already deleted)
+            val account = Accounts.select { 
+                (Accounts.id eq accountId) and 
+                (Accounts.status neq "deleted")
+            }.firstOrNull()
                 ?: throw IllegalArgumentException("Account not found")
             
             // Verify password
@@ -275,61 +315,36 @@ class AccountSettingsService {
                 throw IllegalArgumentException("Invalid password")
             }
             
-            // Delete in order (to respect foreign key constraints)
+            val now = Instant.now()
+            val purgeAt = now.plus(RETENTION_DAYS, ChronoUnit.DAYS)
+            
             // 1. Revoke all sessions
             UserSessions.update({ UserSessions.accountId eq accountId }) {
-                it[revokedAt] = Instant.now()
+                it[UserSessions.revokedAt] = now
             }
             
             // 2. Revoke all refresh tokens
             RefreshTokens.update({ RefreshTokens.accountId eq accountId }) {
-                it[revokedAt] = Instant.now()
+                it[RefreshTokens.revokedAt] = now
             }
             
-            // 3. Delete request logs
-            RequestLogs.deleteWhere { RequestLogs.accountId eq accountId }
+            // 3. Soft delete the account - anonymize PII and mark as deleted
+            val anonymizedUsername = "deleted_${accountId.toString().take(8)}"
             
-            // 4. Delete access tokens
-            AccessTokens.deleteWhere { AccessTokens.accountId eq accountId }
-            
-            // 5. Delete application wallets (for each application)
-            val appIds = Applications.select { Applications.accountId eq accountId }
-                .map { it[Applications.id].value }
-            
-            appIds.forEach { appId ->
-                ApplicationWallets.deleteWhere { ApplicationWallets.applicationId eq appId }
+            Accounts.update({ Accounts.id eq accountId }) {
+                it[Accounts.status] = "deleted"
+                it[Accounts.username] = anonymizedUsername  // Anonymize username
+                it[Accounts.email] = null                    // Remove email
+                it[Accounts.deletedAt] = now
+                it[Accounts.scheduledPurgeAt] = purgeAt
+                it[Accounts.updatedAt] = now
             }
             
-            // 6. Delete transactions and positions for yield accounts
-            val yieldAccountIds = YieldAccounts.select { YieldAccounts.accountId eq accountId }
-                .map { it[YieldAccounts.id].value }
-            
-            yieldAccountIds.forEach { yaId ->
-                Transactions.deleteWhere { Transactions.yieldAccountId eq yaId }
-                Positions.deleteWhere { Positions.yieldAccountId eq yaId }
-            }
-            
-            // 7. Delete yield accounts
-            YieldAccounts.deleteWhere { YieldAccounts.accountId eq accountId }
-            
-            // 8. Delete applications
-            Applications.deleteWhere { Applications.accountId eq accountId }
-            
-            // 9. Delete webhooks
-            Webhooks.deleteWhere { Webhooks.accountId eq accountId }
-            
-            // 10. Delete refresh tokens (hard delete after soft delete)
-            RefreshTokens.deleteWhere { RefreshTokens.accountId eq accountId }
-            
-            // 11. Delete sessions (hard delete after soft delete)
-            UserSessions.deleteWhere { UserSessions.accountId eq accountId }
-            
-            // 12. Finally, delete the account
-            Accounts.deleteWhere { Accounts.id eq accountId }
+            println("🗑️ Account soft deleted: $accountId, scheduled purge: $purgeAt")
             
             DeleteAccountResponse(
                 success = true,
-                message = "Account deleted successfully"
+                message = "Account scheduled for deletion. Your data will be permanently removed in $RETENTION_DAYS days."
             )
         }
     }
@@ -354,4 +369,3 @@ class AccountSettingsService {
         }
     }
 }
-

@@ -9,6 +9,7 @@ import com.tbd.middleware.rateLimit
 import com.tbd.middleware.requestLogging
 import com.tbd.middleware.sentry
 import com.tbd.middleware.statusPages
+import com.tbd.service.AccountCleanupJob
 import com.tbd.service.LogCleanupJob
 import com.tbd.service.WebhookService
 import io.ktor.serialization.kotlinx.json.*
@@ -27,8 +28,9 @@ fun Application.module() {
     // Initialize database (with error handling - don't crash if DB fails)
     try {
         DatabaseFactory.init()
-        // Start background job to clean up old logs
+        // Start background jobs
         LogCleanupJob.start()
+        AccountCleanupJob.start()
     } catch (e: Exception) {
         println("❌ CRITICAL: Database initialization failed: ${e.message}")
         e.printStackTrace()

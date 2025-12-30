@@ -2,6 +2,7 @@ package com.tbd.service
 
 import com.tbd.dto.*
 import com.tbd.model.Accounts
+import com.tbd.model.UserSessions
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
@@ -13,6 +14,7 @@ import java.util.*
  * - BCrypt password hashing
  * - Account lockout after failed attempts (5 attempts → 15 minute lockout)
  * - Password complexity validation
+ * - Session creation on login
  */
 class AccountService {
     
@@ -24,8 +26,11 @@ class AccountService {
     
     fun createAccount(request: CreateAccountRequest): AccountResponse {
         return transaction {
-            // Check if username exists
-            val existing = Accounts.select { Accounts.username eq request.username }.firstOrNull()
+            // Check if username exists (only active accounts)
+            val existing = Accounts.select { 
+                (Accounts.username eq request.username) and 
+                (Accounts.status neq "deleted")
+            }.firstOrNull()
             if (existing != null) {
                 throw IllegalArgumentException("Username is already taken")
             }
@@ -68,16 +73,24 @@ class AccountService {
     }
     
     /**
-     * Authenticate a user with account lockout protection.
+     * Authenticate a user with account lockout protection and session creation.
      * 
      * Security:
      * - After 5 failed attempts, account is locked for 15 minutes
      * - Failed attempt counter resets on successful login
      * - Lockout is time-based and auto-expires
+     * - Session is created and linked to refresh token
+     * 
+     * @param request Authentication request with username and password
+     * @param ipAddress Client IP address for session tracking
+     * @param userAgent Client user agent for device identification
      */
-    fun authenticate(request: AuthenticateRequest): AuthenticateResponse {
+    fun authenticate(request: AuthenticateRequest, ipAddress: String? = null, userAgent: String? = null): AuthenticateResponse {
         return transaction {
-            val account = Accounts.select { Accounts.username eq request.username }.firstOrNull()
+            val account = Accounts.select { 
+                (Accounts.username eq request.username) and
+                (Accounts.status neq "deleted")
+            }.firstOrNull()
                 ?: throw IllegalArgumentException("Invalid username or password")
             
             val accountId = account[Accounts.id].value
@@ -135,15 +148,25 @@ class AccountService {
             
             val tokenService = TokenService()
             
-            // Generate short-lived access token (15 min) and long-lived refresh token (30 days)
-            val accessToken = tokenService.generateAccessToken(accountId)
-            val refreshToken = tokenService.generateRefreshToken(accountId)
+            // Generate refresh token first (we need its ID for the session)
+            val refreshResult = tokenService.generateRefreshToken(accountId)
             
-            println("🔐 User authenticated: $accountId")
+            // Create session linked to the refresh token
+            val sessionId = createSession(
+                accountId = accountId,
+                refreshTokenId = refreshResult.tokenId,
+                ipAddress = ipAddress,
+                userAgent = userAgent
+            )
+            
+            // Generate access token with embedded session ID
+            val accessToken = tokenService.generateAccessToken(accountId, sessionId)
+            
+            println("🔐 User authenticated: $accountId (session: $sessionId)")
             
             AuthenticateResponse(
                 access_token = accessToken,
-                refresh_token = refreshToken,
+                refresh_token = refreshResult.token,
                 token_type = "Bearer",
                 expires_in = TokenService.ACCESS_TOKEN_LIFETIME_SEC,
                 account_id = accountId.toString()
@@ -151,9 +174,58 @@ class AccountService {
         }
     }
     
+    /**
+     * Create a session record for tracking active logins.
+     */
+    private fun createSession(
+        accountId: UUID,
+        refreshTokenId: UUID,
+        ipAddress: String?,
+        userAgent: String?
+    ): UUID {
+        val now = Instant.now()
+        val deviceInfo = parseUserAgent(userAgent)
+        
+        val sessionId = UserSessions.insert {
+            it[UserSessions.accountId] = accountId
+            it[UserSessions.refreshTokenId] = refreshTokenId
+            it[UserSessions.ipAddress] = ipAddress
+            it[UserSessions.userAgent] = userAgent
+            it[UserSessions.deviceInfo] = deviceInfo
+            it[UserSessions.lastActiveAt] = now
+            it[UserSessions.createdAt] = now
+        } get UserSessions.id
+        
+        println("📱 Session created: ${sessionId.value} for account: $accountId (device: $deviceInfo)")
+        return sessionId.value
+    }
+    
+    /**
+     * Parse user agent to get a friendly device name
+     */
+    private fun parseUserAgent(userAgent: String?): String? {
+        if (userAgent == null) return null
+        
+        return when {
+            userAgent.contains("iPhone") -> "iPhone"
+            userAgent.contains("iPad") -> "iPad"
+            userAgent.contains("Android") -> "Android Device"
+            userAgent.contains("Windows") -> "Windows PC"
+            userAgent.contains("Mac OS") || userAgent.contains("Macintosh") -> "Mac"
+            userAgent.contains("Linux") -> "Linux PC"
+            userAgent.contains("Chrome") -> "Chrome Browser"
+            userAgent.contains("Firefox") -> "Firefox Browser"
+            userAgent.contains("Safari") -> "Safari Browser"
+            else -> "Unknown Device"
+        }
+    }
+    
     fun getAccount(accountId: UUID): AccountResponse? {
         return transaction {
-            Accounts.select { Accounts.id eq accountId }.firstOrNull()?.let {
+            Accounts.select { 
+                (Accounts.id eq accountId) and 
+                (Accounts.status neq "deleted")
+            }.firstOrNull()?.let {
                 AccountResponse(
                     account_id = it[Accounts.id].value.toString(),
                     username = it[Accounts.username],

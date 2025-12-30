@@ -17,8 +17,17 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
 /**
+ * Result of generating a refresh token - includes both the token and its database ID.
+ * The ID is needed to link sessions to refresh tokens.
+ */
+data class RefreshTokenResult(
+    val token: String,
+    val tokenId: UUID
+)
+
+/**
  * TokenService handles all token operations with security best practices:
- * - JWT access tokens (short-lived, 15 minutes)
+ * - JWT access tokens (short-lived, 15 minutes) with embedded session ID
  * - HMAC-SHA256 hashed refresh tokens (long-lived, 30 days)
  * - Token rotation on refresh
  */
@@ -80,18 +89,26 @@ class TokenService {
     }
     
     /**
-     * Generate a short-lived JWT access token (15 minutes)
+     * Generate a short-lived JWT access token (15 minutes).
+     * 
+     * @param accountId The user's account ID
+     * @param sessionId Optional session ID to embed in the JWT for "current session" detection
      */
-    fun generateAccessToken(accountId: UUID): String {
+    fun generateAccessToken(accountId: UUID, sessionId: UUID? = null): String {
         val key: SecretKey = Keys.hmacShaKeyFor(jwtSecret.toByteArray())
         
-        return Jwts.builder()
+        val builder = Jwts.builder()
             .setSubject(accountId.toString())
             .setIssuer("tbd-api")
             .setAudience("tbd-api")
             .setExpiration(Date(System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME_MS))
-            .signWith(key)
-            .compact()
+        
+        // Embed session ID in JWT if provided (for "current session" detection)
+        if (sessionId != null) {
+            builder.claim("sid", sessionId.toString())
+        }
+        
+        return builder.signWith(key).compact()
     }
     
     /**
@@ -100,26 +117,28 @@ class TokenService {
      * Security: The token is hashed with HMAC-SHA256 before storage.
      * Only the hash is stored in the database - the plaintext token is
      * returned to the client and never stored.
+     * 
+     * @return RefreshTokenResult containing both the token string and its database ID
      */
-    fun generateRefreshToken(accountId: UUID): String {
+    fun generateRefreshToken(accountId: UUID): RefreshTokenResult {
         val token = "tbd_refresh_${UUID.randomUUID().toString().replace("-", "")}"
         val tokenHash = hmacSha256(token)
-        val tokenPrefix = token.take(TOKEN_PREFIX_LENGTH)
+        val tokenPrefixStr = token.take(TOKEN_PREFIX_LENGTH)
         val expiresAt = Instant.now().plusSeconds(REFRESH_TOKEN_LIFETIME_SEC)
         val now = Instant.now()
         
-        transaction {
+        val tokenId = transaction {
             RefreshTokens.insert {
                 it[RefreshTokens.accountId] = accountId
                 it[RefreshTokens.tokenHash] = tokenHash
-                it[RefreshTokens.tokenPrefix] = tokenPrefix
+                it[RefreshTokens.tokenPrefix] = tokenPrefixStr
                 it[RefreshTokens.expiresAt] = expiresAt
                 it[RefreshTokens.createdAt] = now
-            }
+            } get RefreshTokens.id
         }
         
-        println("🔑 Generated refresh token for account: $accountId (prefix: $tokenPrefix...), expires: $expiresAt")
-        return token  // Return plaintext token to client (never stored)
+        println("🔑 Generated refresh token for account: $accountId (prefix: $tokenPrefixStr...), expires: $expiresAt")
+        return RefreshTokenResult(token = token, tokenId = tokenId.value)
     }
     
     /**
@@ -129,8 +148,10 @@ class TokenService {
      * - Token is hashed and looked up by hash (O(1) indexed lookup)
      * - Old refresh token is revoked immediately (token rotation)
      * - New refresh token is issued
+     * 
+     * @return Tuple of (accessToken, refreshToken, accountId, newRefreshTokenId) or null if invalid
      */
-    fun refreshAccessToken(refreshToken: String): Triple<String, String, UUID>? {
+    fun refreshAccessToken(refreshToken: String, sessionId: UUID? = null): RefreshResult? {
         val tokenHash = hmacSha256(refreshToken)
         
         return transaction {
@@ -159,10 +180,15 @@ class TokenService {
             println("🔄 Rotating refresh token for account: $accountId")
             
             // Generate new tokens
-            val newAccessToken = generateAccessToken(accountId)
-            val newRefreshToken = generateRefreshToken(accountId)
+            val refreshResult = generateRefreshToken(accountId)
+            val newAccessToken = generateAccessToken(accountId, sessionId)
             
-            Triple(newAccessToken, newRefreshToken, accountId)
+            RefreshResult(
+                accessToken = newAccessToken,
+                refreshToken = refreshResult.token,
+                accountId = accountId,
+                refreshTokenId = refreshResult.tokenId
+            )
         }
     }
     
@@ -240,3 +266,13 @@ class TokenService {
         }
     }
 }
+
+/**
+ * Result of refreshing tokens - includes all new token data
+ */
+data class RefreshResult(
+    val accessToken: String,
+    val refreshToken: String,
+    val accountId: UUID,
+    val refreshTokenId: UUID
+)
