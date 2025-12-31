@@ -115,6 +115,10 @@ function highlightCurl(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     
+    // IMPORTANT: Mark quoted strings FIRST (before adding any spans)
+    // This prevents the regex from matching span class attributes later
+    html = html.replace(/"([^"]+)"/g, '%%QUOTE_START%%$1%%QUOTE_END%%');
+    
     // Highlight curl command
     html = html.replace(/^(curl)\s/gm, '<span class="token-cmd">$1</span> ');
     
@@ -124,8 +128,8 @@ function highlightCurl(text) {
     // Highlight flags like -X, -H, -d, -u
     html = html.replace(/(\s)(-[A-Za-z]+)(\s)/g, '$1<span class="token-flag">$2</span>$3');
     
-    // Highlight header values in quotes
-    html = html.replace(/"([^"]+)"/g, '<span class="token-string">"$1"</span>');
+    // Now convert the quote placeholders to actual spans
+    html = html.replace(/%%QUOTE_START%%([^%]+)%%QUOTE_END%%/g, '<span class="token-string">"$1"</span>');
     
     // Highlight single-quoted strings (JSON body)
     html = html.replace(/'(\{[\s\S]*?\})'/g, function(match, json) {
