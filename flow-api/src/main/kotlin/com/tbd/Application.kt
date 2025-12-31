@@ -64,6 +64,7 @@ fun Application.module() {
     healthRoutes()
     accountRoutes()
     authRoutes()
+    accountSettingsRoutes()
     applicationRoutes()
     walletRoutes()
     tokenRoutes()

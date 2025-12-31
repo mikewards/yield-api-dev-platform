@@ -11,7 +11,8 @@ export default {
       '/signin': '/signin.html',
       '/account': '/account.html',
       '/dashboard': '/dashboard.html',
-      '/dashboard-webhooks': '/dashboard-webhooks.html'
+      '/dashboard-webhooks': '/dashboard-webhooks.html',
+      '/account-settings': '/account-settings.html'
     };
     
     // If this is a known route, redirect to the .html file
