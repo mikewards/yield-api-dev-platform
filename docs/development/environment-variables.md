@@ -20,8 +20,11 @@ Complete reference for all environment variables used in the TBD platform.
 
 | Variable | Description | How to Generate |
 |----------|-------------|-----------------|
-| `JWT_SECRET` | Secret key for JWT token signing (min 32 chars) | `openssl rand -hex 32` |
+| `JWT_SECRET` | Secret key for JWT access token signing (min 32 chars) | `openssl rand -hex 32` |
+| `TOKEN_HASH_KEY` | HMAC-SHA256 key for hashing refresh tokens (32+ chars) | `openssl rand -hex 32` |
 | `MASTER_ENCRYPTION_KEY` | AES-256 encryption key for wallet private keys (32 bytes hex) | `openssl rand -hex 32` |
+
+**Security Note**: `TOKEN_HASH_KEY` is critical - refresh tokens are hashed with HMAC-SHA256 before storage. Even with database access, tokens cannot be validated without this key.
 
 ### Environment
 
@@ -118,6 +121,7 @@ openssl rand -hex 32
 ```bash
 #!/bin/bash
 echo "JWT_SECRET=$(openssl rand -hex 32)"
+echo "TOKEN_HASH_KEY=$(openssl rand -hex 32)"
 echo "MASTER_ENCRYPTION_KEY=$(openssl rand -hex 32)"
 ```
 
@@ -130,6 +134,7 @@ Railway automatically sets `DATABASE_URL` when you link a database. You need to 
 | `DATABASE_USER` | Yes | Usually `postgres` |
 | `DATABASE_PASSWORD` | Yes | From database settings |
 | `JWT_SECRET` | Yes | Generate unique for each environment |
+| `TOKEN_HASH_KEY` | Yes | Generate unique for each environment |
 | `MASTER_ENCRYPTION_KEY` | Yes | Generate unique for each environment |
 | `ENVIRONMENT` | Yes | `sandbox` for staging, `production` for prod |
 | `SVIX_API_KEY` | Yes | From Svix dashboard |
@@ -145,6 +150,7 @@ DATABASE_URL=jdbc:postgresql://localhost:5432/flow_api
 DATABASE_USER=postgres
 DATABASE_PASSWORD=your_local_password
 JWT_SECRET=dev_secret_at_least_32_characters_long
+TOKEN_HASH_KEY=dev_token_hash_key_at_least_32_chars
 MASTER_ENCRYPTION_KEY=dev_key_at_least_32_characters_long
 # SVIX_API_KEY=optional_for_local
 ```

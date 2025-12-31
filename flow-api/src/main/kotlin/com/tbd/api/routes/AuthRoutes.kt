@@ -1,6 +1,7 @@
 package com.tbd.api.routes
 
 import com.tbd.dto.*
+import com.tbd.service.AccountLockedException
 import com.tbd.service.AccountService
 import com.tbd.service.TokenService
 import io.ktor.http.*
@@ -23,6 +24,12 @@ fun Application.authRoutes() {
                 try {
                     val response = accountService.authenticate(request)
                     call.respond(response)
+                } catch (e: AccountLockedException) {
+                    // Account is locked due to too many failed attempts
+                    call.respond(
+                        HttpStatusCode.TooManyRequests,
+                        ErrorResponse(ErrorDetail("ACCOUNT_LOCKED", e.message ?: "Account is locked", "authentication_error"))
+                    )
                 } catch (e: IllegalArgumentException) {
                     call.respond(
                         HttpStatusCode.Unauthorized,

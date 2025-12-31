@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger
  * 
  * Configure rate limits per endpoint. Each endpoint can have its own limit.
  * Default is 100 requests per minute if not specified.
+ * 
+ * SECURITY: Auth endpoints have stricter limits to prevent brute force attacks.
  */
 object RateLimitConfig {
     // Default rate limit: 100 requests per minute
@@ -31,16 +33,26 @@ object RateLimitConfig {
      * Endpoints not listed will use DEFAULT_REQUESTS_PER_MINUTE.
      */
     val endpointLimits: Map<String, Int> = mapOf(
-        // === CONFIGURABLE RATE LIMITS ===
-        // Default: 100 req/min for all endpoints
-        // 
-        // Reduced limits (75 req/min) for demonstration:
+        // ============================================
+        // SECURITY: Auth endpoints - STRICT LIMITS
+        // These are critical for preventing brute force
+        // ============================================
+        "POST /v1/auth/authenticate" to 5,    // 5 login attempts per minute per IP
+        "POST /v1/auth/refresh" to 20,        // 20 token refreshes per minute
+        "POST /v1/accounts" to 3,             // 3 signups per minute (spam prevention)
+        
+        // Account settings - sensitive operations
+        "POST /v1/account/password" to 3,     // 3 password change attempts per minute
+        "PATCH /v1/account/email" to 3,       // 3 email change attempts per minute
+        "DELETE /v1/account" to 1,            // 1 account deletion per minute
+        "DELETE /v1/sessions/{id}" to 10,     // 10 session revocations per minute
+        "DELETE /v1/sessions" to 2,           // 2 "revoke all" per minute
+        
+        // ============================================
+        // Standard API endpoints (75-100 req/min)
+        // ============================================
         "GET /v1/markets" to 75,
         "GET /v1/yield/rates" to 75,
-        
-        // Standard limits (100 req/min) - explicitly set for documentation
-        "POST /v1/auth/authenticate" to 100,
-        "POST /v1/accounts" to 100,
         "GET /v1/yield/accounts" to 100,
         "POST /v1/yield/accounts" to 100,
         "GET /v1/yield/positions" to 100,
@@ -48,7 +60,14 @@ object RateLimitConfig {
         "POST /v1/applications" to 100,
         "GET /v1/applications" to 100,
         
-        // Health check - higher limit
+        // Webhooks
+        "POST /v1/webhooks" to 20,            // 20 webhook creations per minute
+        "GET /v1/webhooks" to 60,             // 60 webhook list requests per minute
+        "POST /v1/webhooks/{id}/test" to 10,  // 10 test webhook sends per minute
+        
+        // ============================================
+        // Health/Status - Higher limits
+        // ============================================
         "GET /health" to 300,
         "GET /" to 300
     )
@@ -190,10 +209,16 @@ fun Application.rateLimit() {
             // Still add headers but with higher limits
         }
         
-        // Get client identifier (IP address or API key if authenticated)
-        val clientId = call.request.header("Authorization")?.take(50) 
-            ?: call.request.origin.remoteHost
-            ?: "unknown"
+        // Get client identifier (IP address)
+        // For auth endpoints, we ALWAYS use IP (not API key) to prevent brute force
+        val clientId = if (isAuthEndpoint(path)) {
+            // Auth endpoints: always use IP for rate limiting
+            getClientIp(call)
+        } else {
+            // Other endpoints: use API key if available, else IP
+            call.request.header("Authorization")?.take(50) 
+                ?: getClientIp(call)
+        }
         
         // Normalize path (remove trailing slash, extract base path for parameterized routes)
         val normalizedPath = normalizePath(path)
@@ -244,6 +269,37 @@ fun Application.rateLimit() {
 }
 
 /**
+ * Check if this is an auth-related endpoint (always rate limit by IP)
+ */
+private fun isAuthEndpoint(path: String): Boolean {
+    return path.startsWith("/v1/auth") || 
+           path.startsWith("/v1/accounts") ||
+           path.startsWith("/v1/account") ||
+           path.startsWith("/v1/sessions")
+}
+
+/**
+ * Get the real client IP address, handling proxies
+ */
+private fun getClientIp(call: ApplicationCall): String {
+    // Check X-Forwarded-For (when behind a proxy/load balancer)
+    val forwarded = call.request.header("X-Forwarded-For")
+    if (forwarded != null) {
+        // Take the first IP (original client)
+        return forwarded.split(",").firstOrNull()?.trim() ?: "unknown"
+    }
+    
+    // Check X-Real-IP
+    val realIp = call.request.header("X-Real-IP")
+    if (realIp != null) {
+        return realIp.trim()
+    }
+    
+    // Fall back to direct connection IP
+    return call.request.origin.remoteHost ?: "unknown"
+}
+
+/**
  * Normalize path for rate limiting (handle path parameters)
  */
 private fun normalizePath(path: String): String {
@@ -255,4 +311,3 @@ private fun normalizePath(path: String): String {
         .replace(Regex("/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"), "/{id}")
         .replace(Regex("/\\d+"), "/{id}")
 }
-

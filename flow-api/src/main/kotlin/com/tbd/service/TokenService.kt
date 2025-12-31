@@ -12,12 +12,27 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 import java.util.*
+import javax.crypto.Mac
 import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
 
+/**
+ * TokenService handles all token operations with security best practices:
+ * - JWT access tokens (short-lived, 15 minutes)
+ * - HMAC-SHA256 hashed refresh tokens (long-lived, 30 days)
+ * - Token rotation on refresh
+ */
 class TokenService {
     private val config = ConfigFactory.load()
     private val tokenPrefix = config.getString("tbd.tokenPrefix")
     private val jwtSecret = System.getenv("JWT_SECRET") ?: config.getString("jwt.secret")
+    
+    // HMAC key for hashing refresh tokens - MUST be set in production
+    private val tokenHashKey: String = System.getenv("TOKEN_HASH_KEY") 
+        ?: run {
+            println("⚠️ WARNING: TOKEN_HASH_KEY not set! Using fallback key for development only.")
+            "dev-only-token-hash-key-do-not-use-in-production-32chars!"
+        }
     
     companion object {
         // Access token lifetime: 15 minutes
@@ -26,6 +41,22 @@ class TokenService {
         
         // Refresh token lifetime: 30 days
         const val REFRESH_TOKEN_LIFETIME_SEC = 30 * 24 * 60 * 60L
+        
+        // Token prefix length to store for display
+        const val TOKEN_PREFIX_LENGTH = 20
+    }
+    
+    /**
+     * Compute HMAC-SHA256 hash of a token.
+     * This is used to store refresh tokens securely - even with DB access,
+     * tokens cannot be validated without the TOKEN_HASH_KEY.
+     */
+    private fun hmacSha256(token: String): String {
+        val mac = Mac.getInstance("HmacSHA256")
+        val keySpec = SecretKeySpec(tokenHashKey.toByteArray(Charsets.UTF_8), "HmacSHA256")
+        mac.init(keySpec)
+        val hashBytes = mac.doFinal(token.toByteArray(Charsets.UTF_8))
+        return hashBytes.joinToString("") { "%02x".format(it) }
     }
     
     fun generateToken(accountId: UUID, name: String, expiresIn: Int? = null): Pair<UUID, String> {
@@ -64,37 +95,50 @@ class TokenService {
     }
     
     /**
-     * Generate a long-lived refresh token (30 days), stored in database
+     * Generate a long-lived refresh token (30 days).
+     * 
+     * Security: The token is hashed with HMAC-SHA256 before storage.
+     * Only the hash is stored in the database - the plaintext token is
+     * returned to the client and never stored.
      */
     fun generateRefreshToken(accountId: UUID): String {
         val token = "tbd_refresh_${UUID.randomUUID().toString().replace("-", "")}"
+        val tokenHash = hmacSha256(token)
+        val tokenPrefix = token.take(TOKEN_PREFIX_LENGTH)
         val expiresAt = Instant.now().plusSeconds(REFRESH_TOKEN_LIFETIME_SEC)
         val now = Instant.now()
         
         transaction {
             RefreshTokens.insert {
                 it[RefreshTokens.accountId] = accountId
-                it[RefreshTokens.token] = token
+                it[RefreshTokens.tokenHash] = tokenHash
+                it[RefreshTokens.tokenPrefix] = tokenPrefix
                 it[RefreshTokens.expiresAt] = expiresAt
                 it[RefreshTokens.createdAt] = now
             }
         }
         
-        println("🔑 Generated refresh token for account: $accountId, expires: $expiresAt")
-        return token
+        println("🔑 Generated refresh token for account: $accountId (prefix: $tokenPrefix...), expires: $expiresAt")
+        return token  // Return plaintext token to client (never stored)
     }
     
     /**
-     * Refresh an access token using a valid refresh token
-     * Implements token rotation for security
+     * Refresh an access token using a valid refresh token.
+     * 
+     * Security:
+     * - Token is hashed and looked up by hash (O(1) indexed lookup)
+     * - Old refresh token is revoked immediately (token rotation)
+     * - New refresh token is issued
      */
     fun refreshAccessToken(refreshToken: String): Triple<String, String, UUID>? {
+        val tokenHash = hmacSha256(refreshToken)
+        
         return transaction {
             val now = Instant.now()
             
-            // Find valid refresh token
+            // Find valid refresh token by hash
             val row = RefreshTokens.select { 
-                (RefreshTokens.token eq refreshToken) and 
+                (RefreshTokens.tokenHash eq tokenHash) and 
                 (RefreshTokens.expiresAt greater now) and
                 (RefreshTokens.revokedAt.isNull())
             }.firstOrNull()
@@ -123,7 +167,7 @@ class TokenService {
     }
     
     /**
-     * Revoke all refresh tokens for an account (used on logout)
+     * Revoke all refresh tokens for an account (used on logout and password change)
      */
     fun revokeAllRefreshTokens(accountId: UUID) {
         transaction {

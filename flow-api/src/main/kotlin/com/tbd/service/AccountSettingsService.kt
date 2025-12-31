@@ -107,12 +107,21 @@ class AccountSettingsService {
                 it[updatedAt] = Instant.now()
             }
             
-            // Optionally: Revoke all refresh tokens except current (force re-login on other devices)
-            // For now, we'll leave other sessions active
+            // SECURITY: Revoke ALL refresh tokens (force re-login on all devices)
+            // This is critical - if password was compromised, attacker's sessions must be invalidated
+            tokenService.revokeAllRefreshTokens(accountId)
+            
+            // Also revoke all sessions
+            val now = Instant.now()
+            UserSessions.update({ UserSessions.accountId eq accountId }) {
+                it[revokedAt] = now
+            }
+            
+            println("🔐 Password changed and all sessions revoked for account: $accountId")
             
             ChangePasswordResponse(
                 success = true,
-                message = "Password changed successfully"
+                message = "Password changed successfully. Please sign in again on all devices."
             )
         }
     }
