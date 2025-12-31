@@ -690,14 +690,29 @@
     </section>
 
     <script>
-        // Check authentication using TokenManager
-        if (!TokenManager.isAuthenticated()) {
-            window.location.href = 'signin.html';
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            await TokenManager.init();
+            
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            initializeDashboard();
+        })();
+        
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_username');
+            document.getElementById('userInfo').textContent = username || 'Account';
+            
+            // Load initial data
+            loadApplicationsFilter();
+            fetchLogs();
         }
-        
-        const username = localStorage.getItem('tbd_username');
-        
-        document.getElementById('userInfo').textContent = username || 'Account';
         
         // Dropdown toggle
         const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
@@ -1050,9 +1065,6 @@
             }
         }
         
-        // Initialize: Load applications dropdown, then fetch real logs
-        loadApplicationsFilter();
-        fetchLogs();
     </script>
     <script src="scripts/script.js"></script>
     <script src="scripts/nav-auth.js"></script>

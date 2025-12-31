@@ -562,22 +562,36 @@
         let eventTypes = [];
         let currentTestEndpointId = null;
 
-        // Check authentication using TokenManager
-        if (!TokenManager.isAuthenticated()) {
-            window.location.href = 'signin.html';
-        }
-
-        const username = localStorage.getItem('tbd_username');
-
-        // Update user info display
-        if (document.getElementById('userInfo')) {
-            document.getElementById('userInfo').textContent = username || 'Account';
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            await TokenManager.init();
+            
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            initializeDashboard();
+        })();
+        
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_username');
+            if (document.getElementById('userInfo')) {
+                document.getElementById('userInfo').textContent = username || 'Account';
+            }
+            
+            // Load initial data
+            loadEventTypes();
+            loadWebhooks();
+            loadPortalInfo();
         }
 
         async function checkAuth() {
             const token = await TokenManager.getValidToken();
             if (!token) {
-                TokenManager.handleSessionExpired();
                 return null;
             }
             return token;
@@ -928,12 +942,6 @@
             });
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadEventTypes();
-            loadWebhooks();
-            loadPortalInfo();
-        });
     </script>
 </body>
 </html>

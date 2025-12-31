@@ -220,14 +220,26 @@
     <script>
         // API_BASE_URL is set by config.js (loaded in head)
         
-        // Check authentication using TokenManager
-        if (!TokenManager.isAuthenticated()) {
-            window.location.href = 'signin.html';
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            await TokenManager.init();
+            
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            initializeDashboard();
+        })();
+        
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_username');
+            document.getElementById('userInfo').textContent = username || 'Account';
+            loadYieldAccounts();
         }
-        
-        const username = localStorage.getItem('tbd_username');
-        
-        document.getElementById('userInfo').textContent = username || 'Account';
         
         // Dashboard dropdown toggle
         const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
@@ -248,9 +260,6 @@
         document.getElementById('signOutBtn').addEventListener('click', function() {
             TokenManager.logout();
         });
-        
-        // Load data on page load
-        loadYieldAccounts();
         
         // Create Yield Account
         document.getElementById('createYieldBtn').addEventListener('click', () => openModal('createYieldModal'));

@@ -344,19 +344,42 @@
         let currentAppData = null;
         let webhookSecretVisible = false;
         
-        // Check authentication using TokenManager
-        if (!TokenManager.isAuthenticated()) {
-            window.location.href = 'signin.html';
-        }
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            // Wait for TokenManager initialization
+            await TokenManager.init();
+            
+            // Check if session is valid
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                // Don't redirect if modal is showing - let user click the button
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            // Session is valid, continue with page initialization
+            initializeDashboard();
+        })();
         
-        const username = localStorage.getItem('tbd_username');
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_username');
+            document.getElementById('userInfo').textContent = username || 'Account';
+            
+            // Load initial data
+            loadApplications();
+        }
         
         // Helper function to handle API calls with automatic token refresh
         async function handleApiCall(url, options = {}) {
-            return await TokenManager.apiCall(url, options);
+            const response = await TokenManager.apiCall(url, options);
+            // If response is null, session expired - don't continue
+            if (response === null) {
+                return null;
+            }
+            return response;
         }
-        
-        document.getElementById('userInfo').textContent = username || 'Account';
         
         // Dashboard dropdown toggle
         const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
@@ -377,9 +400,6 @@
         document.getElementById('signOutBtn').addEventListener('click', function() {
             TokenManager.logout();
         });
-        
-        // Load data on page load
-        loadApplications();
         
         // Create Application
         document.getElementById('createAppBtn').addEventListener('click', () => openModal('createAppModal'));

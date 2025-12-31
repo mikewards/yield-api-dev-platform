@@ -5,36 +5,99 @@
  * - Silent token refresh before expiration
  * - Token rotation for security
  * - Graceful session expiration handling
+ * - Race condition prevention
  * - Activity-based session detection
+ * 
+ * Last Updated: December 2025
  */
 const TokenManager = {
     refreshTimer: null,
     activityTimer: null,
     isRefreshing: false,
+    sessionExpired: false,  // Flag to prevent multiple session expired handling
+    initialized: false,
+    initPromise: null,
     
     // Configuration
     config: {
         refreshBeforeExpiry: 2 * 60 * 1000,  // Refresh 2 minutes before expiry
-        inactivityTimeout: 30 * 60 * 1000,   // 30 minutes of inactivity triggers warning
-        checkInterval: 60 * 1000              // Check every minute
+        inactivityTimeout: 30 * 60 * 1000,   // 30 minutes of inactivity
+        checkInterval: 60 * 1000,             // Check every minute
+        maxRefreshRetries: 2                  // Max retries on network error
     },
+    
+    refreshRetryCount: 0,
     
     /**
      * Initialize the token manager
+     * Returns a promise that resolves when initialization is complete
      */
-    init() {
-        const token = localStorage.getItem('tbd_token');
-        if (token) {
-            this.scheduleRefresh();
-            this.trackActivity();
-            console.log('🔐 TokenManager initialized');
+    async init() {
+        // Prevent multiple initializations
+        if (this.initialized) {
+            return;
         }
+        
+        // If already initializing, return the existing promise
+        if (this.initPromise) {
+            return this.initPromise;
+        }
+        
+        this.initPromise = this._doInit();
+        return this.initPromise;
+    },
+    
+    async _doInit() {
+        const token = localStorage.getItem('tbd_token');
+        const refreshToken = localStorage.getItem('tbd_refresh_token');
+        
+        if (!token && !refreshToken) {
+            console.log('🔐 TokenManager: No tokens found');
+            this.initialized = true;
+            return;
+        }
+        
+        // Check if we need to refresh immediately
+        const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
+        const now = Date.now();
+        
+        if (expiresAt && expiresAt < now) {
+            // Access token is expired, try to refresh
+            if (refreshToken) {
+                console.log('🔐 TokenManager: Access token expired, attempting refresh...');
+                const success = await this.refresh();
+                if (!success) {
+                    // Refresh failed - session is truly expired
+                    console.log('🔐 TokenManager: Refresh failed, session expired');
+                    this.initialized = true;
+                    return;
+                }
+            } else {
+                // No refresh token, session expired
+                console.log('🔐 TokenManager: No refresh token, session expired');
+                this.sessionExpired = true;
+                this.initialized = true;
+                return;
+            }
+        }
+        
+        // Schedule next refresh
+        this.scheduleRefresh();
+        this.trackActivity();
+        
+        console.log('🔐 TokenManager initialized successfully');
+        this.initialized = true;
     },
     
     /**
      * Schedule the next token refresh
      */
     scheduleRefresh() {
+        // Don't schedule if session is already expired
+        if (this.sessionExpired) {
+            return;
+        }
+        
         const expiresAt = localStorage.getItem('tbd_token_expires');
         if (!expiresAt) {
             // No expiry stored, use default 15 min from now
@@ -49,7 +112,7 @@ const TokenManager = {
         clearTimeout(this.refreshTimer);
         
         if (timeUntilRefresh <= 0) {
-            // Token already expired or about to expire, refresh now
+            // Token needs refresh now
             this.refresh();
         } else {
             this.refreshTimer = setTimeout(() => this.refresh(), timeUntilRefresh);
@@ -59,18 +122,36 @@ const TokenManager = {
     
     /**
      * Refresh the access token using the refresh token
+     * Returns true if successful, false otherwise
      */
     async refresh() {
+        // Don't refresh if session is already marked as expired
+        if (this.sessionExpired) {
+            console.log('🔄 Session already expired, skipping refresh');
+            return false;
+        }
+        
+        // Prevent concurrent refreshes
         if (this.isRefreshing) {
-            console.log('🔄 Refresh already in progress, skipping...');
-            return;
+            console.log('🔄 Refresh already in progress, waiting...');
+            // Wait for the current refresh to complete
+            await new Promise(resolve => {
+                const checkInterval = setInterval(() => {
+                    if (!this.isRefreshing) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+            });
+            // Return current auth state after waiting
+            return this.hasValidTokens();
         }
         
         const refreshToken = localStorage.getItem('tbd_refresh_token');
         if (!refreshToken) {
             console.log('❌ No refresh token available');
-            this.handleSessionExpired();
-            return;
+            this.markSessionExpired();
+            return false;
         }
         
         this.isRefreshing = true;
@@ -91,27 +172,63 @@ const TokenManager = {
                 localStorage.setItem('tbd_token_expires', (Date.now() + (data.expires_in * 1000)).toString());
                 
                 console.log('✅ Token refreshed silently');
+                this.refreshRetryCount = 0;
                 
                 // Schedule next refresh
                 this.scheduleRefresh();
                 
                 // Dispatch event for any listeners
                 window.dispatchEvent(new CustomEvent('tokenRefreshed'));
+                
+                this.isRefreshing = false;
+                return true;
             } else {
-                const errorData = await response.json().catch(() => ({}));
-                console.log('❌ Token refresh failed:', errorData);
-                this.handleSessionExpired();
+                // Refresh failed - token is invalid
+                console.log('❌ Token refresh failed:', response.status);
+                this.markSessionExpired();
+                this.isRefreshing = false;
+                return false;
             }
         } catch (error) {
             console.error('❌ Token refresh network error:', error);
-            // On network error, retry in 30 seconds
-            setTimeout(() => {
-                this.isRefreshing = false;
-                this.refresh();
-            }, 30000);
-        } finally {
             this.isRefreshing = false;
+            
+            // On network error, retry a limited number of times
+            this.refreshRetryCount++;
+            if (this.refreshRetryCount < this.config.maxRefreshRetries) {
+                console.log(`🔄 Retrying refresh (attempt ${this.refreshRetryCount + 1}/${this.config.maxRefreshRetries})...`);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                return this.refresh();
+            } else {
+                console.log('❌ Max refresh retries exceeded');
+                // Don't mark as expired on network error - user might have intermittent connectivity
+                // Just schedule another attempt later
+                this.refreshRetryCount = 0;
+                setTimeout(() => this.refresh(), 30000);
+                return false;
+            }
         }
+    },
+    
+    /**
+     * Mark the session as expired and show modal
+     */
+    markSessionExpired() {
+        // Prevent multiple triggers
+        if (this.sessionExpired) {
+            return;
+        }
+        
+        console.log('🔒 Marking session as expired');
+        this.sessionExpired = true;
+        clearTimeout(this.refreshTimer);
+        clearInterval(this.activityTimer);
+        
+        // Clear tokens immediately to prevent any further API calls from succeeding
+        this.clearTokens();
+        
+        // Show modal
+        this.showSessionExpiredModal();
     },
     
     /**
@@ -135,18 +252,15 @@ const TokenManager = {
             const inactiveTime = Date.now() - lastActivity;
             if (inactiveTime > this.config.inactivityTimeout) {
                 console.log('⚠️ User inactive for 30 minutes');
-                // Could show warning here, but for now just let token expire naturally
             }
         }, this.config.checkInterval);
     },
     
     /**
-     * Handle expired session - show modal instead of abrupt redirect
+     * Handle expired session - legacy method, calls markSessionExpired
      */
     handleSessionExpired() {
-        clearTimeout(this.refreshTimer);
-        clearInterval(this.activityTimer);
-        this.showSessionExpiredModal();
+        this.markSessionExpired();
     },
     
     /**
@@ -156,7 +270,7 @@ const TokenManager = {
         // Remove existing modal if present
         const existing = document.getElementById('session-expired-modal');
         if (existing) {
-            existing.remove();
+            return; // Modal already showing
         }
         
         const modal = document.createElement('div');
@@ -180,7 +294,7 @@ const TokenManager = {
         `;
         document.body.appendChild(modal);
         
-        // Prevent scrolling
+        // Prevent scrolling and interaction with page behind
         document.body.style.overflow = 'hidden';
     },
     
@@ -193,7 +307,9 @@ const TokenManager = {
         
         // Store the current page to redirect back after login
         const currentPath = window.location.pathname;
-        if (currentPath !== '/signin.html' && currentPath !== '/signin' && currentPath !== '/account.html' && currentPath !== '/account') {
+        if (currentPath !== '/signin.html' && currentPath !== '/signin' && 
+            currentPath !== '/account.html' && currentPath !== '/account' &&
+            !currentPath.includes('signin') && !currentPath.includes('account')) {
             localStorage.setItem('tbd_redirect_after_login', currentPath);
         }
         
@@ -229,34 +345,86 @@ const TokenManager = {
                 });
                 console.log('🚪 Server notified of logout');
             } catch (e) {
-                // Ignore errors - we're logging out anyway
                 console.log('⚠️ Could not notify server of logout');
             }
         }
         
         clearTimeout(this.refreshTimer);
         clearInterval(this.activityTimer);
+        this.sessionExpired = true;
         this.clearTokens();
         window.location.href = 'signin.html';
     },
     
     /**
-     * Check if user is authenticated
+     * Check if tokens exist and are potentially valid
+     * This is a quick synchronous check - doesn't verify with server
      */
-    isAuthenticated() {
+    hasValidTokens() {
         const token = localStorage.getItem('tbd_token');
+        const refreshToken = localStorage.getItem('tbd_refresh_token');
         const expiresAt = localStorage.getItem('tbd_token_expires');
         
-        if (!token) return false;
-        
-        // If we have a refresh token, consider authenticated even if access token expired
-        // (we can refresh it)
-        const refreshToken = localStorage.getItem('tbd_refresh_token');
-        if (refreshToken) return true;
-        
-        // No refresh token, check if access token is still valid
-        if (expiresAt && parseInt(expiresAt) < Date.now()) {
+        // No tokens at all
+        if (!token && !refreshToken) {
             return false;
+        }
+        
+        // Have refresh token - could potentially refresh
+        if (refreshToken && !this.sessionExpired) {
+            return true;
+        }
+        
+        // Have access token that's not expired
+        if (token && expiresAt && parseInt(expiresAt) > Date.now()) {
+            return true;
+        }
+        
+        return false;
+    },
+    
+    /**
+     * Check if user is authenticated
+     * Returns false if session has been marked as expired
+     */
+    isAuthenticated() {
+        // If session was marked as expired, always return false
+        if (this.sessionExpired) {
+            return false;
+        }
+        
+        return this.hasValidTokens();
+    },
+    
+    /**
+     * Async version of isAuthenticated that ensures tokens are valid
+     * Use this when you need to be certain the session is valid
+     */
+    async ensureAuthenticated() {
+        if (this.sessionExpired) {
+            return false;
+        }
+        
+        // Wait for initialization if still in progress
+        if (this.initPromise) {
+            await this.initPromise;
+        }
+        
+        // If still not initialized and session is expired, return false
+        if (this.sessionExpired) {
+            return false;
+        }
+        
+        // Check if we have valid tokens
+        if (!this.hasValidTokens()) {
+            return false;
+        }
+        
+        // If access token is expired, try to refresh
+        const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
+        if (expiresAt < Date.now()) {
+            const refreshed = await this.refresh();
+            return refreshed;
         }
         
         return true;
@@ -266,11 +434,18 @@ const TokenManager = {
      * Get a valid access token, refreshing if needed
      */
     async getValidToken() {
+        if (this.sessionExpired) {
+            return null;
+        }
+        
         const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
         
         // If token expires in less than 1 minute, refresh it
         if (expiresAt - Date.now() < 60000) {
-            await this.refresh();
+            const success = await this.refresh();
+            if (!success) {
+                return null;
+            }
         }
         
         return localStorage.getItem('tbd_token');
@@ -280,42 +455,58 @@ const TokenManager = {
      * Make an authenticated API call with automatic token refresh
      */
     async apiCall(url, options = {}) {
-        let token = await this.getValidToken();
-        
-        if (!token) {
-            this.handleSessionExpired();
+        // Don't make calls if session is expired
+        if (this.sessionExpired) {
+            console.log('🚫 Session expired, blocking API call');
             return null;
         }
         
-        const response = await fetch(url, {
-            ...options,
-            headers: {
-                ...options.headers,
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        let token = await this.getValidToken();
         
-        // If 401, try to refresh and retry once
-        if (response.status === 401) {
-            console.log('⚠️ Got 401, attempting token refresh...');
-            await this.refresh();
-            
-            token = localStorage.getItem('tbd_token');
-            if (!token) {
-                return response; // Return original 401 response
-            }
-            
-            // Retry with new token
-            return fetch(url, {
+        if (!token) {
+            this.markSessionExpired();
+            return null;
+        }
+        
+        try {
+            const response = await fetch(url, {
                 ...options,
                 headers: {
                     ...options.headers,
                     'Authorization': `Bearer ${token}`
                 }
             });
+            
+            // If 401, try to refresh and retry once
+            if (response.status === 401) {
+                console.log('⚠️ Got 401, attempting token refresh...');
+                const refreshed = await this.refresh();
+                
+                if (!refreshed) {
+                    // Session is expired
+                    return null;
+                }
+                
+                token = localStorage.getItem('tbd_token');
+                if (!token) {
+                    return null;
+                }
+                
+                // Retry with new token
+                return fetch(url, {
+                    ...options,
+                    headers: {
+                        ...options.headers,
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('API call error:', error);
+            throw error;
         }
-        
-        return response;
     }
 };
 
@@ -328,4 +519,3 @@ if (document.readyState === 'loading') {
 
 // Make globally available
 window.TokenManager = TokenManager;
-
