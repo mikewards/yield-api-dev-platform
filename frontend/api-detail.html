@@ -151,7 +151,7 @@
                                 </button>
                             </div>
                             <div class="code-block-content">
-                                <pre id="curl-example"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+                                <pre id="curl-example" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
@@ -181,7 +181,7 @@
                                         <span class="code-block-label">Response</span>
                                     </div>
                                     <div class="code-block-content">
-                                        <pre id="success-response">{
+                                        <pre id="success-response" data-language="json">{
   <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234567890abcdef"</span>,
   <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
   <span class="token-property">"protocol"</span>: <span class="token-string-value">"morpho"</span>,
@@ -202,7 +202,7 @@
                                         <span class="code-block-label">Error</span>
                                     </div>
                                     <div class="code-block-content">
-                                        <pre id="error-response">{
+                                        <pre id="error-response" data-language="json">{
   <span class="token-property">"error"</span>: {
     <span class="token-property">"code"</span>: <span class="token-string-value">"INSUFFICIENT_FUNDS"</span>,
     <span class="token-property">"message"</span>: <span class="token-string-value">"Insufficient funds to create yield account"</span>,

@@ -480,7 +480,7 @@
                         </button>
                     </div>
                     <div class="code-block-content">
-                        <pre id="code-auth-header">Authorization: Bearer <span class="token-var">YOUR_API_KEY</span></pre>
+                        <pre id="code-auth-header" data-language="http">Authorization: Bearer <span class="token-var">YOUR_API_KEY</span></pre>
                     </div>
                 </div>
                 
@@ -776,7 +776,7 @@
                         <span class="code-block-label">Error Response</span>
                     </div>
                     <div class="code-block-content">
-                        <pre>{
+                        <pre data-language="json">{
   <span class="token-property">"status"</span>: <span class="token-string-value">"error"</span>,
   <span class="token-property">"code"</span>: <span class="token-number">429</span>,
   <span class="token-property">"message"</span>: <span class="token-string-value">"Rate limit exceeded. Please retry after 45 seconds."</span>,
@@ -850,7 +850,7 @@
                         </button>
                     </div>
                     <div class="code-block-content">
-                        <pre id="code-webhook-create">curl https://api.tbd.com/v1/webhooks \
+                        <pre id="code-webhook-create" data-language="bash">curl https://api.tbd.com/v1/webhooks \
   -X POST \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -871,7 +871,7 @@
                         <span class="code-block-label">Example Payload</span>
                     </div>
                     <div class="code-block-content">
-                        <pre>{
+                        <pre data-language="json">{
   "event_type": "deposit.completed",
   "event_id": "evt_abc123def456",
   "timestamp": 1701456789000,
@@ -906,7 +906,7 @@
                         </button>
                     </div>
                     <div class="code-block-content">
-                        <pre id="code-webhook-verify">import { Webhook } from 'svix';
+                        <pre id="code-webhook-verify" data-language="javascript">import { Webhook } from 'svix';
 
 const wh = new Webhook(process.env.WEBHOOK_SECRET);
 

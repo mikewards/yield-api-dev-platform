@@ -117,7 +117,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-create-account"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/accounts</span> \
+                                    <pre id="code-create-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/accounts</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
   <span class="token-flag">-d</span> <span class="token-string">'{
@@ -133,7 +133,7 @@
                                     <span class="code-block-label">Response</span>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre>{
+                                    <pre data-language="json">{
   <span class="token-property">"account_id"</span>: <span class="token-string-value">"acc_1234567890abcdef"</span>,
   <span class="token-property">"username"</span>: <span class="token-string-value">"your_username"</span>,
   <span class="token-property">"created_at"</span>: <span class="token-string-value">"2025-01-15T10:30:00Z"</span>,
@@ -165,7 +165,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-auth"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/auth/authenticate</span> \
+                                    <pre id="code-auth" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/auth/authenticate</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
   <span class="token-flag">-d</span> <span class="token-string">'{
@@ -180,7 +180,7 @@
                                     <span class="code-block-label">Response</span>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre>{
+                                    <pre data-language="json">{
   <span class="token-property">"access_token"</span>: <span class="token-string-value">"sk_live_temp_..."</span>,
   <span class="token-property">"token_type"</span>: <span class="token-string-value">"Bearer"</span>,
   <span class="token-property">"expires_in"</span>: <span class="token-number">3600</span>,
@@ -199,7 +199,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-create-token"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/access-tokens</span> \
+                                    <pre id="code-create-token" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/access-tokens</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
@@ -215,7 +215,7 @@
                                     <span class="code-block-label">Response</span>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre>{
+                                    <pre data-language="json">{
   <span class="token-property">"token_id"</span>: <span class="token-string-value">"tok_1234567890abcdef"</span>,
   <span class="token-property">"access_token"</span>: <span class="token-string-value">"sk_live_1234567890abcdef"</span>,
   <span class="token-property">"name"</span>: <span class="token-string-value">"My API Key"</span>,
@@ -247,7 +247,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-yield-account"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+                                    <pre id="code-yield-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
@@ -267,7 +267,7 @@
                                     <span class="code-block-label">Response</span>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre>{
+                                    <pre data-language="json">{
   <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234567890abcdef"</span>,
   <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
   <span class="token-property">"protocol"</span>: <span class="token-string-value">"morpho"</span>,
@@ -322,19 +322,19 @@
                         <p>All API requests must include your Personal Access Token in the Authorization header:</p>
                         
                         <div class="code-example-box">
-                            <pre><code>Authorization: Bearer sk_live_1234567890abcdef</code></pre>
+                            <pre data-language="http"><code>Authorization: Bearer sk_live_1234567890abcdef</code></pre>
                         </div>
 
                         <h3>Base URL</h3>
                         <p>All API requests should be made to:</p>
                         <div class="code-example-box">
-                            <pre><code>https://api.tbd.com</code></pre>
+                            <pre data-language="text"><code>https://api.tbd.com</code></pre>
                         </div>
 
                         <h3>API Versioning</h3>
                         <p>TBD APIs are versioned. The current version is <code>2025-01-15</code>. Include the version in your API path:</p>
                         <div class="code-example-box">
-                            <pre><code>https://api.tbd.com/v1/yield/accounts</code></pre>
+                            <pre data-language="text"><code>https://api.tbd.com/v1/yield/accounts</code></pre>
                         </div>
                     </section>
                 </main>
