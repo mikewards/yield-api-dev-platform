@@ -111,16 +111,20 @@
                             <span class="code-block-label">Terminal</span>
                         </div>
                         <div class="code-block-content">
-                            <pre id="hero-curl-mobile" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
-  <span class="token-flag">-u</span> <span class="token-string">YOUR_API_KEY</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"yield_rate=0.06"</span>
+                            <pre id="hero-curl-mobile" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "currency": "USDC",
+    "initial_deposit": { "amount": "1000.00" }
+  }'</span>
 
 <span class="token-comment"># Response</span>
 {
-  <span class="token-property">"yield_account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
-  <span class="token-property">"annual_yield"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
+  <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+  <span class="token-property">"annual_yield_rate"</span>: <span class="token-number">0.06</span>,
   <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>
 }</code></pre>
                         </div>
@@ -148,16 +152,20 @@
                         <span class="code-block-label">Terminal</span>
                     </div>
                     <div class="code-block-content">
-                        <pre id="hero-curl-desktop" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/start</span> \
-  <span class="token-flag">-u</span> <span class="token-string">YOUR_API_KEY</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"amount=1000"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"currency=USDC"</span> \
-  <span class="token-flag">-d</span> <span class="token-string">"yield_rate=0.06"</span>
+                        <pre id="hero-curl-desktop" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "currency": "USDC",
+    "initial_deposit": { "amount": "1000.00" }
+  }'</span>
 
 <span class="token-comment"># Response</span>
 {
-  <span class="token-property">"yield_account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
-  <span class="token-property">"annual_yield"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234..."</span>,
+  <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+  <span class="token-property">"annual_yield_rate"</span>: <span class="token-number">0.06</span>,
   <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>
 }</code></pre>
                     </div>
