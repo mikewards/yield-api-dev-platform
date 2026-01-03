@@ -61,6 +61,54 @@
         position: relative;
     }
     
+    /* ============================================
+       MOBILE TOUCH FEEDBACK
+       Tactile response on tap for all interactive elements
+       ============================================ */
+    
+    /* Buttons - press down effect on touch */
+    .btn-primary:active,
+    .btn-secondary:active,
+    .btn-large:active,
+    .btn-danger:active {
+        transform: scale(0.96) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Cards - subtle press effect */
+    .feature-card:active,
+    .sdk-card:active,
+    .qs-link-card:active,
+    .guide-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Navigation links */
+    .nav-links a:active,
+    .dropdown-item:active {
+        opacity: 0.7;
+        transition: opacity 0.1s ease;
+    }
+    
+    /* Tab buttons */
+    .tab-btn:active,
+    .env-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Code copy button */
+    .code-copy-btn:active {
+        transform: scale(0.9) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Links in content */
+    a:active {
+        opacity: 0.7;
+    }
+    
     /* Prevent horizontal scroll on all containers */
     .container,
     .guides-layout,
