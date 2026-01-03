@@ -90,7 +90,7 @@
     position: sticky;
     top: 80px;
     height: fit-content;
-    background: var(--bg-white);
+    background: transparent;
     padding: 0;
 }
 
