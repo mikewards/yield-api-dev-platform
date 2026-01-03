@@ -492,6 +492,11 @@
 
 .tab-btn:hover {
     color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.tab-btn:active {
+    transform: translateY(0);
 }
 
 .tab-btn.active {

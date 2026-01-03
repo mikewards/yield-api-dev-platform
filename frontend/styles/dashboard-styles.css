@@ -492,11 +492,17 @@
     border-radius: 6px;
     font-size: 12px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
 }
 
 .btn-danger:hover {
     background: #DC2626;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+}
+
+.btn-danger:active {
+    transform: translateY(0) scale(0.98);
 }
 
 /* Tokens List */
@@ -770,6 +776,11 @@
 
 .copy-btn:hover {
     background: var(--primary-dark);
+    transform: translateY(-1px) scale(1.02);
+}
+
+.copy-btn:active {
+    transform: translateY(0) scale(0.98);
 }
 
 /* Yield Info */
