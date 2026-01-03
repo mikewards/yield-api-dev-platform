@@ -226,33 +226,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Process each pre element (for language switching)
         allPre.forEach((pre, preIndex) => {
             const code = pre.querySelector('code');
+            const codeElement = code || pre; // Use pre directly if no code element
             
             // Skip if already highlighted (has span tags or data attribute)
-            if (code && !code.dataset.highlighted) {
+            if (codeElement && !codeElement.dataset.highlighted) {
                 // Check if code already contains highlighting spans
-                const hasInlineHighlighting = code.innerHTML.includes('<span class="token-');
+                const hasInlineHighlighting = codeElement.innerHTML.includes('<span class="token-');
                 
                 if (!hasInlineHighlighting) {
-                    const text = code.textContent || '';
-                    const isCurl = text.trim().startsWith('curl') || block.classList.contains('curl');
-                    const isJson = text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
-                    const isJavaScript = pre.classList.contains('lang-code') && pre.id && pre.id.includes('nodejs');
-                    const isPython = pre.classList.contains('lang-code') && pre.id && pre.id.includes('python');
-                    const isRuby = pre.classList.contains('lang-code') && pre.id && pre.id.includes('ruby');
+                    const text = codeElement.textContent || '';
                     
-                    if (isCurl) {
-                        code.innerHTML = highlightCurl(text);
+                    // Use data-language attribute first, then fall back to content detection
+                    const lang = pre.dataset.language || '';
+                    const isBash = lang === 'bash' || lang === 'shell' || text.trim().startsWith('curl') || block.classList.contains('curl');
+                    const isJson = lang === 'json' || text.trim().startsWith('{') || text.trim().startsWith('[') || block.classList.contains('json');
+                    const isJavaScript = lang === 'javascript' || lang === 'js' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('nodejs'));
+                    const isPython = lang === 'python' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('python'));
+                    const isRuby = lang === 'ruby' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('ruby'));
+                    const isHttp = lang === 'http';
+                    
+                    if (isBash) {
+                        codeElement.innerHTML = highlightCurl(text);
                     } else if (isJson) {
-                        code.innerHTML = highlightJson(text);
+                        codeElement.innerHTML = highlightJson(text);
                     } else if (isJavaScript) {
-                        code.innerHTML = highlightJavaScriptSimple(text);
+                        codeElement.innerHTML = highlightJavaScriptSimple(text);
                     } else if (isPython) {
-                        code.innerHTML = highlightPythonSimple(text);
+                        codeElement.innerHTML = highlightPythonSimple(text);
                     } else if (isRuby) {
-                        code.innerHTML = highlightRubySimple(text);
+                        codeElement.innerHTML = highlightRubySimple(text);
+                    } else if (isHttp) {
+                        // Simple HTTP header highlighting
+                        codeElement.innerHTML = text.replace(/^([A-Za-z-]+):/gm, '<span class="token-property">$1</span>:')
+                            .replace(/Bearer\s+([^\s]+)/g, 'Bearer <span class="token-var">$1</span>');
                     }
                 }
-                code.dataset.highlighted = 'true';
+                codeElement.dataset.highlighted = 'true';
             }
             
             // Set up copy button
