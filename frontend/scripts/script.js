@@ -13,20 +13,46 @@
 
 // Unified Code Block Copy Function
 function copyCode(button, codeId) {
-    const codeElement = document.getElementById(codeId);
+    // Find the code element - either by ID or by finding the pre in the same code block
+    let codeElement;
+    if (codeId) {
+        codeElement = document.getElementById(codeId);
+    } else {
+        // Find the pre element in the same code-block-unified
+        const codeBlock = button.closest('.code-block-unified');
+        if (codeBlock) {
+            codeElement = codeBlock.querySelector('pre');
+        }
+    }
+    
     if (!codeElement) return;
     
     const code = codeElement.innerText || codeElement.textContent;
     navigator.clipboard.writeText(code).then(() => {
-        const originalHTML = button.innerHTML;
-        button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg> Copied!';
+        // Add copied class for animation
         button.classList.add('copied');
+        
+        // Reset after animation
         setTimeout(() => {
-            button.innerHTML = originalHTML;
             button.classList.remove('copied');
         }, 2000);
     }).catch(err => {
         console.error('Failed to copy:', err);
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = code;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            button.classList.add('copied');
+            setTimeout(() => button.classList.remove('copied'), 2000);
+        } catch (e) {
+            console.error('Fallback copy failed:', e);
+        }
+        document.body.removeChild(textarea);
     });
 }
 

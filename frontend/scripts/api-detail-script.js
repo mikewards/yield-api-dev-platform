@@ -2091,14 +2091,18 @@ function populatePage(endpoint) {
         const successLabel = document.getElementById('success-label');
         if (successLabel) {
             successLabel.textContent = endpoint.successStatus || '200 OK';
-            successLabel.classList.remove('error');
+            // Remove error class from parent .code-block-label
+            const successLabelParent = successLabel.closest('.code-block-label');
+            if (successLabelParent) successLabelParent.classList.remove('error');
         }
         
         // Set error label with HTTP status code
         const errorLabel = document.getElementById('error-label');
         if (errorLabel && endpoint.errorResponse) {
             errorLabel.textContent = endpoint.errorStatus || '400 Bad Request';
-            errorLabel.classList.add('error');
+            // Add error class to parent .code-block-label for red traffic lights
+            const errorLabelParent = errorLabel.closest('.code-block-label');
+            if (errorLabelParent) errorLabelParent.classList.add('error');
         }
         
         const successTab = document.querySelector('[data-tab="success-tab"]');

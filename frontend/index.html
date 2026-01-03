@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="styles/mobile.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Scroll Progress Bar (Mobile) -->
@@ -108,7 +108,17 @@
                 <div class="hero-code-mobile">
                     <div class="code-block-unified">
                         <div class="code-block-header">
-                            <span class="code-block-label">Terminal</span>
+                            <span class="code-block-label"><span class="code-block-label-text">request.sh</span></span>
+                            <button class="code-copy-btn" onclick="copyCode(this)">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                </svg>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span class="btn-text"></span>
+                            </button>
                         </div>
                         <div class="code-block-content">
                             <pre id="hero-curl-mobile" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
@@ -149,7 +159,17 @@
             <div class="hero-visual">
                 <div class="code-block-unified">
                     <div class="code-block-header">
-                        <span class="code-block-label">Terminal</span>
+                        <span class="code-block-label"><span class="code-block-label-text">request.sh</span></span>
+                        <button class="code-copy-btn" onclick="copyCode(this)">
+                            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                            </svg>
+                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span class="btn-text"></span>
+                        </button>
                     </div>
                     <div class="code-block-content">
                         <pre id="hero-curl-desktop" data-language="bash"><code><span class="token-cmd">curl</span> <span class="token-url">https://api.tbd.com/v1/yield/accounts</span> \
