@@ -5,11 +5,11 @@
     'use strict';
     
     // API URLs for different environments
-    // Using Railway URLs - can be easily switched to custom domains later
+    // Public API domains (production-ready)
     const API_URLS = {
         local: 'http://localhost:8080',
-        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
-        production: 'https://flow-platform-production.up.railway.app'
+        sandbox: 'https://api-sandbox.ground.com',
+        production: 'https://api.ground.com'
     };
     
     // Detect environment from hostname

@@ -1742,8 +1742,8 @@ function highlightJsonLocal(text) {
 function updateCurlExample(curlExample) {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     const apiUrls = window.API_URLS || {
-        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
-        production: 'https://flow-platform-production.up.railway.app'
+        sandbox: 'https://api-sandbox.ground.com',
+        production: 'https://api.ground.com'
     };
     
     const currentUrl = apiUrls[env] || apiUrls.production;
@@ -1756,6 +1756,8 @@ function updateCurlExample(curlExample) {
         /https:\/\/flow-platform-flow-platform-staging\.up\.railway\.app/g,
         /https:\/\/flow-platform-staging\.up\.railway\.app/g,
         /https:\/\/flow-platform-production\.up\.railway\.app/g,
+        /https:\/\/api-sandbox\.ground\.com/g,
+        /https:\/\/api\.ground\.com/g,
         /https:\/\/api-sandbox\.tbd\.com/g,
         /https:\/\/api\.tbd\.com/g,
         /https:\/\/api-sandbox\.flow\.com/g,
@@ -1783,8 +1785,8 @@ function updateCurlExample(curlExample) {
 function updateAllCurlExamples() {
     const env = window.getApiEnvironment ? window.getApiEnvironment() : 'production';
     const apiUrls = window.API_URLS || {
-        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
-        production: 'https://flow-platform-production.up.railway.app'
+        sandbox: 'https://api-sandbox.ground.com',
+        production: 'https://api.ground.com'
     };
     
     const currentUrl = apiUrls[env] || apiUrls.production;
