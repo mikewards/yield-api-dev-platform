@@ -440,7 +440,7 @@ select option {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: stat-gradient 5s ease infinite;
+    animation: stat-gradient 12s ease infinite;
 }
 
 @keyframes stat-gradient {
