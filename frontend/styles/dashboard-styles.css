@@ -2,7 +2,7 @@
 
 /* Secondary Navigation (Square-style) */
 .secondary-nav {
-    background: var(--bg-white);
+    background: transparent;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 73px; /* Height of main nav */
@@ -137,7 +137,7 @@
     transform: translateX(-50%);
     width: 400px;
     max-width: 90vw;
-    background: white;
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -284,7 +284,6 @@
 .dashboard-section {
     padding: 48px 0;
     min-height: calc(100vh - 200px);
-    background: var(--bg-white);
 }
 
 .dashboard-header {
@@ -333,7 +332,8 @@
 }
 
 .app-card {
-    background: var(--bg-white);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
@@ -434,7 +434,8 @@
 }
 
 .dashboard-card {
-    background: var(--bg-white);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
@@ -547,7 +548,7 @@
 .token-preview {
     font-size: 12px;
     padding: 4px 8px;
-    background: var(--bg-white);
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 4px;
     color: var(--text-secondary);
 }
@@ -656,7 +657,7 @@
 
 .modal-content {
     position: relative;
-    background: var(--bg-white);
+    background: #ffffff;
     border-radius: 16px;
     width: 100%;
     max-width: 480px;
@@ -899,7 +900,7 @@ select option {
     padding: 12px;
     font-size: 14px;
     color: var(--text-primary);
-    background: var(--bg-white);
+    background: #ffffff;
 }
 
 /* Form Row */
