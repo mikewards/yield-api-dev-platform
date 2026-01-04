@@ -1328,12 +1328,9 @@ select option {
     font-weight: 400;
 }
 
-/* Red dot for error responses - override traffic lights */
+/* Error responses keep same traffic lights - differentiated by status text only */
 .code-block-label.error::before {
-    background-image: 
-        radial-gradient(circle at 6px 6px, #ff5f57 5px, transparent 5px),
-        radial-gradient(circle at 26px 6px, #febc2e 5px, transparent 5px),
-        radial-gradient(circle at 46px 6px, #ff5f57 5px, transparent 5px);
+    /* Same traffic lights as success - red/yellow/green */
 }
 
 /* Copy button with better UX */
