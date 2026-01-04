@@ -1592,8 +1592,8 @@ select option {
 /* Line numbers - Stripe/Square style */
 .code-line-numbers {
     padding: 16px 0;
-    background: rgba(0, 0, 0, 0.15);
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    background: #455162;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
     user-select: none;
     text-align: right;
     min-width: 44px;
