@@ -97,8 +97,8 @@ curl {{PRODUCTION_API_URL}}/v1/accounts \
 ## 📊 Environment URLs
 
 Configure these in `config.js`:
-- **Sandbox**: `https://api-sandbox.tbd.com` (or your custom domain)
-- **Production**: `https://api.tbd.com` (or your custom domain)
+- **Sandbox**: `https://api-sandbox.ground.com` (or your custom domain)
+- **Production**: `https://api.ground.com` (or your custom domain)
 
 Or use Railway URLs:
 - **Sandbox**: `https://flow-platform-staging.up.railway.app`

@@ -1,1 +1,1 @@
-rootProject.name = "tbd-api"
+rootProject.name = "ground-api"

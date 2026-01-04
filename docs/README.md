@@ -1,4 +1,4 @@
-# TBD Platform Documentation
+# Ground Platform Documentation
 
 Welcome to the TBD platform documentation. This directory contains all technical documentation organized by topic.
 

@@ -19,7 +19,7 @@
                        hostname === '';
     
     // Check if we're on a sandbox domain (only check hostname, not localStorage)
-    // Also treat tbd.kcwn89.workers.dev as staging for now
+    // Also treat ground.kcwn89.workers.dev as staging for now
     const isSandboxDomain = hostname.includes('staging') || hostname.includes('stage') || hostname.includes('sandbox') || hostname.includes('kcwn89.workers.dev');
     
     // Check if user has manually selected an environment (only for API docs, not user pages)

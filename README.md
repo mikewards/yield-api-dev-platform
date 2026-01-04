@@ -1,4 +1,4 @@
-# TBD Platform
+# Ground Platform
 
 > A unified DeFi API platform that abstracts protocol complexity and enables developers to integrate cryptocurrency yield generation into their applications.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-TBD provides a single, beautiful REST API that wraps multiple DeFi protocols (Morpho and Aave), enabling developers to earn yield without managing protocol-specific integrations, smart contracts, or compliance requirements.
+Ground provides a single, beautiful REST API that wraps multiple DeFi protocols (Morpho and Aave), enabling developers to earn yield without managing protocol-specific integrations, smart contracts, or compliance requirements.
 
 **Key Features:**
 - **Unified API** - Single interface for multiple DeFi protocols
@@ -57,7 +57,7 @@ Visit `http://localhost:8787` for the frontend and `http://localhost:8080` for t
 flow-platform/
 ├── flow-api/              # Kotlin backend (Ktor)
 │   ├── src/main/kotlin/   # Source code
-│   │   └── com/tbd/
+│   │   └── com/ground/
 │   │       ├── api/routes/     # API endpoints
 │   │       ├── dto/            # Data transfer objects
 │   │       ├── middleware/     # Auth, rate limiting, logging
@@ -146,7 +146,7 @@ curl -X POST http://localhost:8080/v1/auth/authenticate \
 curl -X POST http://localhost:8080/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
-    "refresh_token": "tbd_refresh_..."
+    "refresh_token": "ground_refresh_..."
   }'
 ```
 

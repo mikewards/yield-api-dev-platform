@@ -1,8 +1,8 @@
 # Custom Domain Setup Guide
 
-This guide will help you set up custom domains for your TBD API:
-- **Production**: `api.tbd.com`
-- **Sandbox**: `api-sandbox.tbd.com`
+This guide will help you set up custom domains for your Ground API:
+- **Production**: `api.ground.com`
+- **Sandbox**: `api-sandbox.ground.com`
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ This guide will help you set up custom domains for your TBD API:
 4. Go to **Settings** tab
 5. Scroll to **Networking** section
 6. Click **"Custom Domain"** or **"Add Domain"**
-7. Enter: `api.tbd.com`
+7. Enter: `api.ground.com`
 8. Railway will show you DNS records to add (see Step 2)
 
 ### For Sandbox Service
@@ -30,7 +30,7 @@ This guide will help you set up custom domains for your TBD API:
 3. Go to **Settings** tab
 4. Scroll to **Networking** section
 5. Click **"Custom Domain"** or **"Add Domain"**
-6. Enter: `api-sandbox.tbd.com`
+6. Enter: `api-sandbox.ground.com`
 7. Railway will show you DNS records to add
 
 ## Step 2: Configure DNS Records
@@ -127,8 +127,8 @@ The process is similar:
 DNS changes can take anywhere from a few minutes to 48 hours to propagate:
 
 1. **Check propagation status**: Use https://dnschecker.org
-   - Search for: `api.tbd.com`
-   - Search for: `api-sandbox.tbd.com`
+   - Search for: `api.ground.com`
+   - Search for: `api-sandbox.ground.com`
    - Wait until all locations show the Railway IP/domain
 
 2. **Verify in Railway**: 
@@ -151,7 +151,7 @@ Railway automatically provisions SSL certificates via Let's Encrypt:
 
 ```bash
 # Health check
-curl https://api.tbd.com/health
+curl https://api.ground.com/health
 
 # Should return:
 # {"status":"healthy","timestamp":"...","version":"1.0.0"}
@@ -161,7 +161,7 @@ curl https://api.tbd.com/health
 
 ```bash
 # Health check
-curl https://api-sandbox.tbd.com/health
+curl https://api-sandbox.ground.com/health
 
 # Should return:
 # {"status":"healthy","timestamp":"...","version":"1.0.0"}
@@ -171,8 +171,8 @@ curl https://api-sandbox.tbd.com/health
 
 1. The frontend `config.js` is already configured with these domains
 2. No changes needed - it will automatically use:
-   - `https://api.tbd.com` for production
-   - `https://api-sandbox.tbd.com` for sandbox
+   - `https://api.ground.com` for production
+   - `https://api-sandbox.ground.com` for sandbox
 
 ## Step 7: Update Any Remaining References
 
@@ -213,25 +213,25 @@ If you have any hardcoded Railway URLs elsewhere:
 
 ## Verification Checklist
 
-- [ ] DNS records added for `api.tbd.com`
-- [ ] DNS records added for `api-sandbox.tbd.com`
+- [ ] DNS records added for `api.ground.com`
+- [ ] DNS records added for `api-sandbox.ground.com`
 - [ ] DNS propagation verified (dnschecker.org)
 - [ ] Railway shows domains as "Active" or "Verified"
 - [ ] SSL certificates issued (check Railway dashboard)
-- [ ] `curl https://api.tbd.com/health` returns 200
-- [ ] `curl https://api-sandbox.tbd.com/health` returns 200
+- [ ] `curl https://api.ground.com/health` returns 200
+- [ ] `curl https://api-sandbox.ground.com/health` returns 200
 - [ ] Frontend can connect to custom domains
 - [ ] Environment toggle works with custom domains
 
 ## Quick Reference
 
 ### Production
-- **Domain**: `api.tbd.com`
+- **Domain**: `api.ground.com`
 - **Railway Service**: `flow-platform-production`
 - **Branch**: `main`
 
 ### Sandbox
-- **Domain**: `api-sandbox.tbd.com`
+- **Domain**: `api-sandbox.ground.com`
 - **Railway Service**: `flow-platform-staging`
 - **Branch**: `staging`
 
