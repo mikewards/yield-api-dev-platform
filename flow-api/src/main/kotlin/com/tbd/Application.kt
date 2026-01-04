@@ -8,6 +8,7 @@ import com.tbd.middleware.logging
 import com.tbd.middleware.rateLimit
 import com.tbd.middleware.requestLogging
 import com.tbd.middleware.sentry
+import com.tbd.middleware.sentryPerformance
 import com.tbd.middleware.statusPages
 import com.tbd.service.AccountCleanupJob
 import com.tbd.service.LogCleanupJob
