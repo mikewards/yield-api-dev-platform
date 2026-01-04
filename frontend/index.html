@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBD - DeFi Platform for Developers</title>
+    <title>Ground - DeFi Platform for Developers</title>
     <!-- Deploy v2.2 - Account Settings dropdown, centered whale favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/styles.css">
@@ -323,12 +323,12 @@
                             <span class="code-block-label">Terminal</span>
                         </div>
                         <div class="code-block-content">
-                            <pre id="lang-code-nodejs" class="lang-code active" data-language="javascript"><code>const tbd = require('@tbd/api');
+                            <pre id="lang-code-nodejs" class="lang-code active" data-language="javascript"><code>const ground = require('@ground/api');
 
-tbd.apiKey = 'YOUR_API_KEY';
+ground.apiKey = 'YOUR_API_KEY';
 
 // Start earning yield
-const account = await tbd.yield.create({
+const account = await ground.yield.create({
   amount: 1000,
   currency: 'USDC',
   yieldRate: 0.06
@@ -336,12 +336,12 @@ const account = await tbd.yield.create({
 
 console.log(account.id);
 // => 'ya_1234...'</code></pre>
-                            <pre id="lang-code-python" class="lang-code" data-language="python"><code>import tbd
+                            <pre id="lang-code-python" class="lang-code" data-language="python"><code>import ground
 
-tbd.api_key = 'YOUR_API_KEY'
+ground.api_key = 'YOUR_API_KEY'
 
 # Start earning yield
-account = tbd.yield.create(
+account = ground.yield.create(
     amount=1000,
     currency='USDC',
     yield_rate=0.06
@@ -349,12 +349,12 @@ account = tbd.yield.create(
 
 print(account.id)
 # => 'ya_1234...'</code></pre>
-                            <pre id="lang-code-ruby" class="lang-code" data-language="ruby"><code>require 'tbd'
+                            <pre id="lang-code-ruby" class="lang-code" data-language="ruby"><code>require 'ground'
 
-tbd.api_key = 'YOUR_API_KEY'
+ground.api_key = 'YOUR_API_KEY'
 
 # Start earning yield
-account = tbd.yield.create(
+account = ground.yield.create(
     amount: 1000,
     currency: 'USDC',
     yield_rate: 0.06
@@ -375,7 +375,7 @@ puts account.id
             <div class="security-content">
                 <div class="security-badge">Security & Compliance</div>
                 <h2>Enterprise-grade security,<br/>without the complexity</h2>
-                <p>TBD is a US-based company that handles all regulatory requirements, foreign exchange relationships, and DeFi protocol complexity. Your users get secure, compliant yield generation—you get peace of mind.</p>
+                <p>Ground is a US-based company that handles all regulatory requirements, foreign exchange relationships, and DeFi protocol complexity. Your users get secure, compliant yield generation—you get peace of mind.</p>
                 <div class="security-grid">
                     <div class="security-item">
                         <div class="security-icon">
@@ -427,7 +427,7 @@ puts account.id
         <div class="container">
             <div class="cta-content">
                 <h2>Ready to start building?</h2>
-                <p>Join thousands of developers using TBD to integrate DeFi yield generation into their applications.</p>
+                <p>Join thousands of developers using Ground to integrate DeFi yield generation into their applications.</p>
                 <div class="cta-buttons">
                     <a href="account.html" class="btn-primary btn-large">Create Account</a>
                 </div>
@@ -474,7 +474,7 @@ puts account.id
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 TBD. All rights reserved.</p>
+                <p>&copy; 2025 Ground. All rights reserved.</p>
             </div>
         </div>
     </footer>
