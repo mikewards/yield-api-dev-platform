@@ -366,8 +366,29 @@ select option {
 }
 
 .gradient-text {
-    color: var(--accent);
     font-weight: 700;
+    background: linear-gradient(
+        135deg,
+        #006aff 0%,
+        #6366f1 25%,
+        #8b5cf6 50%,
+        #6366f1 75%,
+        #006aff 100%
+    );
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .hero-description {
