@@ -24,6 +24,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 fun Application.module() {
     // Initialize Sentry (if DSN is provided)
     sentry()
+    sentryPerformance()
     
     // Initialize database (with error handling - don't crash if DB fails)
     try {
