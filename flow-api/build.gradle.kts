@@ -73,7 +73,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.tbd.ApplicationKt")
+    mainClass.set("com.ground.ApplicationKt")
 }
 
 tasks.withType<KotlinCompile> {
@@ -91,7 +91,7 @@ tasks.shadowJar {
     archiveVersion.set("")
     
     manifest {
-        attributes(mapOf("Main-Class" to "com.tbd.ApplicationKt"))
+        attributes(mapOf("Main-Class" to "com.ground.ApplicationKt"))
     }
 }
 
