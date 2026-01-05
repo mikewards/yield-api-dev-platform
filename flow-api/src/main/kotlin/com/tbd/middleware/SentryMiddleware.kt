@@ -110,3 +110,39 @@ fun captureException(exception: Throwable, context: Map<String, String> = emptyM
     }
 }
 
+/**
+ * Set user context for Sentry (IDs only - no PII)
+ * Call this after successful JWT authentication
+ */
+fun setSentryUserContext(accountId: String) {
+    try {
+        Sentry.configureScope { scope ->
+            scope.setUser(io.sentry.protocol.User().apply {
+                id = accountId
+            })
+            scope.setTag("auth_type", "jwt")
+        }
+    } catch (e: Exception) {
+        // Silently fail if Sentry is not initialized
+    }
+}
+
+/**
+ * Set application context for Sentry (IDs only - no PII)
+ * Call this after successful API key (PAT) authentication
+ */
+fun setSentryApplicationContext(accountId: String, applicationId: String, environment: String) {
+    try {
+        Sentry.configureScope { scope ->
+            scope.setUser(io.sentry.protocol.User().apply {
+                id = accountId
+            })
+            scope.setTag("auth_type", "api_key")
+            scope.setTag("application_id", applicationId)
+            scope.setTag("api_environment", environment)
+        }
+    } catch (e: Exception) {
+        // Silently fail if Sentry is not initialized
+    }
+}
+

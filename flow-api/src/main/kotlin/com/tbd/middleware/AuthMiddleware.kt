@@ -14,6 +14,8 @@ import io.ktor.server.routing.*
 import io.ktor.util.*
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import com.tbd.middleware.setSentryUserContext
+import com.tbd.middleware.setSentryApplicationContext
 
 // Attribute keys for storing application context
 val ApplicationIdKey = AttributeKey<String>("applicationId")
@@ -54,6 +56,13 @@ fun Application.auth() {
                             if (appName != null) {
                                 this.request.call.attributes.put(ApplicationNameKey, appName)
                             }
+                            
+                            // Set Sentry context for API key auth (IDs only)
+                            setSentryApplicationContext(
+                                accountId = accountId.toString(),
+                                applicationId = applicationId.toString(),
+                                environment = environment
+                            )
                         }
                         
                         return@authenticate UserIdPrincipal(accountId.toString())
@@ -69,6 +78,8 @@ fun Application.auth() {
                         val accountId = claims.payload.subject
                         if (accountId != null) {
                             println("✅ JWT token validated for account: $accountId")
+                            // Set Sentry context for dashboard user (IDs only)
+                            setSentryUserContext(accountId)
                             // JWT tokens are from dashboard login, no application context
                             return@authenticate UserIdPrincipal(accountId)
                         }
