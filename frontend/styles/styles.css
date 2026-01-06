@@ -457,12 +457,12 @@ select option {
     color: var(--text-tertiary);
 }
 
-/* Electricity separator between stats */
+/* Electricity separator between stats - subtle and grounded */
 .stat-separator {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
+    width: 50px;
     height: 40px;
     position: relative;
 }
@@ -470,90 +470,78 @@ select option {
 .electricity {
     position: relative;
     width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent);
+    height: 1px;
+    background: linear-gradient(90deg, 
+        rgba(16, 185, 129, 0.15) 0%, 
+        rgba(6, 182, 212, 0.25) 50%, 
+        rgba(16, 185, 129, 0.15) 100%
+    );
+    overflow: hidden;
 }
 
-.spark {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, #10b981 0%, #06b6d4 50%, transparent 70%);
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    animation: spark-flow 2s ease-in-out infinite;
-    box-shadow: 
-        0 0 6px #10b981,
-        0 0 12px #06b6d4,
-        0 0 18px rgba(16, 185, 129, 0.5);
-}
-
-.spark:nth-child(1) {
-    animation-delay: 0s;
-    left: 0;
-}
-
-.spark:nth-child(2) {
-    animation-delay: 0.4s;
-    left: 0;
-}
-
-.spark:nth-child(3) {
-    animation-delay: 0.8s;
-    left: 0;
-}
-
-@keyframes spark-flow {
-    0% {
-        left: 0;
-        opacity: 0;
-        transform: translateY(-50%) scale(0.5);
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1);
-    }
-    50% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1.2);
-    }
-    90% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1);
-    }
-    100% {
-        left: calc(100% - 8px);
-        opacity: 0;
-        transform: translateY(-50%) scale(0.5);
-    }
-}
-
-/* Pulse glow on the line */
+/* Subtle electrical pulse flowing through the wire */
 .electricity::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
+    top: 0;
+    left: -100%;
+    width: 30%;
+    height: 100%;
     background: linear-gradient(90deg, 
-        transparent 0%, 
-        #10b981 20%, 
-        #06b6d4 50%, 
-        #3b82f6 80%, 
-        transparent 100%
+        transparent, 
+        rgba(16, 185, 129, 0.4), 
+        transparent
     );
-    transform: translateY(-50%);
-    animation: line-pulse 3s ease-in-out infinite;
+    animation: current-flow 4s ease-in-out infinite;
 }
 
-@keyframes line-pulse {
-    0%, 100% {
-        opacity: 0.3;
+@keyframes current-flow {
+    0% {
+        left: -100%;
+        opacity: 0;
     }
     50% {
-        opacity: 0.8;
+        opacity: 1;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+/* Small grounding points at the numbers */
+.stat-value {
+    position: relative;
+}
+
+.stat-value::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 4px;
+    background: linear-gradient(180deg, 
+        rgba(16, 185, 129, 0.6) 0%, 
+        transparent 100%
+    );
+    animation: ground-pulse 3s ease-in-out infinite;
+    opacity: 0;
+}
+
+.stat:hover .stat-value::after {
+    opacity: 1;
+}
+
+@keyframes ground-pulse {
+    0%, 100% {
+        opacity: 0;
+        transform: translateX(-50%) scaleY(0.5);
+    }
+    50% {
+        opacity: 0.6;
+        transform: translateX(-50%) scaleY(1);
     }
 }
 
@@ -2022,3 +2010,4 @@ select option {
 body.modal-open {
     overflow: hidden;
 }
+
