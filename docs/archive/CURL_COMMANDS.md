@@ -1,4 +1,4 @@
-# TBD API cURL Commands
+# Ground API cURL Commands
 
 ## Markets Endpoint
 

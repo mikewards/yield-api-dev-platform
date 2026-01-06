@@ -88,8 +88,8 @@ All examples above use cURL. Make sure to:
 ### With Frontend
 The frontend automatically uses the correct API URL from `config.js`:
 - Local development: `http://localhost:8080`
-- Production: `https://api.tbd.com` (or your custom domain)
-- Sandbox: `https://api-sandbox.tbd.com` (or your custom domain)
+- Production: `https://api.ground.com` (or your custom domain)
+- Sandbox: `https://api-sandbox.ground.com` (or your custom domain)
 
 ### With Postman/Insomnia
 1. Create a new request

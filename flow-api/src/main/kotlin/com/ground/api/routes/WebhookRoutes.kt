@@ -1,0 +1,291 @@
+package com.ground.api.routes
+
+import com.ground.dto.*
+import com.ground.service.WebhookService
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import java.util.*
+
+fun Application.webhookRoutes() {
+    routing {
+        route("/v1/webhooks") {
+            // Get webhook service status (for debugging)
+            get("/status") {
+                val available = WebhookService.isAvailable()
+                call.respond(HttpStatusCode.OK, WebhookStatusResponse(
+                    available = available,
+                    message = if (available) "Webhook service is configured and ready" else "Webhook service is not configured - check SVIX_API_KEY"
+                ))
+            }
+            
+            // Debug endpoint to test list functionality - uses query param instead of path
+            get("/debug") {
+                val accountId = call.request.queryParameters["id"]
+                    ?: return@get call.respond(HttpStatusCode.BadRequest, WebhookStatusResponse(false, "Missing id query param"))
+                
+                try {
+                    val uuid = UUID.fromString(accountId)
+                    val appId = "app_$accountId"
+                    
+                    // Call the raw debug method
+                    val debugResult = WebhookService.debugListEndpoints(uuid)
+                    
+                    call.respond(HttpStatusCode.OK, WebhookStatusResponse(
+                        available = true,
+                        message = debugResult
+                    ))
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, WebhookStatusResponse(
+                        available = false,
+                        message = "Error: ${e.message} (${e.javaClass.simpleName})"
+                    ))
+                }
+            }
+            
+            // Get available event types (public)
+            get("/event-types") {
+                val eventTypes = listOf(
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.DEPOSIT_COMPLETED,
+                        description = "Triggered when funds are successfully deposited to a yield account"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.WITHDRAWAL_COMPLETED,
+                        description = "Triggered when funds are successfully withdrawn from a yield account"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.YIELD_ACCRUED,
+                        description = "Triggered when yield is accrued to an account (daily)"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.RATE_CHANGED,
+                        description = "Triggered when yield rates change significantly (>0.5%)"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.ACCOUNT_STATUS_CHANGED,
+                        description = "Triggered when a yield account status changes"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.APPLICATION_CREATED,
+                        description = "Triggered when a new application is created"
+                    ),
+                    WebhookEventType(
+                        name = WebhookService.EventTypes.API_KEY_CREATED,
+                        description = "Triggered when a new API key is generated"
+                    )
+                )
+                
+                call.respond(HttpStatusCode.OK, WebhookEventTypesResponse(eventTypes))
+            }
+            
+            authenticate("bearer-auth") {
+                // List all webhook endpoints
+                get {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val endpoints = WebhookService.listEndpoints(UUID.fromString(accountId))
+                    
+                    val response = endpoints.map { endpoint ->
+                        WebhookEndpointResponse(
+                            id = endpoint.id,
+                            url = endpoint.url?.toString() ?: "",
+                            description = endpoint.description,
+                            filterTypes = endpoint.filterTypes?.toList(),
+                            createdAt = endpoint.createdAt?.toString(),
+                            updatedAt = endpoint.updatedAt?.toString(),
+                            disabled = endpoint.disabled ?: false
+                        )
+                    }
+                    
+                    call.respond(HttpStatusCode.OK, WebhookEndpointsListResponse(
+                        endpoints = response,
+                        total = response.size
+                    ))
+                }
+                
+                // Create a new webhook endpoint
+                post {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val request = call.receive<CreateWebhookEndpointRequest>()
+                    
+                    // Validate URL
+                    if (!request.url.startsWith("https://")) {
+                        return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to "Webhook URL must use HTTPS")
+                        )
+                    }
+                    
+                    // Validate event types if provided
+                    if (request.filterTypes != null) {
+                        val invalidTypes = request.filterTypes.filter { it !in WebhookService.EventTypes.ALL }
+                        if (invalidTypes.isNotEmpty()) {
+                            return@post call.respond(
+                                HttpStatusCode.BadRequest,
+                                mapOf(
+                                    "error" to "Invalid event types: ${invalidTypes.joinToString(", ")}",
+                                    "valid_types" to WebhookService.EventTypes.ALL
+                                )
+                            )
+                        }
+                    }
+                    
+                    val result = WebhookService.createEndpoint(
+                        accountId = UUID.fromString(accountId),
+                        url = request.url,
+                        description = request.description,
+                        filterTypes = request.filterTypes
+                    )
+                    
+                    if (result.endpoint == null) {
+                        return@post call.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            mapOf("error" to "Webhook service error: ${result.error ?: "Unknown error"}")
+                        )
+                    }
+                    
+                    val endpoint = result.endpoint
+                    call.respond(
+                        HttpStatusCode.Created,
+                        WebhookEndpointResponse(
+                            id = endpoint.id,
+                            url = endpoint.url?.toString() ?: "",
+                            description = endpoint.description,
+                            filterTypes = endpoint.filterTypes?.toList(),
+                            createdAt = endpoint.createdAt?.toString(),
+                            updatedAt = endpoint.updatedAt?.toString(),
+                            disabled = endpoint.disabled ?: false
+                        )
+                    )
+                }
+                
+                // Get a specific endpoint
+                get("/{endpointId}") {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val endpointId = call.parameters["endpointId"]
+                        ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
+                    
+                    val endpoint = WebhookService.getEndpoint(UUID.fromString(accountId), endpointId)
+                        ?: return@get call.respond(HttpStatusCode.NotFound, mapOf("error" to "Endpoint not found"))
+                    
+                    call.respond(
+                        HttpStatusCode.OK,
+                        WebhookEndpointResponse(
+                            id = endpoint.id,
+                            url = endpoint.url?.toString() ?: "",
+                            description = endpoint.description,
+                            filterTypes = endpoint.filterTypes?.toList(),
+                            createdAt = endpoint.createdAt?.toString(),
+                            updatedAt = endpoint.updatedAt?.toString(),
+                            disabled = endpoint.disabled ?: false
+                        )
+                    )
+                }
+                
+                // Delete an endpoint
+                delete("/{endpointId}") {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@delete call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val endpointId = call.parameters["endpointId"]
+                        ?: return@delete call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
+                    
+                    val deleted = WebhookService.deleteEndpoint(UUID.fromString(accountId), endpointId)
+                    
+                    if (deleted) {
+                        call.respond(HttpStatusCode.NoContent)
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, mapOf("error" to "Endpoint not found or could not be deleted"))
+                    }
+                }
+                
+                // Test a webhook endpoint
+                post("/{endpointId}/test") {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val endpointId = call.parameters["endpointId"]
+                        ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
+                    
+                    val request = call.receive<TestWebhookRequest>()
+                    
+                    // Validate event type
+                    if (request.eventType !in WebhookService.EventTypes.ALL) {
+                        return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf(
+                                "error" to "Invalid event type: ${request.eventType}",
+                                "valid_types" to WebhookService.EventTypes.ALL
+                            )
+                        )
+                    }
+                    
+                    // Send test event
+                    val success = WebhookService.sendEvent(
+                        accountId = UUID.fromString(accountId),
+                        eventType = request.eventType,
+                        payload = mapOf(
+                            "test" to true,
+                            "event_type" to request.eventType,
+                            "message" to "This is a test webhook event from TBD",
+                            "timestamp" to System.currentTimeMillis()
+                        )
+                    )
+                    
+                    if (success) {
+                        call.respond(
+                            HttpStatusCode.OK,
+                            TestWebhookResponse(
+                                success = true,
+                                message = "Test webhook sent successfully"
+                            )
+                        )
+                    } else {
+                        call.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            TestWebhookResponse(
+                                success = false,
+                                message = "Failed to send test webhook"
+                            )
+                        )
+                    }
+                }
+                
+                // Get App Portal URL for viewing webhook logs
+                get("/portal") {
+                    val principal = call.principal<UserIdPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
+                    val accountId = principal.name
+                    
+                    val result = WebhookService.getAppPortalUrl(UUID.fromString(accountId))
+                    
+                    if (result.url != null) {
+                        call.respond(HttpStatusCode.OK, WebhookPortalResponse(
+                            url = result.url,
+                            recentMessages = WebhookService.getRecentMessageCount(UUID.fromString(accountId))
+                        ))
+                    } else {
+                        call.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            mapOf("error" to "Webhook portal unavailable: ${result.error}")
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

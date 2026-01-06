@@ -1,6 +1,6 @@
-# TBD API Gateway
+# Ground API Gateway
 
-Kotlin REST API gateway for the TBD DeFi platform, wrapping Morpho and Aave protocols.
+Kotlin REST API gateway for the Ground DeFi platform, wrapping Morpho and Aave protocols.
 
 **Last Updated**: December 2025
 
@@ -175,7 +175,7 @@ See [Railway Deployment Guide](../docs/deployment/railway.md) for production dep
 
 ```
 flow-api/
-├── src/main/kotlin/com/tbd/
+├── src/main/kotlin/com/ground/
 │   ├── api/routes/          # API endpoints
 │   ├── dto/                 # Data transfer objects
 │   ├── middleware/          # Auth, rate limiting, logging

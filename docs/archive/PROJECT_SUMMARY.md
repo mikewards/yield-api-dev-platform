@@ -1,4 +1,4 @@
-# TBD Platform - Project Summary
+# Ground Platform - Project Summary
 
 **Date**: January 2025 | **Status**: Active Development | **Environments**: Staging & Production Deployed
 

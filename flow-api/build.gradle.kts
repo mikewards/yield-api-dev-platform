@@ -7,7 +7,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-group = "com.tbd"
+group = "com.ground"
 version = "1.0.0"
 
 repositories {
@@ -86,7 +86,7 @@ tasks.test {
 
 // Configure Shadow JAR (fat JAR with all dependencies)
 tasks.shadowJar {
-    archiveBaseName.set("tbd-api")
+    archiveBaseName.set("ground-api")
     archiveClassifier.set("")
     archiveVersion.set("")
     
