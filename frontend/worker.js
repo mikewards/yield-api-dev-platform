@@ -12,7 +12,7 @@ export default {
       '/account': '/account.html',
       '/dashboard': '/dashboard.html',
       '/dashboard-webhooks': '/dashboard-webhooks.html',
-      '/account-settings': '/account-settings.html'
+      '/dashboard-settings': '/dashboard-settings.html'
     };
     
     // If this is a known route, redirect to the .html file
