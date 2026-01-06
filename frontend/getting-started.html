@@ -121,7 +121,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-create-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.ground.com/v1/accounts</span> \
+                                    <pre id="code-create-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/accounts</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
   <span class="token-flag">-d</span> <span class="token-string">'{
@@ -169,7 +169,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-auth" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.ground.com/v1/auth/authenticate</span> \
+                                    <pre id="code-auth" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/auth/authenticate</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
   <span class="token-flag">-d</span> <span class="token-string">'{
@@ -203,7 +203,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-create-token" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.ground.com/v1/access-tokens</span> \
+                                    <pre id="code-create-token" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/access-tokens</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
@@ -251,7 +251,7 @@
                                     </button>
                                 </div>
                                 <div class="code-block-content">
-                                    <pre id="code-yield-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://api.ground.com/v1/yield/accounts</span> \
+                                    <pre id="code-yield-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/yield/accounts</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
@@ -332,13 +332,13 @@
                         <h3>Base URL</h3>
                         <p>All API requests should be made to:</p>
                         <div class="code-example-box">
-                            <pre data-language="text"><code>https://api.ground.com</code></pre>
+                            <pre data-language="text"><code>https://flow-platform-production.up.railway.app</code></pre>
                         </div>
 
                         <h3>API Versioning</h3>
                         <p>Ground APIs are versioned. The current version is <code>2025-01-15</code>. Include the version in your API path:</p>
                         <div class="code-example-box">
-                            <pre data-language="text"><code>https://api.ground.com/v1/yield/accounts</code></pre>
+                            <pre data-language="text"><code>https://flow-platform-production.up.railway.app/v1/yield/accounts</code></pre>
                         </div>
                     </section>
                 </main>

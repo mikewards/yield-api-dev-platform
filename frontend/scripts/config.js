@@ -5,11 +5,12 @@
     'use strict';
     
     // API URLs for different environments
-    // Public API domains (production-ready)
+    // Using Railway URLs (working endpoints)
+    // TODO: Update to api.ground.com / api-sandbox.ground.com when DNS is configured
     const API_URLS = {
         local: 'http://localhost:8080',
-        sandbox: 'https://api-sandbox.ground.com',
-        production: 'https://api.ground.com'
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
     };
     
     // Detect environment from hostname

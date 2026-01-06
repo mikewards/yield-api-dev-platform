@@ -7,8 +7,8 @@
     // API URLs for different environments
     // These should match config.js - using Railway URLs
     const API_URLS = window.API_URLS || {
-        sandbox: 'https://api-sandbox.ground.com',
-        production: 'https://api.ground.com'
+        sandbox: 'https://flow-platform-flow-platform-staging.up.railway.app',
+        production: 'https://flow-platform-production.up.railway.app'
     };
     
     // Get current environment from localStorage or default to production
