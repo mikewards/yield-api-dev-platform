@@ -581,17 +581,19 @@
                             ></iframe>
                         </div>
                     </div>
-                    <div class="code-playground">
-                        <div class="playground-header">
-                            <span>index.html</span>
-                            <div class="playground-actions">
-                                <button class="playground-btn" onclick="runApplicationsCode()">▶ Run</button>
-                                <button class="playground-btn secondary" onclick="resetApplicationsCode()">Reset</button>
-                            </div>
+                    <div class="code-block-unified">
+                        <div class="code-block-header">
+                            <span class="code-block-label">index.html</span>
+                            <button class="code-copy-btn" onclick="copyCode(this, 'applications-code')" aria-label="Copy code">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M5.5 3.5h7v7M10.5 3.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                         </div>
-                        <textarea class="code-editor" id="applications-code" spellcheck="false">&lt;!-- Embed Applications SDK --&gt;
+                        <div class="code-block-content" id="applications-code-container">
+                            <pre id="applications-code" data-language="html"><code>&lt;!-- Embed Applications SDK --&gt;
 &lt;iframe
-  src="https://sdks.ground.com/applications?apiKey=YOUR_API_KEY&theme=light"
+  src="https://sdks.ground.com/applications?apiKey=YOUR_API_KEY&amp;theme=light"
   width="100%"
   height="600"
   frameborder="0"
@@ -599,9 +601,10 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Applications SDK"
+  title="Ground Applications SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
-&gt;&lt;/iframe&gt;</textarea>
+&gt;&lt;/iframe&gt;</code></pre>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -669,17 +672,19 @@
                             ></iframe>
                         </div>
                     </div>
-                    <div class="code-playground">
-                        <div class="playground-header">
-                            <span>index.html</span>
-                            <div class="playground-actions">
-                                <button class="playground-btn" onclick="runWalletsCode()">▶ Run</button>
-                                <button class="playground-btn secondary" onclick="resetWalletsCode()">Reset</button>
-                            </div>
+                    <div class="code-block-unified">
+                        <div class="code-block-header">
+                            <span class="code-block-label">index.html</span>
+                            <button class="code-copy-btn" onclick="copyCode(this, 'wallets-code')" aria-label="Copy code">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M5.5 3.5h7v7M10.5 3.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                         </div>
-                        <textarea class="code-editor" id="wallets-code" spellcheck="false">&lt;!-- Embed Wallets SDK --&gt;
+                        <div class="code-block-content" id="wallets-code-container">
+                            <pre id="wallets-code" data-language="html"><code>&lt;!-- Embed Wallets SDK --&gt;
 &lt;iframe
-  src="https://sdks.ground.com/wallets?apiKey=YOUR_API_KEY&applicationId=app_abc123"
+  src="https://sdks.ground.com/wallets?apiKey=YOUR_API_KEY&amp;applicationId=app_abc123"
   width="100%"
   height="600"
   frameborder="0"
@@ -687,9 +692,10 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Wallets SDK"
+  title="Ground Wallets SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
-&gt;&lt;/iframe&gt;</textarea>
+&gt;&lt;/iframe&gt;</code></pre>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -756,17 +762,19 @@
                             ></iframe>
                         </div>
                     </div>
-                    <div class="code-playground">
-                        <div class="playground-header">
-                            <span>index.html</span>
-                            <div class="playground-actions">
-                                <button class="playground-btn" onclick="runYieldCode()">▶ Run</button>
-                                <button class="playground-btn secondary" onclick="resetYieldCode()">Reset</button>
-                            </div>
+                    <div class="code-block-unified">
+                        <div class="code-block-header">
+                            <span class="code-block-label">index.html</span>
+                            <button class="code-copy-btn" onclick="copyCode(this, 'yield-code')" aria-label="Copy code">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M5.5 3.5h7v7M10.5 3.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                         </div>
-                        <textarea class="code-editor" id="yield-code" spellcheck="false">&lt;!-- Embed Yield Accounts SDK --&gt;
+                        <div class="code-block-content" id="yield-code-container">
+                            <pre id="yield-code" data-language="html"><code>&lt;!-- Embed Yield Accounts SDK --&gt;
 &lt;iframe
-  src="https://sdks.ground.com/yield-accounts?apiKey=YOUR_API_KEY&walletId=wallet_xyz789"
+  src="https://sdks.ground.com/yield-accounts?apiKey=YOUR_API_KEY&amp;walletId=wallet_xyz789"
   width="100%"
   height="700"
   frameborder="0"
@@ -774,9 +782,10 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Yield Accounts SDK"
+  title="Ground Yield Accounts SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
-&gt;&lt;/iframe&gt;</textarea>
+&gt;&lt;/iframe&gt;</code></pre>
+                        </div>
                     </div>
                 </div>
                 <div class="sdk-actions">
@@ -966,13 +975,16 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Applications SDK"
+  title="Ground Applications SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runApplicationsCode() {
-            const code = document.getElementById('applications-code').value;
+            const codeElement = document.getElementById('applications-code');
+            if (!codeElement) return;
+            const code = codeElement.textContent || codeElement.innerText;
             const iframe = document.getElementById('applications-iframe');
+            if (!iframe) return;
             const attributes = parseIframeAttributes(code);
             
             // Keep demo src for preview
@@ -986,7 +998,15 @@
         }
 
         function resetApplicationsCode() {
-            document.getElementById('applications-code').value = applicationsDefaultCode;
+            const codeElement = document.getElementById('applications-code');
+            if (!codeElement) return;
+            // Update code content with highlighted HTML
+            if (typeof highlightHtml !== 'undefined') {
+                codeElement.innerHTML = highlightHtml(applicationsDefaultCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+            } else {
+                codeElement.textContent = applicationsDefaultCode;
+            }
+            codeElement.dataset.highlighted = 'true';
             runApplicationsCode();
         }
 
@@ -1008,13 +1028,16 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Wallets SDK"
+  title="Ground Wallets SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runWalletsCode() {
-            const code = document.getElementById('wallets-code').value;
+            const codeElement = document.getElementById('wallets-code');
+            if (!codeElement) return;
+            const code = codeElement.textContent || codeElement.innerText;
             const iframe = document.getElementById('wallets-iframe');
+            if (!iframe) return;
             const attributes = parseIframeAttributes(code);
             
             // Keep demo src for preview
@@ -1028,7 +1051,15 @@
         }
 
         function resetWalletsCode() {
-            document.getElementById('wallets-code').value = walletsDefaultCode;
+            const codeElement = document.getElementById('wallets-code');
+            if (!codeElement) return;
+            // Update code content with highlighted HTML
+            if (typeof highlightHtml !== 'undefined') {
+                codeElement.innerHTML = highlightHtml(walletsDefaultCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+            } else {
+                codeElement.textContent = walletsDefaultCode;
+            }
+            codeElement.dataset.highlighted = 'true';
             runWalletsCode();
         }
 
@@ -1050,13 +1081,16 @@
   scrolling="auto"
   allow="fullscreen"
   loading="eager"
-  title="TBD Yield Accounts SDK"
+  title="Ground Yield Accounts SDK"
   style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
 ></iframe>`;
 
         function runYieldCode() {
-            const code = document.getElementById('yield-code').value;
+            const codeElement = document.getElementById('yield-code');
+            if (!codeElement) return;
+            const code = codeElement.textContent || codeElement.innerText;
             const iframe = document.getElementById('yield-iframe');
+            if (!iframe) return;
             const attributes = parseIframeAttributes(code);
             
             // Keep demo src for preview
@@ -1070,7 +1104,15 @@
         }
 
         function resetYieldCode() {
-            document.getElementById('yield-code').value = yieldDefaultCode;
+            const codeElement = document.getElementById('yield-code');
+            if (!codeElement) return;
+            // Update code content with highlighted HTML
+            if (typeof highlightHtml !== 'undefined') {
+                codeElement.innerHTML = highlightHtml(yieldDefaultCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+            } else {
+                codeElement.textContent = yieldDefaultCode;
+            }
+            codeElement.dataset.highlighted = 'true';
             runYieldCode();
         }
 
@@ -1081,26 +1123,13 @@
             }
         });
 
-        // Auto-update preview as you type (debounced)
+        // Initialize code blocks on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Iframes already have src set, they'll load automatically
-            // Only update when code changes
-            
-            // Auto-update preview as you type (debounced)
-            let updateTimeout;
-            ['applications-code', 'wallets-code', 'yield-code'].forEach(id => {
-                const editor = document.getElementById(id);
-                if (editor) {
-                    editor.addEventListener('input', function() {
-                        clearTimeout(updateTimeout);
-                        updateTimeout = setTimeout(() => {
-                            if (id === 'applications-code') runApplicationsCode();
-                            if (id === 'wallets-code') runWalletsCode();
-                            if (id === 'yield-code') runYieldCode();
-                        }, 500);
-                    });
-                }
-            });
+            // Run initial code to set up previews
+            runApplicationsCode();
+            runWalletsCode();
+            runYieldCode();
         });
 
         // Add slide-in animation

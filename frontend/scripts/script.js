@@ -133,6 +133,37 @@ function highlightJavaScript(text) { return highlightJavaScriptSimple(text); }
 function highlightPython(text) { return highlightPythonSimple(text); }
 function highlightRuby(text) { return highlightRubySimple(text); }
 
+// Syntax highlighting for HTML
+function highlightHtml(text) {
+    // If text is already escaped (contains &lt; or &gt;), work with it directly
+    // Otherwise, escape it first
+    let html = text;
+    if (!text.includes('&lt;') && !text.includes('&gt;')) {
+        html = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+    
+    // Highlight HTML comments first
+    html = html.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="token-comment">$1</span>');
+    
+    // Highlight HTML tags (opening and closing)
+    // Match: &lt;tag attributes&gt; or &lt;/tag&gt; or &lt;tag/&gt;
+    html = html.replace(/(&lt;)(\/?)([\w-]+)([^&]*?)(\/?)(&gt;)/g, function(match, open, slash, tag, attrs, selfClose, close) {
+        const openSpan = '<span class="token-cmd">' + open + slash + tag + '</span>';
+        // Highlight attributes: key="value" or key='value'
+        let highlightedAttrs = attrs.replace(/(\s+)([\w-]+)(=)("([^"]*)"|'([^']*)')/g, 
+            function(attrMatch, space, attrName, eq, quote) {
+                return space + '<span class="token-property">' + attrName + '</span>' + eq + '<span class="token-string">' + quote + '</span>';
+            });
+        const closeSpan = '<span class="token-cmd">' + selfClose + close + '</span>';
+        return openSpan + highlightedAttrs + closeSpan;
+    });
+    
+    return html;
+}
+
 // Syntax highlighting for cURL commands
 function highlightCurl(text) {
     // Escape HTML first
@@ -273,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const isJavaScript = lang === 'javascript' || lang === 'js' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('nodejs'));
                     const isPython = lang === 'python' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('python'));
                     const isRuby = lang === 'ruby' || (pre.classList.contains('lang-code') && pre.id && pre.id.includes('ruby'));
+                    const isHtml = lang === 'html' || text.trim().startsWith('&lt;') || text.trim().startsWith('<!--');
                     const isHttp = lang === 'http';
                     
                     if (isBash) {
@@ -285,6 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         codeElement.innerHTML = highlightPythonSimple(text);
                     } else if (isRuby) {
                         codeElement.innerHTML = highlightRubySimple(text);
+                    } else if (isHtml) {
+                        codeElement.innerHTML = highlightHtml(text);
                     } else if (isHttp) {
                         // Simple HTTP header highlighting
                         codeElement.innerHTML = text.replace(/^([A-Za-z-]+):/gm, '<span class="token-property">$1</span>:')
