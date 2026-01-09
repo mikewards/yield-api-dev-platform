@@ -156,7 +156,7 @@ a.text-link:not(.btn):hover {
 
 .logo svg {
     width: 25.6px;
-    height: 25.6px;
+    height: auto; /* Maintain aspect ratio from viewBox (12.873:16.787) */
 }
 
 .footer-logo svg {
