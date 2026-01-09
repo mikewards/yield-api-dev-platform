@@ -343,6 +343,9 @@ a.text-link:not(.btn):hover {
     text-decoration: none;
     font-weight: 600;
     font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .btn-link:hover {
@@ -758,10 +761,36 @@ select option {
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .feature-link:hover {
     text-decoration: underline;
+}
+
+/* Signal Ground Icon for Links */
+.signal-ground-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.signal-ground-icon svg {
+    transition: transform 0.2s ease;
+    transform: rotate(-90deg) translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    flex-shrink: 0;
+}
+
+.feature-link:hover .signal-ground-icon svg,
+.btn-link:hover .signal-ground-icon svg,
+.qs-link-card:hover .signal-ground-icon svg {
+    transform: rotate(0deg) translateZ(0);
 }
 
 /* Integration Section */
