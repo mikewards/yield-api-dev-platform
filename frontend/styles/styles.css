@@ -155,8 +155,13 @@ a.text-link:not(.btn):hover {
 }
 
 .logo svg {
-    width: 48px;
-    height: 48px;
+    width: 25.6px;
+    height: 25.6px;
+}
+
+.footer-logo svg {
+    width: 38.4px;
+    height: 38.4px;
 }
 
 .logo-text {
