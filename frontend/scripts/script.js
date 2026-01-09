@@ -251,20 +251,40 @@ function addLineNumbers(codeBlock) {
         return;
     }
     
-    // Count lines
-    const codeText = pre.textContent || '';
+    // Count lines - count all lines including empty ones
+    // Use innerHTML or textContent to get the actual rendered content
+    const codeText = pre.textContent || pre.innerText || '';
+    // Split by newline - this will include all lines
     const lines = codeText.split('\n');
-    const lineCount = lines.length;
+    // Always count all lines, including trailing empty line if text ends with \n
+    let lineCount = lines.length;
+    // If the last element is empty string and text doesn't end with \n, it might be an artifact
+    // But to be safe, we'll count it if there's any content
+    if (lineCount > 0 && lines[lineCount - 1] === '' && !codeText.endsWith('\n') && codeText.length > 0) {
+        // This is likely an artifact from split, but we'll include it to match visual lines
+        lineCount = lines.length;
+    }
     
     // Create line numbers element
     const lineNumbers = document.createElement('div');
     lineNumbers.className = 'code-line-numbers';
     
+    // Generate line numbers for all lines
     for (let i = 1; i <= lineCount; i++) {
         const span = document.createElement('span');
         span.textContent = i;
         lineNumbers.appendChild(span);
     }
+    
+    // After inserting, ensure line numbers match pre height
+    setTimeout(() => {
+        const preHeight = pre.offsetHeight;
+        const lineNumbersHeight = lineNumbers.offsetHeight;
+        if (Math.abs(preHeight - lineNumbersHeight) > 2) {
+            // Heights don't match - adjust line numbers to match pre
+            lineNumbers.style.height = preHeight + 'px';
+        }
+    }, 0);
     
     // Insert line numbers before pre
     content.insertBefore(lineNumbers, pre);
@@ -358,9 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add line numbers to response blocks
         if (content && pre && !content.querySelector('.code-line-numbers')) {
-            const codeText = pre.textContent || '';
+            const codeText = pre.textContent || pre.innerText || '';
             const lines = codeText.split('\n');
-            const lineCount = lines.length;
+            let lineCount = lines.length;
             
             const lineNumbers = document.createElement('div');
             lineNumbers.className = 'code-line-numbers';
@@ -372,6 +392,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             content.insertBefore(lineNumbers, pre);
+            
+            // Ensure line numbers match pre height
+            setTimeout(() => {
+                const preHeight = pre.offsetHeight;
+                const lineNumbersHeight = lineNumbers.offsetHeight;
+                if (Math.abs(preHeight - lineNumbersHeight) > 2) {
+                    lineNumbers.style.height = preHeight + 'px';
+                }
+            }, 0);
         }
     });
 });
@@ -408,9 +437,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Count lines for active pre
-        const codeText = activePre.textContent || '';
+        const codeText = activePre.textContent || activePre.innerText || '';
         const lines = codeText.split('\n');
-        const lineCount = lines.length;
+        let lineCount = lines.length;
         
         // Create line numbers
         const lineNumbers = document.createElement('div');
@@ -421,6 +450,15 @@ document.addEventListener('DOMContentLoaded', function() {
             span.textContent = i;
             lineNumbers.appendChild(span);
         }
+        
+        // After inserting, ensure line numbers match pre height
+        setTimeout(() => {
+            const preHeight = activePre.offsetHeight;
+            const lineNumbersHeight = lineNumbers.offsetHeight;
+            if (Math.abs(preHeight - lineNumbersHeight) > 2) {
+                lineNumbers.style.height = preHeight + 'px';
+            }
+        }, 0);
         
         // Insert at the beginning of content (before all pre elements)
         const firstChild = content.firstChild;
