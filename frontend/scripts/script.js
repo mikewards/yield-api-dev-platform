@@ -251,39 +251,23 @@ function addLineNumbers(codeBlock) {
         return;
     }
     
-    // Count VISUAL lines by measuring actual rendered content
-    // This function will be called after initial render, then recalculated
-    function countVisualLines(element) {
-        if (!element) return 1;
-        
-        const computedStyle = window.getComputedStyle(element);
-        const lineHeight = parseFloat(computedStyle.lineHeight);
-        const fontSize = parseFloat(computedStyle.fontSize) || 13;
-        
-        // If lineHeight is a unitless number (like 1.7), multiply by fontSize
-        // If it's in pixels, use it directly
-        const actualLineHeight = (lineHeight > 10) ? lineHeight : (fontSize * lineHeight);
-        
-        const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
-        const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
-        const scrollHeight = element.scrollHeight || element.offsetHeight;
-        const contentHeight = scrollHeight - paddingTop - paddingBottom;
-        
-        // Calculate visual lines
-        const visualLines = Math.max(1, Math.ceil(contentHeight / actualLineHeight));
-        return visualLines;
+    // Count SOURCE lines only (not wrapped lines)
+    // Each source line gets ONE number, even if it wraps to multiple visual lines
+    const codeText = pre.textContent || pre.innerText || '';
+    
+    // Split by newline to get source lines
+    const sourceLines = codeText.split('\n');
+    // Count source lines - each element in the array is a source line
+    // If the last element is empty and text ends with \n, it's still a line
+    let sourceLineCount = sourceLines.length;
+    
+    // Safety: ensure we have at least 1 line if there's any text
+    if (codeText.length > 0 && sourceLineCount === 0) {
+        sourceLineCount = 1;
     }
     
-    // Initial count - use source lines as starting point
-    const codeText = pre.textContent || pre.innerText || '';
-    const newlineMatches = codeText.match(/\n/g);
-    const newlineCount = newlineMatches ? newlineMatches.length : 0;
-    const sourceLineCount = codeText.length > 0 ? newlineCount + 1 : 1;
-    
-    // Try to get visual count immediately (may not be accurate yet)
-    let lineCount = countVisualLines(pre);
-    // Use the maximum to be safe
-    lineCount = Math.max(lineCount, sourceLineCount);
+    // We only number SOURCE lines, not wrapped visual lines
+    const lineCount = sourceLineCount;
     
     // Create line numbers element
     const lineNumbers = document.createElement('div');
@@ -299,41 +283,31 @@ function addLineNumbers(codeBlock) {
     // Insert before pre
     content.insertBefore(lineNumbers, pre);
     
-    // Recalculate after rendering - use multiple timeouts to catch all wrapping
-    function recalculateLines() {
-        const actualVisualLines = countVisualLines(pre);
-        
-        // If we need more line numbers, add them
-        if (actualVisualLines > lineCount) {
-            for (let i = lineCount + 1; i <= actualVisualLines; i++) {
-                const span = document.createElement('span');
-                span.textContent = i;
-                lineNumbers.appendChild(span);
-            }
-            lineCount = actualVisualLines;
-        }
-        
-        // Ensure line numbers container matches pre height exactly
+    // After rendering, ensure line numbers container matches pre height
+    // This allows wrapped lines to have space, but only source lines are numbered
+    setTimeout(() => {
         const preHeight = pre.scrollHeight || pre.offsetHeight;
         const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
         
+        // Match the height so wrapped lines have space, but we only number source lines
         if (Math.abs(preHeight - lineNumbersHeight) > 1) {
             lineNumbers.style.height = preHeight + 'px';
             lineNumbers.style.minHeight = preHeight + 'px';
         }
-    }
+    }, 100);
     
-    // Recalculate multiple times to catch all rendering phases
-    setTimeout(recalculateLines, 0);
-    setTimeout(recalculateLines, 50);
-    setTimeout(recalculateLines, 100);
-    setTimeout(recalculateLines, 200);
-    
-    // Also recalculate on window resize
+    // Recalculate on window resize (wrapping may change)
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(recalculateLines, 100);
+        resizeTimeout = setTimeout(() => {
+            const preHeight = pre.scrollHeight || pre.offsetHeight;
+            const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
+            if (Math.abs(preHeight - lineNumbersHeight) > 1) {
+                lineNumbers.style.height = preHeight + 'px';
+                lineNumbers.style.minHeight = preHeight + 'px';
+            }
+        }, 100);
     });
 }
 
@@ -423,28 +397,15 @@ document.addEventListener('DOMContentLoaded', function() {
             code.dataset.highlighted = 'true';
         }
         
-        // Add line numbers to response blocks
+        // Add line numbers to response blocks - count SOURCE lines only
         if (content && pre && !content.querySelector('.code-line-numbers')) {
-            // Use the same visual line counting function
-            function countVisualLines(element) {
-                if (!element) return 1;
-                const computedStyle = window.getComputedStyle(element);
-                const lineHeight = parseFloat(computedStyle.lineHeight);
-                const fontSize = parseFloat(computedStyle.fontSize) || 13;
-                const actualLineHeight = (lineHeight > 10) ? lineHeight : (fontSize * lineHeight);
-                const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
-                const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
-                const scrollHeight = element.scrollHeight || element.offsetHeight;
-                const contentHeight = scrollHeight - paddingTop - paddingBottom;
-                return Math.max(1, Math.ceil(contentHeight / actualLineHeight));
-            }
-            
             const codeText = pre.textContent || pre.innerText || '';
-            const newlineMatches = codeText.match(/\n/g);
-            const newlineCount = newlineMatches ? newlineMatches.length : 0;
-            const sourceLineCount = codeText.length > 0 ? newlineCount + 1 : 1;
-            let lineCount = countVisualLines(pre);
-            lineCount = Math.max(lineCount, sourceLineCount);
+            const sourceLines = codeText.split('\n');
+            let sourceLineCount = sourceLines.length;
+            if (codeText.length > 0 && sourceLineCount === 0) {
+                sourceLineCount = 1;
+            }
+            const lineCount = sourceLineCount;
             
             const lineNumbers = document.createElement('div');
             lineNumbers.className = 'code-line-numbers';
@@ -457,35 +418,27 @@ document.addEventListener('DOMContentLoaded', function() {
             
             content.insertBefore(lineNumbers, pre);
             
-            // Recalculate function
-            function recalculateLines() {
-                const actualVisualLines = countVisualLines(pre);
-                if (actualVisualLines > lineCount) {
-                    for (let i = lineCount + 1; i <= actualVisualLines; i++) {
-                        const span = document.createElement('span');
-                        span.textContent = i;
-                        lineNumbers.appendChild(span);
-                    }
-                    lineCount = actualVisualLines;
-                }
+            // Match height for wrapped lines, but only number source lines
+            setTimeout(() => {
                 const preHeight = pre.scrollHeight || pre.offsetHeight;
                 const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
                 if (Math.abs(preHeight - lineNumbersHeight) > 1) {
                     lineNumbers.style.height = preHeight + 'px';
                     lineNumbers.style.minHeight = preHeight + 'px';
                 }
-            }
-            
-            // Multiple recalculation passes
-            setTimeout(recalculateLines, 0);
-            setTimeout(recalculateLines, 50);
-            setTimeout(recalculateLines, 100);
-            setTimeout(recalculateLines, 200);
+            }, 100);
             
             let resizeTimeout;
             window.addEventListener('resize', () => {
                 clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(recalculateLines, 100);
+                resizeTimeout = setTimeout(() => {
+                    const preHeight = pre.scrollHeight || pre.offsetHeight;
+                    const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
+                    if (Math.abs(preHeight - lineNumbersHeight) > 1) {
+                        lineNumbers.style.height = preHeight + 'px';
+                        lineNumbers.style.minHeight = preHeight + 'px';
+                    }
+                }, 100);
             });
         }
     });
@@ -522,26 +475,14 @@ document.addEventListener('DOMContentLoaded', function() {
             existing.remove();
         }
         
-        // Count visual lines for active pre using same function
-        function countVisualLines(element) {
-            if (!element) return 1;
-            const computedStyle = window.getComputedStyle(element);
-            const lineHeight = parseFloat(computedStyle.lineHeight);
-            const fontSize = parseFloat(computedStyle.fontSize) || 13;
-            const actualLineHeight = (lineHeight > 10) ? lineHeight : (fontSize * lineHeight);
-            const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
-            const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
-            const scrollHeight = element.scrollHeight || element.offsetHeight;
-            const contentHeight = scrollHeight - paddingTop - paddingBottom;
-            return Math.max(1, Math.ceil(contentHeight / actualLineHeight));
-        }
-        
+        // Count SOURCE lines only (not wrapped visual lines)
         const codeText = activePre.textContent || activePre.innerText || '';
-        const newlineMatches = codeText.match(/\n/g);
-        const newlineCount = newlineMatches ? newlineMatches.length : 0;
-        const sourceLineCount = codeText.length > 0 ? newlineCount + 1 : 1;
-        let lineCount = countVisualLines(activePre);
-        lineCount = Math.max(lineCount, sourceLineCount);
+        const sourceLines = codeText.split('\n');
+        let sourceLineCount = sourceLines.length;
+        if (codeText.length > 0 && sourceLineCount === 0) {
+            sourceLineCount = 1;
+        }
+        const lineCount = sourceLineCount;
         
         // Create line numbers
         const lineNumbers = document.createElement('div');
@@ -553,35 +494,27 @@ document.addEventListener('DOMContentLoaded', function() {
             lineNumbers.appendChild(span);
         }
         
-        // Recalculate function
-        function recalculateLines() {
-            const actualVisualLines = countVisualLines(activePre);
-            if (actualVisualLines > lineCount) {
-                for (let i = lineCount + 1; i <= actualVisualLines; i++) {
-                    const span = document.createElement('span');
-                    span.textContent = i;
-                    lineNumbers.appendChild(span);
-                }
-                lineCount = actualVisualLines;
-            }
+        // Match height for wrapped lines, but only number source lines
+        setTimeout(() => {
             const preHeight = activePre.scrollHeight || activePre.offsetHeight;
             const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
             if (Math.abs(preHeight - lineNumbersHeight) > 1) {
                 lineNumbers.style.height = preHeight + 'px';
                 lineNumbers.style.minHeight = preHeight + 'px';
             }
-        }
-        
-        // Multiple recalculation passes
-        setTimeout(recalculateLines, 0);
-        setTimeout(recalculateLines, 50);
-        setTimeout(recalculateLines, 100);
-        setTimeout(recalculateLines, 200);
+        }, 100);
         
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(recalculateLines, 100);
+            resizeTimeout = setTimeout(() => {
+                const preHeight = activePre.scrollHeight || activePre.offsetHeight;
+                const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
+                if (Math.abs(preHeight - lineNumbersHeight) > 1) {
+                    lineNumbers.style.height = preHeight + 'px';
+                    lineNumbers.style.minHeight = preHeight + 'px';
+                }
+            }, 100);
         });
         
         // Insert at the beginning of content (before all pre elements)

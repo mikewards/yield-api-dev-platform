@@ -1769,7 +1769,8 @@ select option {
     font-size: 13px;
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.3);
-    min-height: calc(1.7em); /* Match line-height to ensure each line number takes full space */
+    /* Each span represents ONE source line, which may wrap to multiple visual lines */
+    /* The line-height matches the code, so wrapped lines will have empty space */
     flex-shrink: 0;
 }
 
