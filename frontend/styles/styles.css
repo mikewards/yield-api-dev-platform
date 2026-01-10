@@ -146,17 +146,22 @@ a.text-link:not(.btn):hover {
     padding: 8px 0;
     gap: 16px;
     min-height: 48px;
+    overflow: visible; /* Ensure logo SVG is not clipped */
 }
 
 .logo {
     display: flex;
     align-items: center;
     text-decoration: none;
+    overflow: visible; /* Ensure SVG is not clipped */
+    min-height: 33.4px; /* Accommodate full SVG height (25.6px width × 1.304 aspect ratio) */
 }
 
 .logo svg {
     width: 25.6px;
     height: auto; /* Maintain aspect ratio from viewBox (12.873:16.787) */
+    display: block; /* Remove any inline spacing */
+    overflow: visible; /* Ensure no clipping */
 }
 
 .footer-logo svg {
