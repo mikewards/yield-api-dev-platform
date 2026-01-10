@@ -1178,7 +1178,7 @@ select option {
     padding: 8px 12px !important;
     font-size: 14px !important;
     font-weight: 500;
-    border-radius: 8px;
+    border-radius: 8px !important;
     transition: all 0.2s ease;
 }
 
