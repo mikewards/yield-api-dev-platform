@@ -412,64 +412,30 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLineNumbers(activePre, container) {
         if (!activePre || !container) return;
         
-        const content = container.querySelector('.code-block-content');
-        if (!content) return;
-        
-        // Remove existing line numbers
-        const existing = content.querySelector('.code-line-numbers');
-        if (existing) {
-            existing.remove();
+        // Skip if already has .code-line elements
+        if (activePre.querySelector('.code-line')) {
+            return;
         }
         
-        // Count SOURCE lines only (not wrapped visual lines)
-        const codeText = activePre.textContent || activePre.innerText || '';
-        const sourceLines = codeText.split('\n');
-        let sourceLineCount = sourceLines.length;
-        if (codeText.length > 0 && sourceLineCount === 0) {
-            sourceLineCount = 1;
-        }
-        const lineCount = sourceLineCount;
+        // Get the code element or use pre directly
+        const codeElement = activePre.querySelector('code') || activePre;
         
-        // Create line numbers
-        const lineNumbers = document.createElement('div');
-        lineNumbers.className = 'code-line-numbers';
+        // Get the HTML content (preserving syntax highlighting)
+        const htmlContent = codeElement.innerHTML;
         
-        for (let i = 1; i <= lineCount; i++) {
-            const span = document.createElement('span');
-            span.textContent = i;
-            lineNumbers.appendChild(span);
-        }
+        // Split by newlines
+        const lines = htmlContent.split('\n');
         
-        // Match height for wrapped lines, but only number source lines
-        setTimeout(() => {
-            const preHeight = activePre.scrollHeight || activePre.offsetHeight;
-            const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
-            if (Math.abs(preHeight - lineNumbersHeight) > 1) {
-                lineNumbers.style.height = preHeight + 'px';
-                lineNumbers.style.minHeight = preHeight + 'px';
-            }
-        }, 100);
-        
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                const preHeight = activePre.scrollHeight || activePre.offsetHeight;
-                const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
-                if (Math.abs(preHeight - lineNumbersHeight) > 1) {
-                    lineNumbers.style.height = preHeight + 'px';
-                    lineNumbers.style.minHeight = preHeight + 'px';
-                }
-            }, 100);
+        // Wrap each line in a span with line number
+        const wrappedLines = lines.map((line, index) => {
+            return `<span class="code-line" data-line-num="${index + 1}">${line || ' '}</span>`;
         });
         
-        // Insert at the beginning of content (before all pre elements)
-        const firstChild = content.firstChild;
-        if (firstChild) {
-            content.insertBefore(lineNumbers, firstChild);
-        } else {
-            content.appendChild(lineNumbers);
-        }
+        // Set the new content - join without newlines since each span is display:block
+        codeElement.innerHTML = wrappedLines.join('');
+        
+        // Add class to pre for CSS styling
+        activePre.classList.add('has-line-numbers');
     }
     
     tabs.forEach(tab => {
