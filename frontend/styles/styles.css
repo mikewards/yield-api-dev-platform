@@ -1728,6 +1728,9 @@ select option {
     align-items: stretch;
     /* Ensure line numbers container matches pre height */
     align-self: stretch;
+    /* Ensure all line numbers are visible - no clipping */
+    overflow: visible;
+    min-height: 100%;
 }
 
 /* Show line numbers more prominently on hover */
