@@ -251,39 +251,39 @@ function addLineNumbers(codeBlock) {
         return;
     }
     
-    // Count VISUAL lines (accounting for text wrapping)
-    // We need to count the actual rendered lines, not just source newlines
+    // Count VISUAL lines by measuring actual rendered content
+    // This function will be called after initial render, then recalculated
+    function countVisualLines(element) {
+        if (!element) return 1;
+        
+        const computedStyle = window.getComputedStyle(element);
+        const lineHeight = parseFloat(computedStyle.lineHeight);
+        const fontSize = parseFloat(computedStyle.fontSize) || 13;
+        
+        // If lineHeight is a unitless number (like 1.7), multiply by fontSize
+        // If it's in pixels, use it directly
+        const actualLineHeight = (lineHeight > 10) ? lineHeight : (fontSize * lineHeight);
+        
+        const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
+        const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
+        const scrollHeight = element.scrollHeight || element.offsetHeight;
+        const contentHeight = scrollHeight - paddingTop - paddingBottom;
+        
+        // Calculate visual lines
+        const visualLines = Math.max(1, Math.ceil(contentHeight / actualLineHeight));
+        return visualLines;
+    }
+    
+    // Initial count - use source lines as starting point
     const codeText = pre.textContent || pre.innerText || '';
-    
-    // First, ensure the pre element is rendered so we can measure it
-    // Get the computed line-height (defaults to 1.7 if not set)
-    const computedStyle = window.getComputedStyle(pre);
-    const lineHeight = parseFloat(computedStyle.lineHeight) || 1.7;
-    const fontSize = parseFloat(computedStyle.fontSize) || 13;
-    const actualLineHeight = fontSize * lineHeight; // Actual pixel line height
-    
-    // Get the scroll height (full content height including wrapped lines)
-    const scrollHeight = pre.scrollHeight || pre.offsetHeight;
-    
-    // Calculate number of visual lines: height / line-height, rounded up
-    // Also account for padding (top and bottom padding of 16px each = 32px total)
-    const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
-    const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
-    const contentHeight = scrollHeight - paddingTop - paddingBottom;
-    let visualLineCount = Math.ceil(contentHeight / actualLineHeight);
-    
-    // Fallback: count source newlines if visual calculation fails
     const newlineMatches = codeText.match(/\n/g);
     const newlineCount = newlineMatches ? newlineMatches.length : 0;
-    const sourceLineCount = codeText.length > 0 ? newlineCount + 1 : 0;
+    const sourceLineCount = codeText.length > 0 ? newlineCount + 1 : 1;
     
-    // Use the maximum to ensure we don't miss any lines
-    let lineCount = Math.max(visualLineCount, sourceLineCount);
-    
-    // Safety check: if we have any text at all, we have at least 1 line
-    if (codeText.length > 0 && lineCount === 0) {
-        lineCount = 1;
-    }
+    // Try to get visual count immediately (may not be accurate yet)
+    let lineCount = countVisualLines(pre);
+    // Use the maximum to be safe
+    lineCount = Math.max(lineCount, sourceLineCount);
     
     // Create line numbers element
     const lineNumbers = document.createElement('div');
@@ -299,19 +299,9 @@ function addLineNumbers(codeBlock) {
     // Insert before pre
     content.insertBefore(lineNumbers, pre);
     
-    // After DOM insertion, recalculate based on actual rendered height
-    // This ensures we account for any wrapping that occurs after rendering
-    setTimeout(() => {
-        // Re-measure after rendering
-        const computedStyle = window.getComputedStyle(pre);
-        const lineHeight = parseFloat(computedStyle.lineHeight) || 1.7;
-        const fontSize = parseFloat(computedStyle.fontSize) || 13;
-        const actualLineHeight = fontSize * lineHeight;
-        const paddingTop = parseFloat(computedStyle.paddingTop) || 16;
-        const paddingBottom = parseFloat(computedStyle.paddingBottom) || 16;
-        const scrollHeight = pre.scrollHeight || pre.offsetHeight;
-        const contentHeight = scrollHeight - paddingTop - paddingBottom;
-        const actualVisualLines = Math.ceil(contentHeight / actualLineHeight);
+    // Recalculate after rendering - use multiple timeouts to catch all wrapping
+    function recalculateLines() {
+        const actualVisualLines = countVisualLines(pre);
         
         // If we need more line numbers, add them
         if (actualVisualLines > lineCount) {
@@ -331,7 +321,20 @@ function addLineNumbers(codeBlock) {
             lineNumbers.style.height = preHeight + 'px';
             lineNumbers.style.minHeight = preHeight + 'px';
         }
-    }, 100);
+    }
+    
+    // Recalculate multiple times to catch all rendering phases
+    setTimeout(recalculateLines, 0);
+    setTimeout(recalculateLines, 50);
+    setTimeout(recalculateLines, 100);
+    setTimeout(recalculateLines, 200);
+    
+    // Also recalculate on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(recalculateLines, 100);
+    });
 }
 
 // Auto-initialize code blocks on page load
