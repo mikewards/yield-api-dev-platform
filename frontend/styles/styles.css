@@ -296,7 +296,7 @@ a.text-link:not(.btn):hover {
 }
 
 .btn-split.btn-secondary .btn-arrow {
-    background: rgba(0, 0, 0, 0.03);
+    background: transparent;
 }
 
 .btn-split .btn-arrow svg {
@@ -305,7 +305,7 @@ a.text-link:not(.btn):hover {
 }
 
 .btn-split:hover .btn-arrow svg {
-    transform: rotate(45deg);
+    transform: rotate(-45deg);
 }
 
 .btn-split:hover .btn-arrow {
@@ -317,7 +317,7 @@ a.text-link:not(.btn):hover {
 }
 
 .btn-split.btn-secondary:hover .btn-arrow {
-    background: rgba(0, 0, 0, 0.08);
+    background: transparent;
 }
 
 /* Ensure split buttons maintain hover effects */
