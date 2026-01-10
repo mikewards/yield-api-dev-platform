@@ -301,7 +301,10 @@ a.text-link:not(.btn):hover {
 
 .btn-split .btn-arrow svg {
     transition: transform 0.2s ease;
-    transform: rotate(0deg);
+    transform: rotate(0deg) translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 .btn-split:hover .btn-arrow svg {
