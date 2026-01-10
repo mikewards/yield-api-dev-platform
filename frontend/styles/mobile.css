@@ -300,11 +300,84 @@
         width: 100%;
     }
     
+    /* Split buttons - mobile optimization */
+    .btn-split {
+        width: 100%;
+    }
+    
+    .btn-split .btn-text {
+        padding: 14px 16px 14px 20px;
+        font-size: 15px;
+        flex: 1;
+        min-width: 0; /* Allow text to shrink */
+    }
+    
+    .btn-split .btn-arrow {
+        padding: 14px 16px;
+        min-width: 44px;
+        flex-shrink: 0;
+    }
+    
+    .btn-split .btn-arrow svg {
+        width: 14px;
+        height: 18px;
+    }
+    
+    /* Signal ground icons in links - mobile sizing */
+    .signal-ground-icon {
+        margin-left: 3px;
+        flex-shrink: 0;
+    }
+    
+    .signal-ground-icon svg {
+        width: 12px;
+        height: 15px;
+    }
+    
+    /* QS link cards - ensure signal ground icons work */
+    .qs-link-card h3 .signal-ground-icon svg {
+        width: 14px;
+        height: 18px;
+    }
+    
     /* Links need more padding */
     .feature-link,
     .btn-link {
         padding: 12px 0;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    /* Split buttons - mobile optimization */
+    .btn-split {
+        width: 100%;
+    }
+    
+    .btn-split .btn-text {
+        padding: 14px 16px 14px 20px;
+        font-size: 15px;
+        flex: 1;
+    }
+    
+    .btn-split .btn-arrow {
+        padding: 14px 16px;
+        min-width: 44px;
+    }
+    
+    .btn-split .btn-arrow svg {
+        width: 14px;
+        height: 18px;
+    }
+    
+    /* Signal ground icons in links - mobile sizing */
+    .signal-ground-icon {
+        margin-left: 3px;
+    }
+    
+    .signal-ground-icon svg {
+        width: 12px;
+        height: 15px;
     }
     
     /* Sidebar links */
