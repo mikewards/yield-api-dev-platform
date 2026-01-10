@@ -1125,6 +1125,41 @@
             runWalletsCode();
             runYieldCode();
         });
+        
+        // Apply syntax highlighting after script.js loads
+        function initializeSdkHighlighting() {
+            if (typeof highlightHtml === 'undefined') {
+                console.warn('highlightHtml not available yet');
+                return;
+            }
+            
+            const sdkCodes = [
+                { id: 'applications-code', defaultCode: applicationsDefaultCode },
+                { id: 'wallets-code', defaultCode: walletsDefaultCode },
+                { id: 'yield-code', defaultCode: yieldDefaultCode }
+            ];
+            
+            sdkCodes.forEach(({ id, defaultCode }) => {
+                const codeElement = document.getElementById(id);
+                if (codeElement && !codeElement.dataset.highlighted) {
+                    const escapedCode = defaultCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    codeElement.innerHTML = highlightHtml(escapedCode);
+                    codeElement.dataset.highlighted = 'true';
+                    
+                    // Re-add line numbers after highlighting
+                    const pre = codeElement.closest('pre');
+                    if (pre && !pre.querySelector('.code-line')) {
+                        const htmlContent = codeElement.innerHTML;
+                        const lines = htmlContent.split('\n');
+                        const wrappedLines = lines.map((line, index) => {
+                            return `<span class="code-line" data-line-num="${index + 1}">${line || ' '}</span>`;
+                        });
+                        codeElement.innerHTML = wrappedLines.join('');
+                        pre.classList.add('has-line-numbers');
+                    }
+                }
+            });
+        }
 
         // Add slide-in animation
         const style = document.createElement('style');
@@ -1143,6 +1178,12 @@
         document.head.appendChild(style);
     </script>
     <script src="scripts/script.js"></script>
+    <script>
+        // Initialize SDK highlighting after script.js has loaded
+        if (typeof initializeSdkHighlighting === 'function') {
+            initializeSdkHighlighting();
+        }
+    </script>
     <script src="scripts/nav-auth.js"></script>
     <script src="scripts/tooltip.js"></script>
     <!-- Cloudflare Web Analytics -->
