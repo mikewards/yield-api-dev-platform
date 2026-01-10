@@ -270,8 +270,8 @@ function addLineNumbers(codeBlock) {
         return `<span class="code-line" data-line-num="${index + 1}">${line || ' '}</span>`;
     });
     
-    // Set the new content
-    codeElement.innerHTML = wrappedLines.join('\n');
+    // Set the new content - join without newlines since each span is display:block
+    codeElement.innerHTML = wrappedLines.join('');
     
     // Add class to pre for CSS styling
     pre.classList.add('has-line-numbers');
