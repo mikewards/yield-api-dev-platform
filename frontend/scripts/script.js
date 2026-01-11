@@ -251,31 +251,39 @@ function addLineNumbers(codeBlock) {
         return;
     }
     
-    // Count lines accurately - count ALL lines including the last one
+    // Count lines using the most reliable method
     const codeText = pre.textContent || pre.innerText || '';
     
-    // Count line breaks - every \n represents a line break
-    // If text doesn't end with \n, there's still a final line
-    let lineCount = 1; // Start with 1 for the first line
-    for (let i = 0; i < codeText.length; i++) {
-        if (codeText[i] === '\n') {
-            lineCount++;
-        }
-    }
+    // Method 1: Count newline characters directly
+    // Every \n creates a new line, so count = number of \n + 1
+    const newlineMatches = codeText.match(/\n/g);
+    const newlineCount = newlineMatches ? newlineMatches.length : 0;
+    const method1Count = codeText.length > 0 ? newlineCount + 1 : 0;
     
-    // Alternative: split and count, but handle edge cases
+    // Method 2: Split by newline
     const lines = codeText.split('\n');
-    const splitCount = lines.length;
-    // If last line is empty and text ends with \n, that's a trailing newline (count it)
-    // If last line is not empty, we have that many lines
-    // Always use the higher count to ensure we don't miss lines
-    lineCount = Math.max(lineCount, splitCount);
+    const method2Count = lines.length;
+    
+    // Method 3: If text ends with \n, there's an extra line after the last \n
+    // If text doesn't end with \n, the last element of split is still a line
+    // So split.length should always be correct, but let's verify
+    let method3Count = lines.length;
+    // If the last element is empty string and text doesn't end with \n, 
+    // that's still a valid line (empty line at the end)
+    
+    // Use the maximum of all methods to ensure we don't miss any lines
+    let lineCount = Math.max(method1Count, method2Count, method3Count);
+    
+    // Safety check: if we have any text at all, we have at least 1 line
+    if (codeText.length > 0 && lineCount === 0) {
+        lineCount = 1;
+    }
     
     // Create line numbers element
     const lineNumbers = document.createElement('div');
     lineNumbers.className = 'code-line-numbers';
     
-    // Generate line numbers for ALL lines
+    // Generate line numbers for ALL lines (1 to lineCount inclusive)
     for (let i = 1; i <= lineCount; i++) {
         const span = document.createElement('span');
         span.textContent = i;
@@ -295,9 +303,7 @@ function addLineNumbers(codeBlock) {
             lineNumbers.style.height = preHeight + 'px';
             lineNumbers.style.minHeight = preHeight + 'px';
         }
-    }, 10);
-    
-    // Insert line numbers before pre (moved to after generation)
+    }, 50);
 }
 
 // Auto-initialize code blocks on page load
@@ -390,15 +396,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (content && pre && !content.querySelector('.code-line-numbers')) {
             const codeText = pre.textContent || pre.innerText || '';
             
-            // Count all lines accurately
-            let lineCount = 1;
-            for (let i = 0; i < codeText.length; i++) {
-                if (codeText[i] === '\n') {
-                    lineCount++;
-                }
-            }
+            // Count lines using the same reliable method
+            const newlineMatches = codeText.match(/\n/g);
+            const newlineCount = newlineMatches ? newlineMatches.length : 0;
+            const method1Count = codeText.length > 0 ? newlineCount + 1 : 0;
             const lines = codeText.split('\n');
-            lineCount = Math.max(lineCount, lines.length);
+            const method2Count = lines.length;
+            let lineCount = Math.max(method1Count, method2Count);
+            if (codeText.length > 0 && lineCount === 0) {
+                lineCount = 1;
+            }
             
             const lineNumbers = document.createElement('div');
             lineNumbers.className = 'code-line-numbers';
@@ -419,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     lineNumbers.style.height = preHeight + 'px';
                     lineNumbers.style.minHeight = preHeight + 'px';
                 }
-            }, 10);
+            }, 50);
         }
     });
 });
@@ -455,17 +462,18 @@ document.addEventListener('DOMContentLoaded', function() {
             existing.remove();
         }
         
-        // Count lines for active pre - count ALL lines accurately
+        // Count lines for active pre using the same reliable method
         const codeText = activePre.textContent || activePre.innerText || '';
         
-        let lineCount = 1;
-        for (let i = 0; i < codeText.length; i++) {
-            if (codeText[i] === '\n') {
-                lineCount++;
-            }
-        }
+        const newlineMatches = codeText.match(/\n/g);
+        const newlineCount = newlineMatches ? newlineMatches.length : 0;
+        const method1Count = codeText.length > 0 ? newlineCount + 1 : 0;
         const lines = codeText.split('\n');
-        lineCount = Math.max(lineCount, lines.length);
+        const method2Count = lines.length;
+        let lineCount = Math.max(method1Count, method2Count);
+        if (codeText.length > 0 && lineCount === 0) {
+            lineCount = 1;
+        }
         
         // Create line numbers
         const lineNumbers = document.createElement('div');
@@ -485,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lineNumbers.style.height = preHeight + 'px';
                 lineNumbers.style.minHeight = preHeight + 'px';
             }
-        }, 10);
+        }, 50);
         
         // Insert at the beginning of content (before all pre elements)
         const firstChild = content.firstChild;

@@ -601,6 +601,21 @@
         overflow: hidden;
     }
     
+    /* Ensure line numbers match code font size on mobile */
+    .code-line-numbers {
+        font-size: 13px !important; /* Match code font size */
+    }
+    
+    .code-line-numbers span {
+        font-size: 13px !important; /* Match code font size */
+        line-height: 1.7 !important; /* Match code line-height */
+    }
+    
+    /* Code block content pre font size */
+    .code-block-content pre {
+        font-size: 13px;
+    }
+    
     /* API example boxes */
     .code-example-box {
         max-width: 100%;
