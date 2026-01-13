@@ -53,16 +53,8 @@ data class UpdateUserRequest(
     val avatar_url: String? = null
 )
 
-@Serializable
-data class ChangePasswordRequest(
-    val current_password: String,
-    val new_password: String
-)
-
-@Serializable
-data class DeleteAccountRequest(
-    val password: String
-)
+// Note: ChangePasswordRequest is defined in AccountSettingsDto.kt
+// Note: DeleteAccountRequest is defined in AccountSettingsDto.kt (with confirmation field)
 
 @Serializable
 data class EnableMfaRequest(

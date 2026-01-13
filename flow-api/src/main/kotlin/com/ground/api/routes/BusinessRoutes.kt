@@ -2,8 +2,6 @@ package com.ground.api.routes
 
 import com.ground.dto.*
 import com.ground.service.*
-import com.ground.middleware.CurrentUserIdKey
-import com.ground.middleware.CurrentBusinessIdKey
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -36,7 +34,7 @@ fun Application.businessRoutes() {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
                     
                     val businesses = businessService.listUserBusinesses(userId)
-                    call.respond(businesses.map { it.toResponse() })
+                    call.respond(businesses.map { it.toBusinessWithRolesResponse() })
                 }
                 
                 /**
@@ -45,7 +43,7 @@ fun Application.businessRoutes() {
                 post {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     val request = call.receive<CreateBusinessRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         val business = businessService.createBusiness(
@@ -57,7 +55,7 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(HttpStatusCode.Created, business.toResponse())
+                        call.respond(HttpStatusCode.Created, business.toBusinessResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.Conflict,
@@ -71,7 +69,7 @@ fun Application.businessRoutes() {
                  */
                 get("/{businessId}") {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@get call.respondBadRequest("Invalid business ID")
                     
                     // Check if user is a member
@@ -88,7 +86,7 @@ fun Application.businessRoutes() {
                         return@get
                     }
                     
-                    call.respond(business.toResponse())
+                    call.respond(business.toBusinessResponse())
                 }
                 
                 /**
@@ -96,10 +94,10 @@ fun Application.businessRoutes() {
                  */
                 patch("/{businessId}") {
                     val userId = call.getCurrentUserId() ?: return@patch call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@patch call.respondBadRequest("Invalid business ID")
                     val request = call.receive<UpdateBusinessRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         val business = businessService.updateBusiness(
@@ -119,7 +117,7 @@ fun Application.businessRoutes() {
                             )
                         }
                         
-                        call.respond(business.toResponse())
+                        call.respond(business.toBusinessResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respondForbidden(e.message ?: "Permission denied")
                     }
@@ -134,12 +132,12 @@ fun Application.businessRoutes() {
                  */
                 get("/{businessId}/members") {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@get call.respondBadRequest("Invalid business ID")
                     
                     try {
                         val members = businessService.listMembers(userId, businessId)
-                        call.respond(members.map { it.toResponse() })
+                        call.respond(members.map { it.toMemberResponse() })
                     } catch (e: IllegalArgumentException) {
                         call.respondForbidden(e.message ?: "Permission denied")
                     }
@@ -150,13 +148,13 @@ fun Application.businessRoutes() {
                  */
                 post("/{businessId}/invitations") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@post call.respondBadRequest("Invalid business ID")
                     val request = call.receive<InviteMemberRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
-                        val roleIds = request.role_ids.map { UUID.fromString(it) }
+                        val roleIds = request.role_ids.mapNotNull { it.toUUIDOrNull() }
                         
                         val invitation = businessService.inviteMember(
                             inviterId = userId,
@@ -166,7 +164,7 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(HttpStatusCode.Created, invitation.toResponse())
+                        call.respond(HttpStatusCode.Created, invitation.toInvitationResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.BadRequest,
@@ -180,11 +178,11 @@ fun Application.businessRoutes() {
                  */
                 delete("/{businessId}/members/{memberId}") {
                     val userId = call.getCurrentUserId() ?: return@delete call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid business ID")
-                    val memberId = call.parameters["memberId"]?.let { UUID.fromString(it) }
+                    val memberId = call.parameters["memberId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid member ID")
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         businessService.removeMember(
@@ -212,7 +210,7 @@ fun Application.businessRoutes() {
                  */
                 get("/{businessId}/roles") {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@get call.respondBadRequest("Invalid business ID")
                     
                     // Check membership
@@ -221,7 +219,7 @@ fun Application.businessRoutes() {
                     }
                     
                     val roles = roleService.listRoles(businessId)
-                    call.respond(roles.map { it.toResponse() })
+                    call.respond(roles.map { it.toRoleResponse() })
                 }
                 
                 /**
@@ -229,10 +227,10 @@ fun Application.businessRoutes() {
                  */
                 post("/{businessId}/roles") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@post call.respondBadRequest("Invalid business ID")
                     val request = call.receive<CreateRoleRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Check permission
                     if (!businessService.hasBusinessPermission(userId, businessId, "roles:create")) {
@@ -251,7 +249,7 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(HttpStatusCode.Created, role.toResponse())
+                        call.respond(HttpStatusCode.Created, role.toRoleResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.Conflict,
@@ -265,12 +263,12 @@ fun Application.businessRoutes() {
                  */
                 patch("/{businessId}/roles/{roleId}") {
                     val userId = call.getCurrentUserId() ?: return@patch call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@patch call.respondBadRequest("Invalid business ID")
-                    val roleId = call.parameters["roleId"]?.let { UUID.fromString(it) }
+                    val roleId = call.parameters["roleId"]?.toUUIDOrNull()
                         ?: return@patch call.respondBadRequest("Invalid role ID")
                     val request = call.receive<UpdateRoleRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Check permission
                     if (!businessService.hasBusinessPermission(userId, businessId, "roles:edit")) {
@@ -295,7 +293,7 @@ fun Application.businessRoutes() {
                             )
                         }
                         
-                        call.respond(role.toResponse())
+                        call.respond(role.toRoleResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.BadRequest,
@@ -309,11 +307,11 @@ fun Application.businessRoutes() {
                  */
                 delete("/{businessId}/roles/{roleId}") {
                     val userId = call.getCurrentUserId() ?: return@delete call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid business ID")
-                    val roleId = call.parameters["roleId"]?.let { UUID.fromString(it) }
+                    val roleId = call.parameters["roleId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid role ID")
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Check permission
                     if (!businessService.hasBusinessPermission(userId, businessId, "roles:delete")) {
@@ -336,12 +334,12 @@ fun Application.businessRoutes() {
                  */
                 post("/{businessId}/roles/{roleId}/assign") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@post call.respondBadRequest("Invalid business ID")
-                    val roleId = call.parameters["roleId"]?.let { UUID.fromString(it) }
+                    val roleId = call.parameters["roleId"]?.toUUIDOrNull()
                         ?: return@post call.respondBadRequest("Invalid role ID")
                     val request = call.receive<AssignRoleRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Check permission
                     if (!businessService.hasBusinessPermission(userId, businessId, "members:manage_roles")) {
@@ -349,7 +347,8 @@ fun Application.businessRoutes() {
                     }
                     
                     try {
-                        val targetUserId = UUID.fromString(request.user_id)
+                        val targetUserId = request.user_id.toUUIDOrNull()
+                            ?: return@post call.respondBadRequest("Invalid user ID")
                         val expiresAt = request.expires_at?.let { java.time.Instant.parse(it) }
                         
                         roleService.assignRole(
@@ -374,13 +373,13 @@ fun Application.businessRoutes() {
                  */
                 delete("/{businessId}/roles/{roleId}/users/{targetUserId}") {
                     val userId = call.getCurrentUserId() ?: return@delete call.respondUnauthorized()
-                    val businessId = call.parameters["businessId"]?.let { UUID.fromString(it) }
+                    val businessId = call.parameters["businessId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid business ID")
-                    val roleId = call.parameters["roleId"]?.let { UUID.fromString(it) }
+                    val roleId = call.parameters["roleId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid role ID")
-                    val targetUserId = call.parameters["targetUserId"]?.let { UUID.fromString(it) }
+                    val targetUserId = call.parameters["targetUserId"]?.toUUIDOrNull()
                         ?: return@delete call.respondBadRequest("Invalid target user ID")
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Check permission
                     if (!businessService.hasBusinessPermission(userId, businessId, "members:manage_roles")) {
@@ -411,7 +410,7 @@ fun Application.businessRoutes() {
                 post("/accept") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     val request = call.receive<AcceptInvitationRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         val business = businessService.acceptInvitation(
@@ -420,7 +419,7 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(business.toResponse())
+                        call.respond(business.toBusinessWithRolesResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.BadRequest,
@@ -435,7 +434,7 @@ fun Application.businessRoutes() {
                 post("/decline") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     val request = call.receive<AcceptInvitationRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         businessService.declineInvitation(
@@ -458,10 +457,10 @@ fun Application.businessRoutes() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS & EXTENSIONS
+// EXTENSION FUNCTIONS FOR RESPONSE MAPPING
 // ═══════════════════════════════════════════════════════════════
 
-private fun com.ground.service.BusinessResponse.toResponse() = BusinessResponse(
+private fun com.ground.service.BusinessResponse.toBusinessResponse() = BusinessResponse(
     id = this.id.toString(),
     name = this.name,
     slug = this.slug,
@@ -475,7 +474,7 @@ private fun com.ground.service.BusinessResponse.toResponse() = BusinessResponse(
     updated_at = this.updatedAt?.toString()
 )
 
-private fun com.ground.service.BusinessWithRoles.toResponse() = BusinessWithRolesResponse(
+private fun com.ground.service.BusinessWithRoles.toBusinessWithRolesResponse() = BusinessWithRolesResponse(
     id = this.id.toString(),
     name = this.name,
     slug = this.slug,
@@ -485,23 +484,23 @@ private fun com.ground.service.BusinessWithRoles.toResponse() = BusinessWithRole
     plan = this.plan,
     status = this.status,
     is_owner = this.isOwner,
-    roles = this.roles.map { it.toResponse() },
+    roles = this.roles.map { it.toRoleInfoResponse() },
     created_at = this.createdAt?.toString() ?: "",
     updated_at = this.updatedAt?.toString()
 )
 
-private fun com.ground.service.MemberInfo.toResponse() = MemberResponse(
+private fun com.ground.service.MemberInfo.toMemberResponse() = MemberResponse(
     user_id = this.userId.toString(),
     email = this.email,
     first_name = this.firstName,
     last_name = this.lastName,
     avatar_url = this.avatarUrl,
-    roles = this.roles.map { it.toResponse() },
+    roles = this.roles.map { it.toRoleInfoResponse() },
     is_owner = this.isOwner,
     joined_at = this.joinedAt?.toString()
 )
 
-private fun com.ground.service.InvitationResponse.toResponse() = InvitationResponse(
+private fun com.ground.service.InvitationResponse.toInvitationResponse() = com.ground.dto.InvitationResponse(
     membership_id = this.membershipId.toString(),
     business_id = this.businessId.toString(),
     business_name = this.businessName,
@@ -511,7 +510,7 @@ private fun com.ground.service.InvitationResponse.toResponse() = InvitationRespo
     role_ids = this.roleIds.map { it.toString() }
 )
 
-private fun com.ground.service.RoleInfo.toResponse() = RoleInfoResponse(
+private fun com.ground.service.RoleInfo.toRoleInfoResponse() = RoleInfoResponse(
     id = this.id.toString(),
     name = this.name,
     display_name = this.displayName,
@@ -519,7 +518,7 @@ private fun com.ground.service.RoleInfo.toResponse() = RoleInfoResponse(
     is_system = this.isSystem
 )
 
-private fun com.ground.service.RoleResponse.toResponse() = RoleResponse(
+private fun com.ground.service.RoleResponse.toRoleResponse() = com.ground.dto.RoleResponse(
     id = this.id.toString(),
     business_id = this.businessId.toString(),
     name = this.name,
@@ -534,17 +533,8 @@ private fun com.ground.service.RoleResponse.toResponse() = RoleResponse(
     updated_at = this.updatedAt?.toString()
 )
 
-suspend fun ApplicationCall.respondBadRequest(message: String) {
-    respond(
-        HttpStatusCode.BadRequest,
-        ErrorResponse(ErrorDetail("BAD_REQUEST", message, "validation_error"))
-    )
-}
+// ═══════════════════════════════════════════════════════════════
+// UTILITY EXTENSIONS
+// ═══════════════════════════════════════════════════════════════
 
-suspend fun ApplicationCall.respondForbidden(message: String) {
-    respond(
-        HttpStatusCode.Forbidden,
-        ErrorResponse(ErrorDetail("FORBIDDEN", message, "authorization_error"))
-    )
-}
-
+private fun String.toUUIDOrNull(): UUID? = try { UUID.fromString(this) } catch (e: Exception) { null }
