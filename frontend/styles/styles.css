@@ -1672,9 +1672,7 @@ select option {
 .code-block-content {
     padding: 0;
     overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    display: table;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -1690,11 +1688,12 @@ select option {
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-word;
-    flex: 1;
-    min-width: 0;
+    display: table-cell;
+    vertical-align: top;
     box-sizing: border-box;
     overflow-y: auto;
     max-height: 500px;
+    width: 100%;
 }
 
 /* When line numbers are present, adjust padding */
@@ -1717,18 +1716,14 @@ select option {
     user-select: none;
     text-align: right;
     min-width: 44px;
-    flex-shrink: 0;
     font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
     font-size: 12px;
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.25);
     transition: color 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    /* Match the padding of the pre element */
-    padding-top: 16px;
-    padding-bottom: 16px;
+    display: table-cell;
+    vertical-align: top;
+    width: 44px;
 }
 
 /* Show line numbers more prominently on hover */
@@ -1761,21 +1756,16 @@ select option {
 }
 
 .code-line-numbers span {
-    display: block;
+    display: table-row;
     padding: 0 12px;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 13px;
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.3);
-    flex-shrink: 0;
     /* Each span represents ONE source line */
-    /* Height is exactly one line-height to align with first visual line */
-    /* When source line wraps, wrapped lines have no span = no number */
+    /* Using table-row makes it align with the first visual line of its source line */
+    /* Wrapped continuation lines have no span = no number */
     height: 1.7em;
-    min-height: 1.7em;
-    max-height: 1.7em;
-    /* Ensure text aligns to top */
-    vertical-align: top;
 }
 
 /* Language code block switching */
