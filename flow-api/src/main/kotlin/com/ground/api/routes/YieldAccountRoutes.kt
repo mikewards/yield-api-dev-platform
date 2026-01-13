@@ -6,6 +6,7 @@ import com.ground.service.WebhookService
 import com.ground.middleware.ApplicationIdKey
 import com.ground.middleware.ApplicationNameKey
 import com.ground.middleware.EnvironmentKey
+import com.ground.middleware.CurrentUserIdKey
 import com.ground.integration.ProtocolService
 import com.ground.integration.morpho.MorphoMarket
 import com.ground.integration.aave.AaveReserve
@@ -128,11 +129,19 @@ fun Application.yieldAccountRoutes() {
             authenticate("bearer-auth") {
                 post {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val request = call.receive<CreateYieldAccountRequest>()
                     
                     try {
-                        val account = yieldService.createYieldAccount(accountId, request)
+                        // Try RCAC first
+                        val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                        
+                        val account = if (userId != null) {
+                            yieldService.createYieldAccountRcac(userId, request)
+                        } else {
+                            val accountId = UUID.fromString(principal.name)
+                            yieldService.createYieldAccount(accountId, request)
+                        }
+                        
                         call.respond(HttpStatusCode.Created, account)
                     } catch (e: IllegalArgumentException) {
                         call.respond(
@@ -144,17 +153,34 @@ fun Application.yieldAccountRoutes() {
                 
                 get {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
-                    val accounts = yieldService.listYieldAccounts(accountId)
+                    
+                    // Try RCAC first
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    
+                    val accounts = if (userId != null) {
+                        yieldService.listYieldAccountsRcac(userId)
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        yieldService.listYieldAccounts(accountId)
+                    }
+                    
                     call.respond(accounts)
                 }
                 
                 get("/{yieldAccountId}") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val yieldAccountId = UUID.fromString(call.parameters["yieldAccountId"])
                     
-                    val account = yieldService.getYieldAccount(accountId, yieldAccountId)
+                    // Try RCAC first
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    
+                    val account = if (userId != null) {
+                        yieldService.getYieldAccountRcac(userId, yieldAccountId, "read")
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        yieldService.getYieldAccount(accountId, yieldAccountId)
+                    }
+                    
                     if (account != null) {
                         call.respond(account)
                     } else {
@@ -167,7 +193,6 @@ fun Application.yieldAccountRoutes() {
                 
                 post("/{yieldAccountId}/deposit") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val yieldAccountId = UUID.fromString(call.parameters["yieldAccountId"])
                     val request = call.receive<DepositRequest>()
                     
@@ -177,22 +202,33 @@ fun Application.yieldAccountRoutes() {
                     val environment = call.attributes.getOrNull(EnvironmentKey)
                     
                     try {
-                        val transaction = yieldService.deposit(accountId, yieldAccountId, request)
+                        // Try RCAC first
+                        val userId = call.attributes.getOrNull(CurrentUserIdKey)
                         
-                        // Fire webhook event asynchronously with application context
-                        coroutineScope {
-                            launch {
-                                WebhookService.sendDepositCompleted(
-                                    accountId = accountId,
-                                    applicationId = applicationId,
-                                    applicationName = applicationName,
-                                    environment = environment,
-                                    yieldAccountId = yieldAccountId.toString(),
-                                    amount = request.amount,
-                                    currency = request.currency,
-                                    protocol = "auto",
-                                    transactionId = transaction.transaction_id
-                                )
+                        val transaction = if (userId != null) {
+                            yieldService.depositRcac(userId, yieldAccountId, request)
+                        } else {
+                            val accountId = UUID.fromString(principal.name)
+                            yieldService.deposit(accountId, yieldAccountId, request)
+                        }
+                        
+                        // Fire webhook event asynchronously (legacy, uses accountId if available)
+                        val accountIdForWebhook = try { UUID.fromString(principal.name) } catch (e: Exception) { null }
+                        if (accountIdForWebhook != null) {
+                            coroutineScope {
+                                launch {
+                                    WebhookService.sendDepositCompleted(
+                                        accountId = accountIdForWebhook,
+                                        applicationId = applicationId,
+                                        applicationName = applicationName,
+                                        environment = environment,
+                                        yieldAccountId = yieldAccountId.toString(),
+                                        amount = request.amount,
+                                        currency = request.currency,
+                                        protocol = "auto",
+                                        transactionId = transaction.transaction_id
+                                    )
+                                }
                             }
                         }
                         
@@ -207,7 +243,6 @@ fun Application.yieldAccountRoutes() {
                 
                 post("/{yieldAccountId}/withdraw") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val yieldAccountId = UUID.fromString(call.parameters["yieldAccountId"])
                     val request = call.receive<WithdrawRequest>()
                     
@@ -217,21 +252,32 @@ fun Application.yieldAccountRoutes() {
                     val environment = call.attributes.getOrNull(EnvironmentKey)
                     
                     try {
-                        val transaction = yieldService.withdraw(accountId, yieldAccountId, request)
+                        // Try RCAC first
+                        val userId = call.attributes.getOrNull(CurrentUserIdKey)
                         
-                        // Fire webhook event asynchronously with application context
-                        coroutineScope {
-                            launch {
-                                WebhookService.sendWithdrawalCompleted(
-                                    accountId = accountId,
-                                    applicationId = applicationId,
-                                    applicationName = applicationName,
-                                    environment = environment,
-                                    yieldAccountId = yieldAccountId.toString(),
-                                    amount = request.amount,
-                                    currency = request.currency,
-                                    transactionId = transaction.transaction_id
-                                )
+                        val transaction = if (userId != null) {
+                            yieldService.withdrawRcac(userId, yieldAccountId, request)
+                        } else {
+                            val accountId = UUID.fromString(principal.name)
+                            yieldService.withdraw(accountId, yieldAccountId, request)
+                        }
+                        
+                        // Fire webhook event asynchronously (legacy, uses accountId if available)
+                        val accountIdForWebhook = try { UUID.fromString(principal.name) } catch (e: Exception) { null }
+                        if (accountIdForWebhook != null) {
+                            coroutineScope {
+                                launch {
+                                    WebhookService.sendWithdrawalCompleted(
+                                        accountId = accountIdForWebhook,
+                                        applicationId = applicationId,
+                                        applicationName = applicationName,
+                                        environment = environment,
+                                        yieldAccountId = yieldAccountId.toString(),
+                                        amount = request.amount,
+                                        currency = request.currency,
+                                        transactionId = transaction.transaction_id
+                                    )
+                                }
                             }
                         }
                         
