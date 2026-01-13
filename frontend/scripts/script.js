@@ -387,28 +387,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             content.insertBefore(lineNumbers, pre);
             
-            // Match height for wrapped lines, but only number source lines
-            setTimeout(() => {
-                const preHeight = pre.scrollHeight || pre.offsetHeight;
-                const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
-                if (Math.abs(preHeight - lineNumbersHeight) > 1) {
-                    lineNumbers.style.height = preHeight + 'px';
-                    lineNumbers.style.minHeight = preHeight + 'px';
-                }
-            }, 100);
-            
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    const preHeight = pre.scrollHeight || pre.offsetHeight;
-                    const lineNumbersHeight = lineNumbers.scrollHeight || lineNumbers.offsetHeight;
-                    if (Math.abs(preHeight - lineNumbersHeight) > 1) {
-                        lineNumbers.style.height = preHeight + 'px';
-                        lineNumbers.style.minHeight = preHeight + 'px';
-                    }
-                }, 100);
-            });
+            // DO NOT match height - let line numbers be naturally sized
+            // One line number per source line, each exactly one line-height tall
         }
     });
 });
