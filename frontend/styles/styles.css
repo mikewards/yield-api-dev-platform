@@ -1674,7 +1674,7 @@ select option {
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: flex-start;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -1726,9 +1726,9 @@ select option {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    /* Do NOT stretch to match pre height - let it be naturally sized */
-    /* Each span is one line-height, aligning with first visual line of each source line */
-    align-self: flex-start;
+    /* Match the padding of the pre element */
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
 
 /* Show line numbers more prominently on hover */
@@ -1768,12 +1768,14 @@ select option {
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
-    /* Each span is exactly ONE line-height tall */
-    /* It aligns with the FIRST visual line of its source line */
-    /* Wrapped continuation lines have no span, so no number */
-    height: calc(1.7em);
-    min-height: calc(1.7em);
-    max-height: calc(1.7em);
+    /* Each span represents ONE source line */
+    /* Height is exactly one line-height to align with first visual line */
+    /* When source line wraps, wrapped lines have no span = no number */
+    height: 1.7em;
+    min-height: 1.7em;
+    max-height: 1.7em;
+    /* Ensure text aligns to top */
+    vertical-align: top;
 }
 
 /* Language code block switching */
