@@ -2138,6 +2138,45 @@ function populatePage(endpoint) {
     if (!isWebhookEvent) {
         setupEnvironmentToggle();
     }
+    
+    // Add line numbers to all code blocks after content is populated
+    addLineNumbersToApiDetailBlocks();
+}
+
+// Add line numbers to code blocks on API detail page
+// Uses the same approach as script.js - wrapping each source line with inline numbers
+function addLineNumbersToApiDetailBlocks() {
+    document.querySelectorAll('.code-block-unified').forEach(codeBlock => {
+        const content = codeBlock.querySelector('.code-block-content');
+        if (!content) return;
+        
+        const pre = content.querySelector('pre');
+        if (!pre) return;
+        
+        // Skip if already processed
+        if (pre.dataset.lineNumbersAdded) return;
+        pre.dataset.lineNumbersAdded = 'true';
+        
+        // Get the code element or use pre directly
+        const codeElement = pre.querySelector('code') || pre;
+        
+        // Get the HTML content (preserving syntax highlighting)
+        const htmlContent = codeElement.innerHTML;
+        
+        // Split by newlines
+        const lines = htmlContent.split('\n');
+        
+        // Wrap each line in a span with line number
+        const wrappedLines = lines.map((line, index) => {
+            return `<span class="code-line" data-line-num="${index + 1}">${line || ' '}</span>`;
+        });
+        
+        // Set the new content - join without newlines since each span is display:block
+        codeElement.innerHTML = wrappedLines.join('');
+        
+        // Add class to pre for CSS styling
+        pre.classList.add('has-line-numbers');
+    });
 }
 
 function createParamElement(param, isWebhookEvent = false) {
