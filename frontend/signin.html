@@ -160,14 +160,19 @@
 
     <script src="scripts/config.js"></script>
     <script>
+        console.log('🔐 Sign-in page script loading...');
+        
         // API_BASE_URL is now set by config.js
         if (typeof API_BASE_URL === 'undefined') {
             console.error('API_BASE_URL is not defined! Check config.js');
             alert('Configuration error: API URL not set. Please refresh the page.');
+        } else {
+            console.log('✅ API_BASE_URL:', API_BASE_URL);
         }
         
         // Check if already logged in with valid session
         (async function checkExistingSession() {
+            console.log('🔍 Checking existing session...');
             const existingToken = localStorage.getItem('tbd_token');
             const refreshToken = localStorage.getItem('tbd_refresh_token');
             
@@ -206,21 +211,30 @@
             }
         })();
         
-        document.getElementById('signinForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing In...';
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        const signinForm = document.getElementById('signinForm');
+        console.log('📝 Sign-in form found:', !!signinForm);
+        
+        if (!signinForm) {
+            console.error('❌ Sign-in form not found!');
+        } else {
+            signinForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('🚀 Form submitted!');
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Signing In...';
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                console.log('📧 Attempting login for:', email);
 
-            try {
-                // Try RCAC login first (email-based)
-                let response = await fetch(`${API_BASE_URL}/v1/users/login`, {
+                try {
+                    // Try RCAC login first (email-based)
+                    console.log('🔗 Calling RCAC login:', `${API_BASE_URL}/v1/users/login`);
+                    let response = await fetch(`${API_BASE_URL}/v1/users/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -292,7 +306,8 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
-        });
+            });
+        }
         
         function showErrorMessage(message) {
             const existingError = document.querySelector('.error-message');
