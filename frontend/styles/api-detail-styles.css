@@ -407,6 +407,52 @@
     display: block;
 }
 
+/* Line numbers for API detail page code blocks */
+.example-section .code-block-content pre.has-line-numbers {
+    padding-left: 60px !important;
+}
+
+.example-section .code-block-content pre.has-line-numbers .code-line {
+    display: block;
+    position: relative;
+}
+
+.example-section .code-block-content pre.has-line-numbers .code-line::before {
+    content: attr(data-line-num);
+    position: absolute;
+    left: -48px;
+    width: 36px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    line-height: 1.7;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Response section line numbers */
+.response-section .code-block-content pre.has-line-numbers {
+    padding-left: 60px !important;
+}
+
+.response-section .code-block-content pre.has-line-numbers .code-line {
+    display: block;
+    position: relative;
+}
+
+.response-section .code-block-content pre.has-line-numbers .code-line::before {
+    content: attr(data-line-num);
+    position: absolute;
+    left: -48px;
+    width: 36px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    line-height: 1.7;
+    user-select: none;
+    pointer-events: none;
+}
+
 .code-example-box {
     background: #455162;
     border-radius: 8px;
