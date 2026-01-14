@@ -1,6 +1,8 @@
 package com.ground.api.routes
 
 import com.ground.dto.*
+import com.ground.middleware.CurrentUserIdKey
+import com.ground.middleware.CurrentBusinessIdKey
 import com.ground.service.WebhookService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -9,6 +11,27 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
+
+/**
+ * Get the effective context ID for webhook operations.
+ * 
+ * Priority:
+ * 1. X-Business-Id header (RCAC: webhooks scoped to business)
+ * 2. Legacy accountId from principal
+ * 
+ * This allows team members to share webhook configuration within a business.
+ */
+private fun ApplicationCall.getWebhookContextId(): UUID? {
+    // Try RCAC business context first
+    val businessId = attributes.getOrNull(CurrentBusinessIdKey)
+    if (businessId != null) return businessId
+    
+    // Fall back to legacy accountId
+    val principal = principal<UserIdPrincipal>()
+    return principal?.name?.let { 
+        try { UUID.fromString(it) } catch (e: Exception) { null }
+    }
+}
 
 fun Application.webhookRoutes() {
     routing {
@@ -85,11 +108,10 @@ fun Application.webhookRoutes() {
             authenticate("bearer-auth") {
                 // List all webhook endpoints
                 get {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
-                    val endpoints = WebhookService.listEndpoints(UUID.fromString(accountId))
+                    val endpoints = WebhookService.listEndpoints(contextId)
                     
                     val response = endpoints.map { endpoint ->
                         WebhookEndpointResponse(
@@ -111,9 +133,8 @@ fun Application.webhookRoutes() {
                 
                 // Create a new webhook endpoint
                 post {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
                     val request = call.receive<CreateWebhookEndpointRequest>()
                     
@@ -140,7 +161,7 @@ fun Application.webhookRoutes() {
                     }
                     
                     val result = WebhookService.createEndpoint(
-                        accountId = UUID.fromString(accountId),
+                        accountId = contextId,
                         url = request.url,
                         description = request.description,
                         filterTypes = request.filterTypes
@@ -170,14 +191,13 @@ fun Application.webhookRoutes() {
                 
                 // Get a specific endpoint
                 get("/{endpointId}") {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
                     
-                    val endpoint = WebhookService.getEndpoint(UUID.fromString(accountId), endpointId)
+                    val endpoint = WebhookService.getEndpoint(contextId, endpointId)
                         ?: return@get call.respond(HttpStatusCode.NotFound, mapOf("error" to "Endpoint not found"))
                     
                     call.respond(
@@ -196,14 +216,13 @@ fun Application.webhookRoutes() {
                 
                 // Delete an endpoint
                 delete("/{endpointId}") {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@delete call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@delete call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
                     
-                    val deleted = WebhookService.deleteEndpoint(UUID.fromString(accountId), endpointId)
+                    val deleted = WebhookService.deleteEndpoint(contextId, endpointId)
                     
                     if (deleted) {
                         call.respond(HttpStatusCode.NoContent)
@@ -214,9 +233,8 @@ fun Application.webhookRoutes() {
                 
                 // Test a webhook endpoint
                 post("/{endpointId}/test") {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@post call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
                     val endpointId = call.parameters["endpointId"]
                         ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing endpoint ID"))
@@ -236,12 +254,12 @@ fun Application.webhookRoutes() {
                     
                     // Send test event
                     val success = WebhookService.sendEvent(
-                        accountId = UUID.fromString(accountId),
+                        accountId = contextId,
                         eventType = request.eventType,
                         payload = mapOf(
                             "test" to true,
                             "event_type" to request.eventType,
-                            "message" to "This is a test webhook event from TBD",
+                            "message" to "This is a test webhook event from Ground",
                             "timestamp" to System.currentTimeMillis()
                         )
                     )
@@ -267,16 +285,15 @@ fun Application.webhookRoutes() {
                 
                 // Get App Portal URL for viewing webhook logs
                 get("/portal") {
-                    val principal = call.principal<UserIdPrincipal>()
+                    val contextId = call.getWebhookContextId()
                         ?: return@get call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid token"))
-                    val accountId = principal.name
                     
-                    val result = WebhookService.getAppPortalUrl(UUID.fromString(accountId))
+                    val result = WebhookService.getAppPortalUrl(contextId)
                     
                     if (result.url != null) {
                         call.respond(HttpStatusCode.OK, WebhookPortalResponse(
                             url = result.url,
-                            recentMessages = WebhookService.getRecentMessageCount(UUID.fromString(accountId))
+                            recentMessages = WebhookService.getRecentMessageCount(contextId)
                         ))
                     } else {
                         call.respond(

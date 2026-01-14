@@ -1,6 +1,7 @@
 package com.ground.api.routes
 
 import com.ground.dto.*
+import com.ground.middleware.CurrentUserIdKey
 import com.ground.service.ApplicationService
 import com.ground.service.WalletService
 import io.ktor.http.*
@@ -21,16 +22,24 @@ fun Application.walletRoutes() {
                 // Create new wallet for application
                 post {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     val request = call.receive<CreateWalletRequest>()
                     
-                    // Verify application belongs to account
-                    val app = applicationService.getApplication(accountId, applicationId)
-                        ?: return@post call.respond(
+                    // Try RCAC first, then legacy
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    val app = if (userId != null) {
+                        applicationService.getApplicationRcac(userId, applicationId, "write")
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.getApplication(accountId, applicationId)
+                    }
+                    
+                    if (app == null) {
+                        return@post call.respond(
                             HttpStatusCode.NotFound,
                             ErrorResponse(ErrorDetail("NOT_FOUND", "Application not found", "not_found_error"))
                         )
+                    }
                     
                     // Create wallet with same environment as application
                     val wallet = walletService.createWallet(
@@ -57,15 +66,23 @@ fun Application.walletRoutes() {
                 // List all wallets for application
                 get {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     
-                    // Verify application belongs to account
-                    val app = applicationService.getApplication(accountId, applicationId)
-                        ?: return@get call.respond(
+                    // Try RCAC first, then legacy
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    val app = if (userId != null) {
+                        applicationService.getApplicationRcac(userId, applicationId, "read")
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.getApplication(accountId, applicationId)
+                    }
+                    
+                    if (app == null) {
+                        return@get call.respond(
                             HttpStatusCode.NotFound,
                             ErrorResponse(ErrorDetail("NOT_FOUND", "Application not found", "not_found_error"))
                         )
+                    }
                     
                     val wallets = walletService.listWallets(applicationId)
                     call.respond(
@@ -88,16 +105,24 @@ fun Application.walletRoutes() {
                 // Get specific wallet
                 get("/{walletId}") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     val walletId = UUID.fromString(call.parameters["walletId"])
                     
-                    // Verify application belongs to account
-                    val app = applicationService.getApplication(accountId, applicationId)
-                        ?: return@get call.respond(
+                    // Try RCAC first, then legacy
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    val app = if (userId != null) {
+                        applicationService.getApplicationRcac(userId, applicationId, "read")
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.getApplication(accountId, applicationId)
+                    }
+                    
+                    if (app == null) {
+                        return@get call.respond(
                             HttpStatusCode.NotFound,
                             ErrorResponse(ErrorDetail("NOT_FOUND", "Application not found", "not_found_error"))
                         )
+                    }
                     
                     val wallet = walletService.getWallet(walletId)
                         ?: return@get call.respond(
@@ -129,16 +154,24 @@ fun Application.walletRoutes() {
                 // Archive wallet
                 delete("/{walletId}") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     val walletId = UUID.fromString(call.parameters["walletId"])
                     
-                    // Verify application belongs to account
-                    val app = applicationService.getApplication(accountId, applicationId)
-                        ?: return@delete call.respond(
+                    // Try RCAC first (need admin), then legacy
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    val app = if (userId != null) {
+                        applicationService.getApplicationRcac(userId, applicationId, "admin")
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.getApplication(accountId, applicationId)
+                    }
+                    
+                    if (app == null) {
+                        return@delete call.respond(
                             HttpStatusCode.NotFound,
                             ErrorResponse(ErrorDetail("NOT_FOUND", "Application not found", "not_found_error"))
                         )
+                    }
                     
                     val archived = walletService.archiveWallet(walletId)
                     if (archived) {
