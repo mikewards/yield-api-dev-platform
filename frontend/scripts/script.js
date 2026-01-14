@@ -233,6 +233,8 @@ function highlightJson(text) {
 }
 
 // Generate line numbers for code blocks
+// NEW APPROACH: Wrap each source line in its own div with CSS counter for line numbers
+// This ensures line numbers stay with their source line even when text wraps
 function addLineNumbers(codeBlock) {
     const content = codeBlock.querySelector('.code-block-content');
     if (!content) return;
@@ -246,38 +248,33 @@ function addLineNumbers(codeBlock) {
     const pre = content.querySelector('pre');
     if (!pre) return;
     
-    // Skip if line numbers already exist
-    if (pre.previousElementSibling && pre.previousElementSibling.classList.contains('code-line-numbers')) {
+    // Skip if already processed
+    if (pre.dataset.lineNumbersAdded) {
         return;
     }
+    pre.dataset.lineNumbersAdded = 'true';
     
-    // Count SOURCE lines only (split by \n)
-    // Each source line gets ONE number, wrapped lines get no number
-    const codeText = pre.textContent || pre.innerText || '';
-    const sourceLines = codeText.split('\n');
-    let sourceLineCount = sourceLines.length;
-    if (codeText.length > 0 && sourceLineCount === 0) {
-        sourceLineCount = 1;
-    }
+    // Get the code element or use pre directly
+    const codeElement = pre.querySelector('code') || pre;
     
-    // Create line numbers element
-    const lineNumbers = document.createElement('div');
-    lineNumbers.className = 'code-line-numbers';
+    // Get the HTML content (preserving syntax highlighting)
+    const htmlContent = codeElement.innerHTML;
     
-    // Generate one line number per source line
-    // Each span will be exactly one line-height tall, aligning with first visual line
-    for (let i = 1; i <= sourceLineCount; i++) {
-        const span = document.createElement('span');
-        span.textContent = i;
-        lineNumbers.appendChild(span);
-    }
+    // Split by newlines while preserving HTML
+    // This regex splits on newlines but keeps the HTML structure
+    const lines = htmlContent.split('\n');
     
-    // Insert before pre
-    content.insertBefore(lineNumbers, pre);
+    // Wrap each line in a span with line number
+    const wrappedLines = lines.map((line, index) => {
+        // Use data-line-num attribute for CSS to display the number
+        return `<span class="code-line" data-line-num="${index + 1}">${line || ' '}</span>`;
+    });
     
-    // DO NOT match container height to pre height
-    // Let line numbers be naturally sized (one line-height per source line)
-    // Wrapped lines will naturally have no number because there's no span for them
+    // Set the new content
+    codeElement.innerHTML = wrappedLines.join('\n');
+    
+    // Add class to pre for CSS styling
+    pre.classList.add('has-line-numbers');
 }
 
 // Auto-initialize code blocks on page load

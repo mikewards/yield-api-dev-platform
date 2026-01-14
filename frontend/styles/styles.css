@@ -1672,9 +1672,6 @@ select option {
 .code-block-content {
     padding: 0;
     overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -1690,11 +1687,33 @@ select option {
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-word;
-    flex: 1;
-    min-width: 0;
     box-sizing: border-box;
     overflow-y: auto;
     max-height: 500px;
+    counter-reset: line-number;
+}
+
+/* Line numbers using CSS counter - number stays with source line even when wrapped */
+.code-block-content pre.has-line-numbers {
+    padding-left: 60px;
+}
+
+.code-block-content pre.has-line-numbers .code-line {
+    display: block;
+    position: relative;
+}
+
+.code-block-content pre.has-line-numbers .code-line::before {
+    content: attr(data-line-num);
+    position: absolute;
+    left: -48px;
+    width: 36px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    line-height: 1.7;
+    user-select: none;
+    pointer-events: none;
 }
 
 /* When line numbers are present, adjust padding */
@@ -1710,21 +1729,9 @@ select option {
 }
 
 /* Line numbers - Stripe/Square style */
+/* Old line numbers column - hidden, using inline approach now */
 .code-line-numbers {
-    padding: 16px 0;
-    background: #455162;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    user-select: none;
-    text-align: right;
-    min-width: 44px;
-    flex-shrink: 0;
-    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
-    font-size: 12px;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.25);
-    transition: color 0.2s ease;
-    display: flex;
-    flex-direction: column;
+    display: none;
 }
 
 /* Show line numbers more prominently on hover */
