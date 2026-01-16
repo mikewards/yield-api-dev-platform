@@ -298,7 +298,7 @@
             display: flex;
         }
         
-        .modal {
+        .modal-overlay .modal-box {
             background: white;
             border-radius: 12px;
             width: 100%;
@@ -311,19 +311,19 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
-        .modal h3 {
+        .modal-overlay .modal-box h3 {
             font-size: 18px;
             font-weight: 600;
             margin: 0 0 8px 0;
         }
         
-        .modal > p {
+        .modal-overlay .modal-box > p {
             font-size: 14px;
             color: var(--text-secondary);
             margin: 0 0 20px 0;
         }
         
-        .modal-form .form-group {
+        .modal-overlay .modal-form .form-group {
             margin-bottom: 16px;
         }
         
@@ -509,7 +509,7 @@
                 flex: 1;
             }
             
-            .modal {
+            .modal-overlay .modal-box {
                 max-width: 90%;
                 margin: 20px;
                 padding: 20px;
@@ -770,7 +770,7 @@
 
     <!-- Invite Member Modal -->
     <div class="modal-overlay" id="inviteModal">
-        <div class="modal">
+        <div class="modal-box">
             <h3>Invite Team Member</h3>
             <p>Send an invitation to join this business.</p>
             <form class="modal-form" id="inviteForm">
@@ -796,7 +796,7 @@
     
     <!-- Create Business Modal -->
     <div class="modal-overlay" id="createBusinessModal">
-        <div class="modal">
+        <div class="modal-box">
             <h3>Create New Business</h3>
             <p>Set up a new business organization.</p>
             <form class="modal-form" id="createBusinessForm">
@@ -818,7 +818,7 @@
     
     <!-- Create Role Modal -->
     <div class="modal-overlay" id="createRoleModal">
-        <div class="modal">
+        <div class="modal-box">
             <h3>Create Custom Role</h3>
             <p>Define a new role with specific permissions.</p>
             <form class="modal-form" id="createRoleForm">
