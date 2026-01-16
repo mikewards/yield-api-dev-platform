@@ -230,6 +230,8 @@ class UserService(
     /**
      * Authenticate user with email and password.
      * Handles account lockout after failed attempts.
+     * 
+     * Also supports login by username (for migrated accounts where email might be username@migrated.ground.dev)
      */
     fun authenticate(
         email: String,
@@ -238,8 +240,24 @@ class UserService(
         userAgent: String? = null
     ): AuthResult {
         return transaction {
-            val user = Users.select { Users.email eq email.lowercase().trim() }
-                .firstOrNull() ?: return@transaction AuthResult.InvalidCredentials
+            val normalizedInput = email.lowercase().trim()
+            
+            // First, try to find by exact email match
+            var user = Users.select { Users.email eq normalizedInput }.firstOrNull()
+            
+            // If not found and input doesn't look like an email, try as username
+            // (for migrated accounts where email is username@migrated.ground.dev)
+            if (user == null && !normalizedInput.contains("@")) {
+                val migratedEmail = "$normalizedInput@migrated.ground.dev"
+                user = Users.select { Users.email eq migratedEmail }.firstOrNull()
+            }
+            
+            // Also try matching by firstName (which is set to username during migration)
+            if (user == null) {
+                user = Users.select { Users.firstName eq normalizedInput }.firstOrNull()
+            }
+            
+            if (user == null) return@transaction AuthResult.InvalidCredentials
             
             val userId = user[Users.id].value
             
