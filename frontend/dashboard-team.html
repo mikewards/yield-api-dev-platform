@@ -937,11 +937,14 @@
         });
         
         async function loadBusinesses() {
+            console.log('📊 Loading businesses...');
             try {
                 const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses`);
+                console.log('📊 Businesses API response:', response?.status);
                 
                 if (response && response.ok) {
                     const data = await response.json();
+                    console.log('📊 Businesses data:', data);
                     businesses = data.businesses || [];
                     
                     const select = document.getElementById('businessSelect');
@@ -1214,6 +1217,11 @@
         async function handleInviteMember(e) {
             e.preventDefault();
             
+            if (!currentBusinessId) {
+                showMessage('Please select or create a business first', 'error');
+                return;
+            }
+            
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
@@ -1253,6 +1261,11 @@
         
         async function handleCreateRole(e) {
             e.preventDefault();
+            
+            if (!currentBusinessId) {
+                showMessage('Please select or create a business first', 'error');
+                return;
+            }
             
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
