@@ -306,6 +306,9 @@
             padding: 24px;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
         .modal h3 {
@@ -921,12 +924,16 @@
                 document.getElementById('teamMembersSection').style.pointerEvents = 'none';
                 document.getElementById('rolesSection').style.opacity = '0.5';
                 document.getElementById('rolesSection').style.pointerEvents = 'none';
+                // Still setup event listeners so buttons work
+                setupEventListeners();
                 return;
             }
             
+            // Setup event listeners first (so buttons work even if API fails)
+            setupEventListeners();
+            
             // Load businesses
             await loadBusinesses();
-            setupEventListeners();
         });
         
         async function loadBusinesses() {
