@@ -3,6 +3,7 @@ package com.ground.service
 import com.ground.model.AuditLogs
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -203,7 +204,8 @@ class AuditService {
     ): List<AuditLogEntry> {
         return transaction {
             AuditLogs.select { 
-                (AuditLogs.resourceType eq resourceType) and (AuditLogs.resourceId eq resourceId)
+                (AuditLogs.resourceType eq resourceType) and 
+                (AuditLogs.resourceId eq resourceId)
             }
             .orderBy(AuditLogs.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC)
             .limit(limit, offset.toLong())

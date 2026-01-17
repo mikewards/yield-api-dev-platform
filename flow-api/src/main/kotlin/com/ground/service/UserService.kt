@@ -311,7 +311,7 @@ class UserService(
             val now = Instant.now()
             Users.update({ Users.id eq userId }) {
                 it[failedLoginAttempts] = 0
-                it[lockedUntil] = null
+                it[Users.lockedUntil] = null
                 it[lastLoginAt] = now
                 it[lastLoginIp] = ipAddress
             }
