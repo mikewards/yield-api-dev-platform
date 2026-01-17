@@ -150,14 +150,15 @@ function highlightHtml(text) {
     
     // Highlight HTML tags (opening and closing)
     // Match: &lt;tag attributes&gt; or &lt;/tag&gt; or &lt;tag/&gt;
-    html = html.replace(/(&lt;)(\/?)([\w-]+)([^&]*?)(\/?)(&gt;)/g, function(match, open, slash, tag, attrs, selfClose, close) {
+    // Use [\s\S]*? to match any character including newlines, but stop at &gt;
+    html = html.replace(/(&lt;)(\/?)([\w-]+)([\s\S]*?)(&gt;)/g, function(match, open, slash, tag, attrs, close) {
         const openSpan = '<span class="token-cmd">' + open + slash + tag + '</span>';
-        // Highlight attributes: key="value" or key='value'
-        let highlightedAttrs = attrs.replace(/(\s+)([\w-]+)(=)("([^"]*)"|'([^']*)')/g, 
-            function(attrMatch, space, attrName, eq, quote) {
-                return space + '<span class="token-property">' + attrName + '</span>' + eq + '<span class="token-string">' + quote + '</span>';
+        // Highlight attributes: key="value" or key='value' (handles &amp; in values)
+        let highlightedAttrs = attrs.replace(/([\w-]+)(=)("(?:[^"]|&[^;]*;)*"|'(?:[^']|&[^;]*;)*')/g, 
+            function(attrMatch, attrName, eq, quote) {
+                return '<span class="token-property">' + attrName + '</span>' + eq + '<span class="token-string">' + quote + '</span>';
             });
-        const closeSpan = '<span class="token-cmd">' + selfClose + close + '</span>';
+        const closeSpan = '<span class="token-cmd">' + close + '</span>';
         return openSpan + highlightedAttrs + closeSpan;
     });
     
