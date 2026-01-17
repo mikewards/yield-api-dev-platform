@@ -252,9 +252,9 @@ class UserService(
                 user = Users.select { Users.email eq migratedEmail }.firstOrNull()
             }
             
-            // Also try matching by firstName (which is set to username during migration)
+            // Also try matching by firstName (case-insensitive, set to username during migration)
             if (user == null) {
-                user = Users.select { Users.firstName eq normalizedInput }.firstOrNull()
+                user = Users.select { Users.firstName.lowerCase() eq normalizedInput }.firstOrNull()
             }
             
             if (user == null) return@transaction AuthResult.InvalidCredentials

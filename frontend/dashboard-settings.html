@@ -841,17 +841,36 @@
         
         // Load account settings
         async function loadAccountSettings() {
+            const authMode = localStorage.getItem('tbd_auth_mode');
+            
             try {
-                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('usernameValue').textContent = data.username;
-                    document.getElementById('emailValue').textContent = data.email || 'Not set';
-                    document.getElementById('accountIdValue').textContent = data.account_id;
-                    document.getElementById('createdAtValue').textContent = formatDate(data.created_at);
+                if (authMode === 'rcac') {
+                    // RCAC: Use /v1/users/me endpoint
+                    const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/users/me`);
+                    
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        const user = data.user || data;
+                        document.getElementById('usernameValue').textContent = user.first_name || user.email?.split('@')[0] || 'N/A';
+                        document.getElementById('emailValue').textContent = user.email || 'Not set';
+                        document.getElementById('accountIdValue').textContent = user.id || localStorage.getItem('tbd_user_id');
+                        document.getElementById('createdAtValue').textContent = formatDate(user.created_at);
+                    } else {
+                        showMessage('Failed to load account settings', 'error');
+                    }
                 } else {
-                    showMessage('Failed to load account settings', 'error');
+                    // Legacy: Use /v1/account endpoint
+                    const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account`);
+                    
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        document.getElementById('usernameValue').textContent = data.username;
+                        document.getElementById('emailValue').textContent = data.email || 'Not set';
+                        document.getElementById('accountIdValue').textContent = data.account_id;
+                        document.getElementById('createdAtValue').textContent = formatDate(data.created_at);
+                    } else {
+                        showMessage('Failed to load account settings', 'error');
+                    }
                 }
             } catch (error) {
                 console.error('Error loading account settings:', error);
