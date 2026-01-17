@@ -13,8 +13,28 @@ import com.ground.middleware.CurrentUserIdKey
 import com.typesafe.config.ConfigFactory
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.*
+
+/**
+ * Response DTOs for user endpoints
+ */
+@Serializable
+data class UserProfileResponse(
+    val user: com.ground.dto.UserResponse,
+    val businesses: List<BusinessWithRolesResponse>
+)
+
+@Serializable
+data class SimpleMessageResponse(
+    val message: String
+)
+
+@Serializable
+data class MfaRequiredResponse(
+    val mfa_required: Boolean = true
+)
 
 /**
  * User authentication routes for RCAC.
@@ -165,7 +185,7 @@ fun Application.userAuthRoutes() {
                         // This case is handled above but included for completeness
                         call.respond(
                             HttpStatusCode.OK,
-                            mapOf("mfa_required" to true)
+                            MfaRequiredResponse()
                         )
                     }
                 }
@@ -195,9 +215,9 @@ fun Application.userAuthRoutes() {
                     // Get user's businesses
                     val businesses = businessService.listUserBusinesses(userId)
                     
-                    call.respond(mapOf(
-                        "user" to user.toUserResponse(),
-                        "businesses" to businesses.map { it.toBusinessWithRolesResponse() }
+                    call.respond(UserProfileResponse(
+                        user = user.toUserResponse(),
+                        businesses = businesses.map { it.toBusinessWithRolesResponse() }
                     ))
                 }
                 
@@ -259,7 +279,7 @@ fun Application.userAuthRoutes() {
                         return@post
                     }
                     
-                    call.respond(mapOf("message" to "Password changed successfully"))
+                    call.respond(SimpleMessageResponse("Password changed successfully"))
                 }
                 
                 /**
@@ -284,7 +304,7 @@ fun Application.userAuthRoutes() {
                         return@delete
                     }
                     
-                    call.respond(mapOf("message" to "Account scheduled for deletion"))
+                    call.respond(SimpleMessageResponse("Account scheduled for deletion"))
                 }
                 
                 /**
@@ -295,7 +315,7 @@ fun Application.userAuthRoutes() {
                     
                     // TODO: Revoke refresh tokens
                     
-                    call.respond(mapOf("message" to "Successfully logged out"))
+                    call.respond(SimpleMessageResponse("Successfully logged out"))
                 }
             }
         }
