@@ -2163,11 +2163,13 @@ function addLineNumbersToApiDetailBlocks() {
             return;
         }
         
-        // Skip if already processed
-        if (pre.dataset.lineNumbersAdded) {
-            console.log('🔢 Block', blockIndex, ': already processed');
+        // Check if ALREADY has .code-line elements (actually processed, not just marked)
+        if (pre.querySelector('.code-line')) {
+            console.log('🔢 Block', blockIndex, ': already has .code-line elements');
             return;
         }
+        
+        // Mark as processed
         pre.dataset.lineNumbersAdded = 'true';
         
         // Get the code element or use pre directly
