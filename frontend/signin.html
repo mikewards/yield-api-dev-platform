@@ -184,7 +184,6 @@
                     return;
                 }
                 
-                // Try to refresh token
                 try {
                     const response = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
                         method: 'POST',
@@ -204,19 +203,17 @@
                     console.log('Session refresh failed, showing login form');
                 }
                 
-                // Clear old tokens
                 localStorage.removeItem('tbd_token');
                 localStorage.removeItem('tbd_refresh_token');
                 localStorage.removeItem('tbd_token_expires');
             }
         })();
         
+        // Form submission handler
         const signinForm = document.getElementById('signinForm');
         console.log('📝 Sign-in form found:', !!signinForm);
         
-        if (!signinForm) {
-            console.error('❌ Sign-in form not found!');
-        } else {
+        if (signinForm) {
             signinForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 console.log('🚀 Form submitted!');
@@ -235,78 +232,74 @@
                     // Try RCAC login first (email-based)
                     console.log('🔗 Calling RCAC login:', `${API_BASE_URL}/v1/users/login`);
                     let response = await fetch(`${API_BASE_URL}/v1/users/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                let data = await response.json();
-                let isRcac = response.ok;
-                
-                // Fall back to legacy auth if RCAC fails (for migrated users)
-                if (!response.ok) {
-                    console.log('RCAC login failed, trying legacy auth...');
-                    response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: email, password })
+                        body: JSON.stringify({ email, password })
                     });
-                    data = await response.json();
-                    isRcac = false;
-                }
-                
-                if (response.ok) {
-                    // Store tokens and user info
-                    localStorage.setItem('tbd_token', data.access_token);
-                    localStorage.setItem('tbd_refresh_token', data.refresh_token);
-                    localStorage.setItem('tbd_token_expires', Date.now() + (data.expires_in * 1000));
                     
-                    if (isRcac) {
-                        // RCAC: Store user info
-                        localStorage.setItem('tbd_user_id', data.user?.id || '');
-                        localStorage.setItem('tbd_username', data.user?.email || email);
-                        localStorage.setItem('tbd_user_name', `${data.user?.first_name || ''} ${data.user?.last_name || ''}`.trim() || email.split('@')[0]);
-                        localStorage.setItem('tbd_auth_mode', 'rcac');
-                        
-                        // Fetch user's businesses
-                        try {
-                            const bizResponse = await fetch(`${API_BASE_URL}/v1/businesses`, {
-                                headers: { 'Authorization': `Bearer ${data.access_token}` }
-                            });
-                            if (bizResponse.ok) {
-                                const bizData = await bizResponse.json();
-                                localStorage.setItem('tbd_businesses', JSON.stringify(bizData.businesses || []));
-                                // Set first business as current if available
-                                if (bizData.businesses?.length > 0) {
-                                    localStorage.setItem('tbd_current_business_id', bizData.businesses[0].id);
-                                    localStorage.setItem('tbd_current_business_name', bizData.businesses[0].name);
-                                }
-                            }
-                        } catch (e) {
-                            console.log('Failed to fetch businesses:', e);
-                        }
-                    } else {
-                        // Legacy: Store account info
-                        localStorage.setItem('tbd_account_id', data.account_id);
-                        localStorage.setItem('tbd_username', email);
-                        localStorage.setItem('tbd_auth_mode', 'legacy');
+                    let data = await response.json();
+                    let isRcac = response.ok;
+                    
+                    // Fall back to legacy auth if RCAC fails
+                    if (!response.ok) {
+                        console.log('RCAC login failed, trying legacy auth...');
+                        response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: email, password })
+                        });
+                        data = await response.json();
+                        isRcac = false;
                     }
                     
-                    // Redirect
-                    const redirectPath = localStorage.getItem('tbd_redirect_after_login');
-                    localStorage.removeItem('tbd_redirect_after_login');
-                    window.location.href = redirectPath || 'dashboard.html';
-                } else {
-                    showErrorMessage(data.error?.message || data.message || 'Invalid email or password');
+                    if (response.ok) {
+                        localStorage.setItem('tbd_token', data.access_token);
+                        localStorage.setItem('tbd_refresh_token', data.refresh_token);
+                        localStorage.setItem('tbd_token_expires', Date.now() + (data.expires_in * 1000));
+                        
+                        if (isRcac) {
+                            localStorage.setItem('tbd_user_id', data.user?.id || '');
+                            localStorage.setItem('tbd_username', data.user?.email || email);
+                            localStorage.setItem('tbd_user_name', `${data.user?.first_name || ''} ${data.user?.last_name || ''}`.trim() || email.split('@')[0]);
+                            localStorage.setItem('tbd_auth_mode', 'rcac');
+                            
+                            try {
+                                const bizResponse = await fetch(`${API_BASE_URL}/v1/businesses`, {
+                                    headers: { 'Authorization': `Bearer ${data.access_token}` }
+                                });
+                                if (bizResponse.ok) {
+                                    const bizData = await bizResponse.json();
+                                    localStorage.setItem('tbd_businesses', JSON.stringify(bizData.businesses || []));
+                                    if (bizData.businesses?.length > 0) {
+                                        localStorage.setItem('tbd_current_business_id', bizData.businesses[0].id);
+                                        localStorage.setItem('tbd_current_business_name', bizData.businesses[0].name);
+                                    }
+                                }
+                            } catch (bizErr) {
+                                console.log('Failed to fetch businesses:', bizErr);
+                            }
+                        } else {
+                            localStorage.setItem('tbd_account_id', data.account_id);
+                            localStorage.setItem('tbd_username', email);
+                            localStorage.setItem('tbd_auth_mode', 'legacy');
+                        }
+                        
+                        const redirectPath = localStorage.getItem('tbd_redirect_after_login');
+                        localStorage.removeItem('tbd_redirect_after_login');
+                        window.location.href = redirectPath || 'dashboard.html';
+                    } else {
+                        showErrorMessage(data.error?.message || data.message || 'Invalid email or password');
+                    }
+                } catch (error) {
+                    console.error('Error signing in:', error);
+                    showErrorMessage('Unable to connect to the server. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
                 }
-            } catch (error) {
-                console.error('Error signing in:', error);
-                showErrorMessage('Unable to connect to the server. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }
             });
+        } else {
+            console.error('❌ Sign-in form not found!');
         }
         
         function showErrorMessage(message) {
