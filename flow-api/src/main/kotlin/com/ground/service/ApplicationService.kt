@@ -52,13 +52,10 @@ class ApplicationService {
         }
         
         // Grant admin access to creator
-        permissionService.grantUserAccess(
+        permissionService.grantCreatorAccess(
+            creatorId = userId,
             resourceType = "application",
-            resourceId = applicationId.value,
-            userId = userId,
-            permission = "admin",
-            grantedBy = userId,
-            reason = "Resource creator"
+            resourceId = applicationId.value
         )
         
         // Create default wallet

@@ -54,13 +54,10 @@ class YieldService {
             val account = YieldAccounts.select { YieldAccounts.id eq yieldAccountId }.first()
             
             // Grant admin access to creator
-            permissionService.grantUserAccess(
+            permissionService.grantCreatorAccess(
+                creatorId = userId,
                 resourceType = "yield_account",
-                resourceId = yieldAccountId.value,
-                userId = userId,
-                permission = "admin",
-                grantedBy = userId,
-                reason = "Resource creator"
+                resourceId = yieldAccountId.value
             )
             
             account.toYieldAccountResponse()
