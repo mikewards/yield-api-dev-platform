@@ -7,6 +7,31 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+/**
+ * Migration DTOs
+ */
+@Serializable
+data class MigrationStatusResponse(
+    val total_accounts: Long,
+    val total_users: Long,
+    val total_businesses: Long,
+    val total_resource_access_records: Long,
+    val applications_migrated: String,
+    val migration_complete: Boolean
+)
+
+@Serializable
+data class MigrationRunResponse(
+    val status: String,
+    val message: String,
+    val accounts_migrated: Int,
+    val users_created: Int,
+    val businesses_created: Int,
+    val resource_access_records: Int,
+    val errors: List<String> = emptyList()
+)
 
 /**
  * Migration endpoints for RCAC data migration.
@@ -47,32 +72,20 @@ fun Application.migrationRoutes() {
                         
                         val result = migrationService.migrate()
                         
-                        if (result.errors.isEmpty()) {
-                            call.respond(
-                                HttpStatusCode.OK,
-                                mapOf(
-                                    "status" to "success",
-                                    "message" to "RCAC migration completed successfully",
-                                    "accounts_migrated" to result.accountsMigrated,
-                                    "users_created" to result.usersMigrated,
-                                    "businesses_created" to result.businessesCreated,
-                                    "resource_access_records" to result.resourceAccessRecordsCreated
-                                )
-                            )
-                        } else {
-                            call.respond(
-                                HttpStatusCode.OK,
-                                mapOf(
-                                    "status" to "partial",
-                                    "message" to "RCAC migration completed with errors",
-                                    "accounts_migrated" to result.accountsMigrated,
-                                    "users_created" to result.usersMigrated,
-                                    "businesses_created" to result.businessesCreated,
-                                    "resource_access_records" to result.resourceAccessRecordsCreated,
-                                    "errors" to result.errors
-                                )
-                            )
-                        }
+                        val response = MigrationRunResponse(
+                            status = if (result.errors.isEmpty()) "success" else "partial",
+                            message = if (result.errors.isEmpty()) 
+                                "RCAC migration completed successfully" 
+                            else 
+                                "RCAC migration completed with errors",
+                            accounts_migrated = result.accountsMigrated,
+                            users_created = result.usersMigrated,
+                            businesses_created = result.businessesCreated,
+                            resource_access_records = result.resourceAccessRecordsCreated,
+                            errors = result.errors
+                        )
+                        
+                        call.respond(HttpStatusCode.OK, response)
                     } catch (e: Exception) {
                         call.application.environment.log.error("Migration error", e)
                         call.respond(

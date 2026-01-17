@@ -1,5 +1,6 @@
 package com.ground.service
 
+import com.ground.api.routes.MigrationStatusResponse
 import com.ground.model.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -435,7 +436,7 @@ class RcacMigrationService(
     /**
      * Get migration status.
      */
-    fun getMigrationStatus(): Map<String, Any> {
+    fun getMigrationStatus(): MigrationStatusResponse {
         return transaction {
             val totalAccounts = Accounts.selectAll().count()
             val totalUsers = Users.selectAll().count()
@@ -446,13 +447,13 @@ class RcacMigrationService(
             val appsWithCreatedBy = Applications.select { Applications.createdBy.isNotNull() }.count()
             val totalApps = Applications.selectAll().count()
             
-            mapOf(
-                "total_accounts" to totalAccounts,
-                "total_users" to totalUsers,
-                "total_businesses" to totalBusinesses,
-                "total_resource_access_records" to totalResourceAccess,
-                "applications_migrated" to "$appsWithCreatedBy / $totalApps",
-                "migration_complete" to (totalAccounts == totalUsers)
+            MigrationStatusResponse(
+                total_accounts = totalAccounts,
+                total_users = totalUsers,
+                total_businesses = totalBusinesses,
+                total_resource_access_records = totalResourceAccess,
+                applications_migrated = "$appsWithCreatedBy / $totalApps",
+                migration_complete = (totalAccounts == totalUsers)
             )
         }
     }
