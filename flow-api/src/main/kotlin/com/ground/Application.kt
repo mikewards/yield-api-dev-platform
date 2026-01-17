@@ -66,6 +66,13 @@ fun Application.module() {
     
     // Configure routes
     healthRoutes()
+    
+    // RCAC routes (new user/business model)
+    userAuthRoutes()
+    businessRoutes()
+    resourceAccessRoutes()
+    
+    // Legacy routes (still using Account model, will be migrated)
     accountRoutes()
     authRoutes()
     accountSettingsRoutes()

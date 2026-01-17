@@ -16,11 +16,16 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import com.ground.middleware.setSentryUserContext
 import com.ground.middleware.setSentryApplicationContext
+import java.util.*
 
 // Attribute keys for storing application context
 val ApplicationIdKey = AttributeKey<String>("applicationId")
 val ApplicationNameKey = AttributeKey<String>("applicationName")
 val EnvironmentKey = AttributeKey<String>("environment")
+
+// RCAC attribute keys
+val CurrentUserIdKey = AttributeKey<UUID>("currentUserId")
+val CurrentBusinessIdKey = AttributeKey<UUID>("currentBusinessId")
 
 fun Application.auth() {
     val config = ConfigFactory.load()
@@ -75,13 +80,31 @@ fun Application.auth() {
                             .verifyWith(key)
                             .build()
                             .parseSignedClaims(tokenCredential.token)
-                        val accountId = claims.payload.subject
-                        if (accountId != null) {
-                            println("✅ JWT token validated for account: $accountId")
+                        val userId = claims.payload.subject
+                        if (userId != null) {
+                            println("✅ JWT token validated for user: $userId")
                             // Set Sentry context for dashboard user (IDs only)
-                            setSentryUserContext(accountId)
+                            setSentryUserContext(userId)
+                            
+                            // Store user ID in call attributes for easy access
+                            try {
+                                this.request.call.attributes.put(CurrentUserIdKey, UUID.fromString(userId))
+                            } catch (e: Exception) {
+                                // Ignore if can't parse as UUID (legacy tokens)
+                            }
+                            
+                            // Check for business context header
+                            val businessIdHeader = this.request.call.request.headers["X-Business-Id"]
+                            if (businessIdHeader != null) {
+                                try {
+                                    this.request.call.attributes.put(CurrentBusinessIdKey, UUID.fromString(businessIdHeader))
+                                } catch (e: Exception) {
+                                    // Invalid business ID format, ignore
+                                }
+                            }
+                            
                             // JWT tokens are from dashboard login, no application context
-                            return@authenticate UserIdPrincipal(accountId)
+                            return@authenticate UserIdPrincipal(userId)
                         }
                     } catch (e: Exception) {
                         println("⚠️ JWT validation failed: ${e.message}")
