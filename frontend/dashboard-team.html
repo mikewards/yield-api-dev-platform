@@ -1116,6 +1116,8 @@
         }
         
         function setupEventListeners() {
+            console.log('🔧 Setting up event listeners...');
+            
             // Business selector change
             document.getElementById('businessSelect').addEventListener('change', function() {
                 currentBusinessId = this.value;
@@ -1134,7 +1136,10 @@
             document.getElementById('inviteMemberBtn').addEventListener('click', () => openModal('inviteModal'));
             
             // Create role button
-            document.getElementById('createRoleBtn').addEventListener('click', () => openModal('createRoleModal'));
+            document.getElementById('createRoleBtn').addEventListener('click', () => {
+                console.log('🎭 Create Role button clicked');
+                openModal('createRoleModal');
+            });
             
             // Create business form
             document.getElementById('createBusinessForm').addEventListener('submit', handleCreateBusiness);
@@ -1143,7 +1148,10 @@
             document.getElementById('inviteForm').addEventListener('submit', handleInviteMember);
             
             // Create role form
-            document.getElementById('createRoleForm').addEventListener('submit', handleCreateRole);
+            document.getElementById('createRoleForm').addEventListener('submit', (e) => {
+                console.log('🎭 Create Role form submitted');
+                handleCreateRole(e);
+            });
             
             // Close modals on overlay click
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -1261,9 +1269,12 @@
         
         async function handleCreateRole(e) {
             e.preventDefault();
+            console.log('🎭 handleCreateRole called, currentBusinessId:', currentBusinessId);
             
             if (!currentBusinessId) {
+                console.log('🎭 No business ID, showing error');
                 showMessage('Please select or create a business first', 'error');
+                closeModal('createRoleModal');
                 return;
             }
             
@@ -1378,7 +1389,14 @@
         
         // Modal functions
         function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+            console.log('🔓 Opening modal:', modalId);
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                console.log('🔓 Modal element found and activated');
+            } else {
+                console.error('🔓 Modal element not found:', modalId);
+            }
         }
         
         function closeModal(modalId) {
