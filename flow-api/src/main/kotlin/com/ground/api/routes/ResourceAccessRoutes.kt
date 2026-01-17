@@ -35,13 +35,12 @@ fun Application.resourceAccessRoutes() {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
                     val resourceType = call.parameters["resourceType"]
                         ?: return@get call.respondBadRequest("Resource type required")
-                    val resourceId = call.parameters["resourceId"]?.let { 
-                        try { UUID.fromString(it) } catch (e: Exception) { null }
-                    } ?: return@get call.respondBadRequest("Invalid resource ID")
+                    val resourceId = call.parameters["resourceId"]?.toUUIDOrNull()
+                        ?: return@get call.respondBadRequest("Invalid resource ID")
                     
                     try {
                         val accessList = permissionService.getResourceAccessList(userId, resourceType, resourceId)
-                        call.respond(accessList.map { it.toResponse() })
+                        call.respond(accessList.map { it.toResourceAccessResponse() })
                     } catch (e: IllegalArgumentException) {
                         call.respondForbidden(e.message ?: "Admin permission required")
                     }
@@ -55,11 +54,10 @@ fun Application.resourceAccessRoutes() {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     val resourceType = call.parameters["resourceType"]
                         ?: return@post call.respondBadRequest("Resource type required")
-                    val resourceId = call.parameters["resourceId"]?.let { 
-                        try { UUID.fromString(it) } catch (e: Exception) { null }
-                    } ?: return@post call.respondBadRequest("Invalid resource ID")
+                    val resourceId = call.parameters["resourceId"]?.toUUIDOrNull()
+                        ?: return@post call.respondBadRequest("Invalid resource ID")
                     val request = call.receive<GrantAccessRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     // Validate that either user_id or role_id is provided, not both
                     if ((request.user_id == null && request.role_id == null) ||
@@ -80,9 +78,11 @@ fun Application.resourceAccessRoutes() {
                     
                     try {
                         val grant = if (request.user_id != null) {
+                            val targetUserId = request.user_id.toUUIDOrNull()
+                                ?: return@post call.respondBadRequest("Invalid user ID")
                             permissionService.grantUserAccess(
                                 grantorId = userId,
-                                targetUserId = UUID.fromString(request.user_id),
+                                targetUserId = targetUserId,
                                 resourceType = resourceType,
                                 resourceId = resourceId,
                                 permission = request.permission,
@@ -91,9 +91,11 @@ fun Application.resourceAccessRoutes() {
                                 ipAddress = ipAddress
                             )
                         } else {
+                            val targetRoleId = request.role_id!!.toUUIDOrNull()
+                                ?: return@post call.respondBadRequest("Invalid role ID")
                             permissionService.grantRoleAccess(
                                 grantorId = userId,
-                                roleId = UUID.fromString(request.role_id!!),
+                                roleId = targetRoleId,
                                 resourceType = resourceType,
                                 resourceId = resourceId,
                                 permission = request.permission,
@@ -102,7 +104,7 @@ fun Application.resourceAccessRoutes() {
                             )
                         }
                         
-                        call.respond(HttpStatusCode.Created, grant.toResponse())
+                        call.respond(HttpStatusCode.Created, grant.toResourceAccessResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.Forbidden,
@@ -117,16 +119,10 @@ fun Application.resourceAccessRoutes() {
                  */
                 delete("/{accessId}") {
                     val userId = call.getCurrentUserId() ?: return@delete call.respondUnauthorized()
-                    val resourceType = call.parameters["resourceType"]
-                        ?: return@delete call.respondBadRequest("Resource type required")
-                    val resourceId = call.parameters["resourceId"]?.let { 
-                        try { UUID.fromString(it) } catch (e: Exception) { null }
-                    } ?: return@delete call.respondBadRequest("Invalid resource ID")
-                    val accessId = call.parameters["accessId"]?.let { 
-                        try { UUID.fromString(it) } catch (e: Exception) { null }
-                    } ?: return@delete call.respondBadRequest("Invalid access ID")
+                    val accessId = call.parameters["accessId"]?.toUUIDOrNull()
+                        ?: return@delete call.respondBadRequest("Invalid access ID")
                     val reason = call.request.queryParameters["reason"]
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     try {
                         permissionService.revokeAccess(
@@ -154,9 +150,8 @@ fun Application.resourceAccessRoutes() {
                     val userId = call.getCurrentUserId() ?: return@get call.respondUnauthorized()
                     val resourceType = call.parameters["resourceType"]
                         ?: return@get call.respondBadRequest("Resource type required")
-                    val resourceId = call.parameters["resourceId"]?.let { 
-                        try { UUID.fromString(it) } catch (e: Exception) { null }
-                    } ?: return@get call.respondBadRequest("Invalid resource ID")
+                    val resourceId = call.parameters["resourceId"]?.toUUIDOrNull()
+                        ?: return@get call.respondBadRequest("Invalid resource ID")
                     
                     val permission = permissionService.getEffectivePermission(userId, resourceType, resourceId)
                     
@@ -178,10 +173,10 @@ fun Application.resourceAccessRoutes() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
+// EXTENSION FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
-private fun ResourceAccessGrant.toResponse(): ResourceAccessResponse {
+private fun ResourceAccessGrant.toResourceAccessResponse(): ResourceAccessResponse {
     // Look up user email and role name if available
     val userEmail = this.userId?.let { uid ->
         transaction {
@@ -213,3 +208,4 @@ private fun ResourceAccessGrant.toResponse(): ResourceAccessResponse {
     )
 }
 
+private fun String.toUUIDOrNull(): UUID? = try { UUID.fromString(this) } catch (e: Exception) { null }

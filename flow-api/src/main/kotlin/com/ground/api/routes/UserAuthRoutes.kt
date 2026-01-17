@@ -5,6 +5,7 @@ import com.ground.service.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -41,7 +42,7 @@ fun Application.userAuthRoutes() {
              */
             post("/register") {
                 val request = call.receive<RegisterUserRequest>()
-                val ipAddress = getClientIp(call)
+                val ipAddress = call.getClientIpAddress()
                 val userAgent = call.request.headers["User-Agent"]
                 
                 try {
@@ -73,7 +74,7 @@ fun Application.userAuthRoutes() {
                     )
                     
                     // Generate tokens
-                    val (accessToken, expiresIn) = generateAccessToken(user.id, jwtKey)
+                    val (accessToken, expiresIn) = generateAccessToken(user.id.toString(), jwtKey)
                     val refreshToken = generateRefreshToken()
                     
                     // TODO: Store refresh token in database
@@ -84,7 +85,7 @@ fun Application.userAuthRoutes() {
                             access_token = accessToken,
                             refresh_token = refreshToken,
                             expires_in = expiresIn,
-                            user = user.toResponse()
+                            user = user.toUserResponse()
                         )
                     )
                 } catch (e: IllegalArgumentException) {
@@ -100,7 +101,7 @@ fun Application.userAuthRoutes() {
              */
             post("/login") {
                 val request = call.receive<LoginRequest>()
-                val ipAddress = getClientIp(call)
+                val ipAddress = call.getClientIpAddress()
                 val userAgent = call.request.headers["User-Agent"]
                 
                 when (val result = userService.authenticate(
@@ -120,7 +121,7 @@ fun Application.userAuthRoutes() {
                                     access_token = "",
                                     refresh_token = "",
                                     expires_in = 0,
-                                    user = user.toResponse(),
+                                    user = user.toUserResponse(),
                                     mfa_required = true
                                 )
                             )
@@ -139,7 +140,7 @@ fun Application.userAuthRoutes() {
                             access_token = accessToken,
                             refresh_token = refreshToken,
                             expires_in = expiresIn,
-                            user = user.toResponse()
+                            user = user.toUserResponse()
                         ))
                     }
                     is AuthResult.InvalidCredentials -> {
@@ -195,8 +196,8 @@ fun Application.userAuthRoutes() {
                     val businesses = businessService.listUserBusinesses(userId)
                     
                     call.respond(mapOf(
-                        "user" to user.toResponse(),
-                        "businesses" to businesses.map { it.toResponse() }
+                        "user" to user.toUserResponse(),
+                        "businesses" to businesses.map { it.toBusinessWithRolesResponse() }
                     ))
                 }
                 
@@ -206,7 +207,7 @@ fun Application.userAuthRoutes() {
                 patch("/me") {
                     val userId = call.getCurrentUserId() ?: return@patch call.respondUnauthorized()
                     val request = call.receive<UpdateUserRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     val user = userService.updateUser(
                         userId = userId,
@@ -224,7 +225,7 @@ fun Application.userAuthRoutes() {
                         return@patch
                     }
                     
-                    call.respond(user.toResponse())
+                    call.respond(user.toUserResponse())
                 }
                 
                 /**
@@ -233,7 +234,7 @@ fun Application.userAuthRoutes() {
                 post("/me/change-password") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     val request = call.receive<ChangePasswordRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     if (request.new_password.length < 8) {
                         call.respond(
@@ -267,7 +268,7 @@ fun Application.userAuthRoutes() {
                 delete("/me") {
                     val userId = call.getCurrentUserId() ?: return@delete call.respondUnauthorized()
                     val request = call.receive<DeleteAccountRequest>()
-                    val ipAddress = getClientIp(call)
+                    val ipAddress = call.getClientIpAddress()
                     
                     val success = userService.deleteUser(
                         userId = userId,
@@ -328,7 +329,11 @@ private fun isValidEmail(email: String): Boolean {
     return email.matches(emailRegex)
 }
 
-private fun UserResponse.toResponse() = UserResponse(
+// ═══════════════════════════════════════════════════════════════
+// EXTENSION FUNCTIONS FOR RESPONSE MAPPING
+// ═══════════════════════════════════════════════════════════════
+
+private fun com.ground.service.UserResponse.toUserResponse() = UserResponse(
     id = this.id.toString(),
     email = this.email,
     first_name = this.firstName,
@@ -342,21 +347,7 @@ private fun UserResponse.toResponse() = UserResponse(
     updated_at = this.updatedAt?.toString()
 )
 
-private fun com.ground.service.UserResponse.toResponse() = UserResponse(
-    id = this.id.toString(),
-    email = this.email,
-    first_name = this.firstName,
-    last_name = this.lastName,
-    avatar_url = this.avatarUrl,
-    status = this.status,
-    email_verified = this.emailVerifiedAt != null,
-    mfa_enabled = this.mfaEnabled,
-    last_login_at = this.lastLoginAt?.toString(),
-    created_at = this.createdAt?.toString() ?: "",
-    updated_at = this.updatedAt?.toString()
-)
-
-private fun com.ground.service.BusinessWithRoles.toResponse() = BusinessWithRolesResponse(
+private fun com.ground.service.BusinessWithRoles.toBusinessWithRolesResponse() = BusinessWithRolesResponse(
     id = this.id.toString(),
     name = this.name,
     slug = this.slug,
@@ -366,12 +357,12 @@ private fun com.ground.service.BusinessWithRoles.toResponse() = BusinessWithRole
     plan = this.plan,
     status = this.status,
     is_owner = this.isOwner,
-    roles = this.roles.map { it.toResponse() },
+    roles = this.roles.map { it.toRoleInfoResponse() },
     created_at = this.createdAt?.toString() ?: "",
     updated_at = this.updatedAt?.toString()
 )
 
-private fun com.ground.service.RoleInfo.toResponse() = RoleInfoResponse(
+private fun com.ground.service.RoleInfo.toRoleInfoResponse() = RoleInfoResponse(
     id = this.id.toString(),
     name = this.name,
     display_name = this.displayName,
@@ -379,7 +370,34 @@ private fun com.ground.service.RoleInfo.toResponse() = RoleInfoResponse(
     is_system = this.isSystem
 )
 
-// Extension to get current user ID from call
+// ═══════════════════════════════════════════════════════════════
+// SHARED UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Get the real client IP address, handling proxies
+ */
+fun ApplicationCall.getClientIpAddress(): String {
+    // Check X-Forwarded-For (when behind a proxy/load balancer)
+    val forwarded = request.header("X-Forwarded-For")
+    if (forwarded != null) {
+        // Take the first IP (original client)
+        return forwarded.split(",").firstOrNull()?.trim() ?: "unknown"
+    }
+    
+    // Check X-Real-IP
+    val realIp = request.header("X-Real-IP")
+    if (realIp != null) {
+        return realIp.trim()
+    }
+    
+    // Fall back to direct connection IP
+    return request.origin.remoteHost ?: "unknown"
+}
+
+/**
+ * Extension to get current user ID from call
+ */
 fun ApplicationCall.getCurrentUserId(): UUID? {
     return try {
         // Try from attribute first (set by middleware)
@@ -397,3 +415,16 @@ suspend fun ApplicationCall.respondUnauthorized() {
     )
 }
 
+suspend fun ApplicationCall.respondBadRequest(message: String) {
+    respond(
+        HttpStatusCode.BadRequest,
+        ErrorResponse(ErrorDetail("BAD_REQUEST", message, "validation_error"))
+    )
+}
+
+suspend fun ApplicationCall.respondForbidden(message: String) {
+    respond(
+        HttpStatusCode.Forbidden,
+        ErrorResponse(ErrorDetail("FORBIDDEN", message, "authorization_error"))
+    )
+}
