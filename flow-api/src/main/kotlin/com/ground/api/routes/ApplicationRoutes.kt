@@ -1,6 +1,7 @@
 package com.ground.api.routes
 
 import com.ground.dto.*
+import com.ground.middleware.CurrentUserIdKey
 import com.ground.service.ApplicationService
 import com.ground.service.SandboxService
 import com.ground.service.WebhookService
@@ -23,25 +24,37 @@ fun Application.applicationRoutes() {
                 // Create application
                 post {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val request = call.receive<CreateApplicationRequest>()
                     
                     try {
-                        val app = applicationService.createApplication(accountId, request)
+                        // Try RCAC first (JWT users have CurrentUserIdKey)
+                        val userId = call.attributes.getOrNull(CurrentUserIdKey)
                         
-                        // Fire webhook event asynchronously
-                        coroutineScope {
-                            launch {
-                                WebhookService.sendEvent(
-                                    accountId = accountId,
-                                    eventType = WebhookService.EventTypes.APPLICATION_CREATED,
-                                    payload = mapOf(
-                                        "application_id" to app.application_id,
-                                        "application_name" to app.name,
-                                        "environment" to app.environment,
-                                        "timestamp" to System.currentTimeMillis()
+                        val app = if (userId != null) {
+                            // RCAC: User creating via dashboard/JWT
+                            applicationService.createApplicationRcac(userId, request)
+                        } else {
+                            // Legacy: API key with accountId
+                            val accountId = UUID.fromString(principal.name)
+                            applicationService.createApplication(accountId, request)
+                        }
+                        
+                        // Fire webhook event asynchronously (legacy, uses accountId if available)
+                        val accountIdForWebhook = try { UUID.fromString(principal.name) } catch (e: Exception) { null }
+                        if (accountIdForWebhook != null) {
+                            coroutineScope {
+                                launch {
+                                    WebhookService.sendEvent(
+                                        accountId = accountIdForWebhook,
+                                        eventType = WebhookService.EventTypes.APPLICATION_CREATED,
+                                        payload = mapOf(
+                                            "application_id" to app.application_id,
+                                            "application_name" to app.name,
+                                            "environment" to app.environment,
+                                            "timestamp" to System.currentTimeMillis()
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                         
@@ -57,8 +70,17 @@ fun Application.applicationRoutes() {
                 // List applications
                 get {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
-                    val apps = applicationService.listApplications(accountId)
+                    
+                    // Try RCAC first
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    
+                    val apps = if (userId != null) {
+                        applicationService.listApplicationsRcac(userId)
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.listApplications(accountId)
+                    }
+                    
                     call.respond(ApplicationListResponse(apps))
                 }
                 
@@ -66,10 +88,18 @@ fun Application.applicationRoutes() {
                 get("/{applicationId}") {
                     try {
                         val principal = call.principal<UserIdPrincipal>()!!
-                        val accountId = UUID.fromString(principal.name)
                         val applicationId = UUID.fromString(call.parameters["applicationId"])
                         
-                        val app = applicationService.getApplication(accountId, applicationId)
+                        // Try RCAC first
+                        val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                        
+                        val app = if (userId != null) {
+                            applicationService.getApplicationRcac(userId, applicationId, "read")
+                        } else {
+                            val accountId = UUID.fromString(principal.name)
+                            applicationService.getApplication(accountId, applicationId)
+                        }
+                        
                         if (app != null) {
                             call.respond(app)
                         } else {
@@ -90,11 +120,19 @@ fun Application.applicationRoutes() {
                 // Update application
                 patch("/{applicationId}") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     val request = call.receive<UpdateApplicationRequest>()
                     
-                    val app = applicationService.updateApplication(accountId, applicationId, request)
+                    // Try RCAC first
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    
+                    val app = if (userId != null) {
+                        applicationService.updateApplicationRcac(userId, applicationId, request)
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.updateApplication(accountId, applicationId, request)
+                    }
+                    
                     if (app != null) {
                         call.respond(app)
                     } else {
@@ -108,10 +146,18 @@ fun Application.applicationRoutes() {
                 // Delete application
                 delete("/{applicationId}") {
                     val principal = call.principal<UserIdPrincipal>()!!
-                    val accountId = UUID.fromString(principal.name)
                     val applicationId = UUID.fromString(call.parameters["applicationId"])
                     
-                    val deleted = applicationService.deleteApplication(accountId, applicationId)
+                    // Try RCAC first
+                    val userId = call.attributes.getOrNull(CurrentUserIdKey)
+                    
+                    val deleted = if (userId != null) {
+                        applicationService.deleteApplicationRcac(userId, applicationId)
+                    } else {
+                        val accountId = UUID.fromString(principal.name)
+                        applicationService.deleteApplication(accountId, applicationId)
+                    }
+                    
                     if (deleted) {
                         call.respond(HttpStatusCode.NoContent)
                     } else {

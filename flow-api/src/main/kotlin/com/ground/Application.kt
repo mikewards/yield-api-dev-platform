@@ -71,6 +71,7 @@ fun Application.module() {
     userAuthRoutes()
     businessRoutes()
     resourceAccessRoutes()
+    migrationRoutes()  // Admin routes for RCAC migration
     
     // Legacy routes (still using Account model, will be migrated)
     accountRoutes()
