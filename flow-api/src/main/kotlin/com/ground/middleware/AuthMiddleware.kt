@@ -80,31 +80,41 @@ fun Application.auth() {
                             .verifyWith(key)
                             .build()
                             .parseSignedClaims(tokenCredential.token)
-                        val userId = claims.payload.subject
-                        if (userId != null) {
-                            println("✅ JWT token validated for user: $userId")
+                        val subjectId = claims.payload.subject
+                        if (subjectId != null) {
+                            println("✅ JWT token validated for subject: $subjectId")
                             // Set Sentry context for dashboard user (IDs only)
-                            setSentryUserContext(userId)
+                            setSentryUserContext(subjectId)
                             
-                            // Store user ID in call attributes for easy access
+                            // Only set CurrentUserIdKey if this is a RCAC user (exists in Users table)
+                            // Legacy tokens have accountId in subject, not userId
                             try {
-                                this.request.call.attributes.put(CurrentUserIdKey, UUID.fromString(userId))
-                            } catch (e: Exception) {
-                                // Ignore if can't parse as UUID (legacy tokens)
-                            }
-                            
-                            // Check for business context header
-                            val businessIdHeader = this.request.call.request.headers["X-Business-Id"]
-                            if (businessIdHeader != null) {
-                                try {
-                                    this.request.call.attributes.put(CurrentBusinessIdKey, UUID.fromString(businessIdHeader))
-                                } catch (e: Exception) {
-                                    // Invalid business ID format, ignore
+                                val uuid = UUID.fromString(subjectId)
+                                val isRcacUser = transaction {
+                                    com.ground.model.Users.select { com.ground.model.Users.id eq uuid }.count() > 0
                                 }
+                                if (isRcacUser) {
+                                    println("  → RCAC user detected, setting CurrentUserIdKey")
+                                    this.request.call.attributes.put(CurrentUserIdKey, uuid)
+                                    
+                                    // Check for business context header
+                                    val businessIdHeader = this.request.call.request.headers["X-Business-Id"]
+                                    if (businessIdHeader != null) {
+                                        try {
+                                            this.request.call.attributes.put(CurrentBusinessIdKey, UUID.fromString(businessIdHeader))
+                                        } catch (e: Exception) {
+                                            // Invalid business ID format, ignore
+                                        }
+                                    }
+                                } else {
+                                    println("  → Legacy account detected, using accountId fallback")
+                                }
+                            } catch (e: Exception) {
+                                println("  → Error checking user type: ${e.message}")
                             }
                             
                             // JWT tokens are from dashboard login, no application context
-                            return@authenticate UserIdPrincipal(userId)
+                            return@authenticate UserIdPrincipal(subjectId)
                         }
                     } catch (e: Exception) {
                         println("⚠️ JWT validation failed: ${e.message}")
