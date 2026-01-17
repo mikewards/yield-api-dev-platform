@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - TBD</title>
+    <title>Sign In - Ground</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/api-styles.css">
@@ -84,14 +84,14 @@
         <div class="container">
             <div class="account-container">
                 <div class="account-header">
-                    <h1>Sign In to TBD</h1>
+                    <h1>Sign In to Ground</h1>
                     <p>Access your dashboard and manage your DeFi yield accounts.</p>
                 </div>
 
                 <form class="account-form" id="signinForm" method="post" action="#" onsubmit="return false;">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required placeholder="your_username">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
                     </div>
 
                     <div class="form-group">
@@ -161,7 +161,6 @@
     <script src="scripts/config.js"></script>
     <script>
         // API_BASE_URL is now set by config.js
-        // Ensure it's available
         if (typeof API_BASE_URL === 'undefined') {
             console.error('API_BASE_URL is not defined! Check config.js');
             alert('Configuration error: API URL not set. Please refresh the page.');
@@ -173,16 +172,14 @@
             const refreshToken = localStorage.getItem('tbd_refresh_token');
             
             if (existingToken && refreshToken) {
-                // Have tokens - check if session is still valid
                 const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
                 
                 if (expiresAt > Date.now()) {
-                    // Access token still valid - redirect to dashboard
                     window.location.href = 'dashboard.html';
                     return;
                 }
                 
-                // Access token expired but have refresh token - try to refresh
+                // Try to refresh token
                 try {
                     const response = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
                         method: 'POST',
@@ -202,7 +199,7 @@
                     console.log('Session refresh failed, showing login form');
                 }
                 
-                // Refresh failed - clear old tokens so user can log in fresh
+                // Clear old tokens
                 localStorage.removeItem('tbd_token');
                 localStorage.removeItem('tbd_refresh_token');
                 localStorage.removeItem('tbd_token_expires');
@@ -218,42 +215,79 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Signing In...';
             
-            const formData = {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value
-            };
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
+                // Try RCAC login first (email-based)
+                let response = await fetch(`${API_BASE_URL}/v1/users/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
                 
-                const data = await response.json();
+                let data = await response.json();
+                let isRcac = response.ok;
+                
+                // Fall back to legacy auth if RCAC fails (for migrated users)
+                if (!response.ok) {
+                    console.log('RCAC login failed, trying legacy auth...');
+                    response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: email, password })
+                    });
+                    data = await response.json();
+                    isRcac = false;
+                }
                 
                 if (response.ok) {
                     // Store tokens and user info
                     localStorage.setItem('tbd_token', data.access_token);
                     localStorage.setItem('tbd_refresh_token', data.refresh_token);
-                    localStorage.setItem('tbd_account_id', data.account_id);
-                    localStorage.setItem('tbd_username', formData.username);
                     localStorage.setItem('tbd_token_expires', Date.now() + (data.expires_in * 1000));
                     
-                    // Check if we need to redirect to a specific page after login
+                    if (isRcac) {
+                        // RCAC: Store user info
+                        localStorage.setItem('tbd_user_id', data.user?.id || '');
+                        localStorage.setItem('tbd_username', data.user?.email || email);
+                        localStorage.setItem('tbd_user_name', `${data.user?.first_name || ''} ${data.user?.last_name || ''}`.trim() || email.split('@')[0]);
+                        localStorage.setItem('tbd_auth_mode', 'rcac');
+                        
+                        // Fetch user's businesses
+                        try {
+                            const bizResponse = await fetch(`${API_BASE_URL}/v1/businesses`, {
+                                headers: { 'Authorization': `Bearer ${data.access_token}` }
+                            });
+                            if (bizResponse.ok) {
+                                const bizData = await bizResponse.json();
+                                localStorage.setItem('tbd_businesses', JSON.stringify(bizData.businesses || []));
+                                // Set first business as current if available
+                                if (bizData.businesses?.length > 0) {
+                                    localStorage.setItem('tbd_current_business_id', bizData.businesses[0].id);
+                                    localStorage.setItem('tbd_current_business_name', bizData.businesses[0].name);
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Failed to fetch businesses:', e);
+                        }
+                    } else {
+                        // Legacy: Store account info
+                        localStorage.setItem('tbd_account_id', data.account_id);
+                        localStorage.setItem('tbd_username', email);
+                        localStorage.setItem('tbd_auth_mode', 'legacy');
+                    }
+                    
+                    // Redirect
                     const redirectPath = localStorage.getItem('tbd_redirect_after_login');
                     localStorage.removeItem('tbd_redirect_after_login');
-                    
-                    // Redirect to saved path or dashboard
                     window.location.href = redirectPath || 'dashboard.html';
                 } else {
-                    showErrorMessage(data.error?.message || 'Invalid username or password');
+                    showErrorMessage(data.error?.message || data.message || 'Invalid email or password');
                 }
             } catch (error) {
                 console.error('Error signing in:', error);
-                showErrorMessage('Unable to connect to the server. Please ensure the API is running.');
+                showErrorMessage('Unable to connect to the server. Please try again.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
@@ -262,9 +296,7 @@
         
         function showErrorMessage(message) {
             const existingError = document.querySelector('.error-message');
-            if (existingError) {
-                existingError.remove();
-            }
+            if (existingError) existingError.remove();
             
             const form = document.getElementById('signinForm');
             const errorDiv = document.createElement('div');
@@ -277,10 +309,7 @@
                 <span>${message}</span>
             `;
             form.insertBefore(errorDiv, form.firstChild);
-            
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
+            setTimeout(() => errorDiv.remove(), 5000);
         }
     </script>
     <script src="scripts/script.js"></script>

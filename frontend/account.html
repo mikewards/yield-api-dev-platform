@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - TBD</title>
+    <title>Create Account - Ground</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/api-styles.css">
@@ -86,15 +86,15 @@
         <div class="container">
             <div class="account-container">
                 <div class="account-header">
-                    <h1>Create Your TBD Account</h1>
+                    <h1>Create Your Ground Account</h1>
                     <p>Get started with Ground APIs in seconds. Create an account to access our DeFi platform and start earning yield.</p>
                 </div>
 
                 <form class="account-form" id="accountForm" method="post" action="#" onsubmit="return false;">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" placeholder="your_username">
-                        <small>3-50 characters, letters, numbers, and underscores only</small>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
+                        <small>Your email will be used to sign in</small>
                     </div>
 
                     <div class="form-group">
@@ -103,10 +103,21 @@
                         <small>Minimum 8 characters</small>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" placeholder="Doe">
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <label for="email">Email (Optional)</label>
-                        <input type="email" id="email" name="email" placeholder="your_email@example.com">
-                        <small>For account notifications and password recovery</small>
+                        <label for="businessName">Business Name</label>
+                        <input type="text" id="businessName" name="businessName" required placeholder="Acme Inc.">
+                        <small>Your business or project name</small>
                     </div>
 
                     <button type="submit" class="btn-primary btn-large btn-full">Create Account</button>
@@ -131,13 +142,15 @@
                         </button>
                     </div>
                     <div class="code-block-content">
-                        <pre id="code-api-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/accounts</span> \
+                        <pre id="code-api-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/users/register</span> \
   <span class="token-flag">-X</span> POST \
   <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
   <span class="token-flag">-d</span> <span class="token-string">'{
-    "username": "your_username",
+    "email": "you@example.com",
     "password": "your_secure_password",
-    "email": "your_email@example.com"
+    "first_name": "John",
+    "last_name": "Doe",
+    "business_name": "Acme Inc."
   }'</span></pre>
                     </div>
                 </div>
@@ -198,11 +211,9 @@
     <script src="scripts/script.js"></script>
     <script src="scripts/config.js"></script>
     <script>
-        // API_BASE_URL is now set by config.js
-        // Ensure it's available
         if (typeof API_BASE_URL === 'undefined') {
             console.error('API_BASE_URL is not defined! Check config.js');
-            alert('Configuration error: API URL not set. Please refresh the page.');
+            alert('Configuration error: API URL not set.');
         }
         
         document.getElementById('accountForm').addEventListener('submit', async function(e) {
@@ -211,49 +222,49 @@
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             
-            // Disable button and show loading state
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating Account...';
             
-            const formData = {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value
-            };
-            
             const email = document.getElementById('email').value;
-            if (email) {
-                formData.email = email;
-            }
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const businessName = document.getElementById('businessName').value;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/v1/accounts`, {
+                // Use RCAC registration endpoint
+                const response = await fetch(`${API_BASE_URL}/v1/users/register`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        first_name: firstName || null,
+                        last_name: lastName || null,
+                        business_name: businessName
+                    })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Success! Show success message and store account info
-                    showSuccessMessage(data);
+                    showSuccessMessage(data, email, businessName);
                 } else {
-                    // API returned an error
-                    showErrorMessage(data.error?.message || 'Failed to create account. Please try again.');
+                    showErrorMessage(data.error?.message || data.message || 'Failed to create account. Please try again.');
                 }
             } catch (error) {
                 console.error('Error creating account:', error);
-                showErrorMessage('Unable to connect to the server. Please ensure the API is running at ' + API_BASE_URL);
+                showErrorMessage('Unable to connect to the server. Please try again.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
         });
         
-        function showSuccessMessage(data) {
+        function showSuccessMessage(data, email, businessName) {
             const container = document.querySelector('.account-container');
+            const userName = data.user?.first_name || email.split('@')[0];
+            
             container.innerHTML = `
                 <div class="success-message">
                     <div class="success-icon">
@@ -263,20 +274,20 @@
                         </svg>
                     </div>
                     <h2>Account Created Successfully!</h2>
-                    <p>Welcome to TBD, <strong>${data.username}</strong>!</p>
+                    <p>Welcome to Ground, <strong>${userName}</strong>!</p>
                     
                     <div class="account-details">
                         <div class="detail-row">
-                            <span class="detail-label">Account ID</span>
-                            <code class="detail-value">${data.account_id}</code>
+                            <span class="detail-label">Email</span>
+                            <code class="detail-value">${email}</code>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Business</span>
+                            <span class="detail-value">${businessName}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Status</span>
-                            <span class="status-badge status-${data.status}">${data.status}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Created</span>
-                            <span class="detail-value">${new Date(data.created_at).toLocaleString()}</span>
+                            <span class="status-badge status-active">active</span>
                         </div>
                     </div>
                     
@@ -284,8 +295,9 @@
                         <h3>Next Steps</h3>
                         <ol>
                             <li>Sign in to access your dashboard</li>
-                            <li>Create a Personal Access Token (PAT) for API calls</li>
-                            <li>Start earning 6% APY on your crypto!</li>
+                            <li>Create applications and API keys</li>
+                            <li>Invite team members to your business</li>
+                            <li>Start building with Ground APIs!</li>
                         </ol>
                     </div>
                     
@@ -298,11 +310,8 @@
         }
         
         function showErrorMessage(message) {
-            // Remove existing error if any
             const existingError = document.querySelector('.error-message');
-            if (existingError) {
-                existingError.remove();
-            }
+            if (existingError) existingError.remove();
             
             const form = document.getElementById('accountForm');
             const errorDiv = document.createElement('div');
@@ -315,11 +324,7 @@
                 <span>${message}</span>
             `;
             form.insertBefore(errorDiv, form.firstChild);
-            
-            // Auto-remove error after 5 seconds
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
+            setTimeout(() => errorDiv.remove(), 5000);
         }
     </script>
     <script src="scripts/nav-auth.js"></script>
