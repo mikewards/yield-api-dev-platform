@@ -773,7 +773,7 @@
         <div class="modal-box">
             <h3>Invite Team Member</h3>
             <p>Send an invitation to join this business.</p>
-            <form class="modal-form" id="inviteForm">
+            <form class="modal-form" id="inviteForm" novalidate>
                 <div class="form-group">
                     <label for="inviteEmail">Email Address</label>
                     <input type="email" id="inviteEmail" required placeholder="colleague@example.com">
@@ -799,7 +799,7 @@
         <div class="modal-box">
             <h3>Create New Business</h3>
             <p>Set up a new business organization.</p>
-            <form class="modal-form" id="createBusinessForm">
+            <form class="modal-form" id="createBusinessForm" novalidate>
                 <div class="form-group">
                     <label for="businessName">Business Name</label>
                     <input type="text" id="businessName" required placeholder="Acme Inc." minlength="3" maxlength="100">
@@ -821,7 +821,7 @@
         <div class="modal-box">
             <h3>Create Custom Role</h3>
             <p>Define a new role with specific permissions.</p>
-            <form class="modal-form" id="createRoleForm">
+            <form class="modal-form" id="createRoleForm" novalidate>
                 <div class="form-group">
                     <label for="roleName">Role Name</label>
                     <input type="text" id="roleName" required placeholder="e.g., Developer, Analyst" minlength="2" maxlength="50">
