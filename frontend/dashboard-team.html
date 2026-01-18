@@ -893,21 +893,37 @@
     <script src="scripts/script.js"></script>
     <script src="scripts/nav-auth.js"></script>
     <script>
+        console.log('🚀 Team page script starting...');
+        
         const API_BASE_URL = window.API_BASE_URL || 'https://flow-platform-production.up.railway.app';
+        console.log('🚀 API_BASE_URL:', API_BASE_URL);
+        
         let currentBusinessId = null;
         let businesses = [];
         let members = [];
         let roles = [];
         
         // Check authentication
-        if (!TokenManager.isAuthenticated()) {
-            localStorage.setItem('tbd_redirect_after_login', window.location.pathname);
-            window.location.href = 'signin.html';
+        try {
+            console.log('🚀 Checking TokenManager...');
+            if (typeof TokenManager === 'undefined') {
+                console.error('❌ TokenManager is not defined!');
+            } else if (!TokenManager.isAuthenticated()) {
+                console.log('🚀 Not authenticated, redirecting...');
+                localStorage.setItem('tbd_redirect_after_login', window.location.pathname);
+                window.location.href = 'signin.html';
+            } else {
+                console.log('🚀 User is authenticated');
+            }
+        } catch (e) {
+            console.error('❌ Error checking auth:', e);
         }
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 DOMContentLoaded fired');
             const authMode = localStorage.getItem('tbd_auth_mode');
+            console.log('🚀 Auth mode:', authMode);
             
             // Update username in nav
             const username = localStorage.getItem('tbd_user_name') || localStorage.getItem('tbd_username');
