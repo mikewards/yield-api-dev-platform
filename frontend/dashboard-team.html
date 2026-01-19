@@ -675,7 +675,7 @@
                     <select id="businessSelect">
                         <option value="">Select a business...</option>
                     </select>
-                    <button class="btn-primary btn-small" id="createBusinessBtn">
+                    <button class="btn-primary btn-small" id="createBusinessBtn" onclick="console.log('BIZ CLICKED!'); openModal('createBusinessModal');">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
@@ -698,7 +698,7 @@
                     
                     <div class="members-header">
                         <h3 id="memberCount">0 members</h3>
-                        <button class="btn-primary btn-small" id="inviteMemberBtn">
+                        <button class="btn-primary btn-small" id="inviteMemberBtn" onclick="console.log('INVITE CLICKED!'); openModal('inviteModal');">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
@@ -746,7 +746,7 @@
                     
                     <div class="members-header">
                         <h3 id="roleCount">0 roles</h3>
-                        <button class="btn-primary btn-small" id="createRoleBtn">
+                        <button class="btn-primary btn-small" id="createRoleBtn" onclick="console.log('CLICKED!'); openModal('createRoleModal');">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
@@ -933,13 +933,13 @@
             
             // Check if using RCAC
             if (authMode !== 'rcac') {
+                console.log('⚠️ Not in RCAC mode, showing legacy notice');
                 // Show legacy notice
                 document.getElementById('legacyNotice').style.display = 'flex';
                 document.getElementById('businessSelector').style.display = 'none';
                 document.getElementById('teamMembersSection').style.opacity = '0.5';
-                document.getElementById('teamMembersSection').style.pointerEvents = 'none';
                 document.getElementById('rolesSection').style.opacity = '0.5';
-                document.getElementById('rolesSection').style.pointerEvents = 'none';
+                // NOTE: Removed pointer-events:none so buttons still work for testing
                 // Still setup event listeners so buttons work
                 setupEventListeners();
                 return;
