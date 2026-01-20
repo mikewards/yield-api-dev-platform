@@ -961,6 +961,7 @@
                 if (response && response.ok) {
                     const data = await response.json();
                     console.log('📊 Businesses data:', data);
+                    console.log('📊 First business:', data.businesses?.[0]);
                     businesses = data.businesses || [];
                     
                     const select = document.getElementById('businessSelect');
@@ -973,15 +974,22 @@
                     
                     // Select current business or first one
                     const savedBusinessId = localStorage.getItem('tbd_current_business_id');
+                    console.log('📊 Saved business ID from localStorage:', savedBusinessId);
+                    console.log('📊 Business IDs in array:', businesses.map(b => b.id));
+                    
                     if (savedBusinessId && businesses.find(b => b.id === savedBusinessId)) {
                         select.value = savedBusinessId;
                         currentBusinessId = savedBusinessId;
+                        console.log('📊 Using saved business ID:', currentBusinessId);
                     } else if (businesses.length > 0) {
                         select.value = businesses[0].id;
                         currentBusinessId = businesses[0].id;
                         localStorage.setItem('tbd_current_business_id', currentBusinessId);
                         localStorage.setItem('tbd_current_business_name', businesses[0].name);
+                        console.log('📊 Using first business ID:', currentBusinessId);
                     }
+                    
+                    console.log('📊 Final currentBusinessId:', currentBusinessId);
                     
                     if (currentBusinessId) {
                         loadBusinessData(currentBusinessId);
