@@ -57,6 +57,8 @@ fun Application.businessRoutes() {
                     val ipAddress = call.getClientIpAddress()
                     
                     try {
+                        call.application.environment.log.info("Creating business for user $userId: ${request.name}")
+                        
                         val business = businessService.createBusiness(
                             userId = userId,
                             name = request.name,
@@ -66,11 +68,17 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(HttpStatusCode.Created, business.toBusinessResponse())
+                        call.respond(HttpStatusCode.Created, business)
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.Conflict,
                             ErrorResponse(ErrorDetail("SLUG_EXISTS", e.message ?: "Business slug already exists", "validation_error"))
+                        )
+                    } catch (e: Exception) {
+                        call.application.environment.log.error("Error creating business", e)
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            ErrorResponse(ErrorDetail("CREATE_ERROR", e.message ?: "Failed to create business", "server_error"))
                         )
                     }
                 }
