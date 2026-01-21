@@ -700,3 +700,44 @@ data class InvitationResponse(
     val roleIds: List<UUID>
 )
 
+// ═══════════════════════════════════════════════════════════════
+// EXTENSION FUNCTIONS TO CONVERT TO DTOs
+// ═══════════════════════════════════════════════════════════════
+
+fun BusinessResponse.toDto(): com.ground.dto.BusinessResponse = com.ground.dto.BusinessResponse(
+    id = id.toString(),
+    name = name,
+    slug = slug,
+    logo_url = logoUrl,
+    description = description,
+    website = website,
+    plan = plan,
+    status = status,
+    owner_id = ownerId.toString(),
+    created_at = createdAt?.toString() ?: "",
+    updated_at = updatedAt?.toString()
+)
+
+fun BusinessWithRoles.toBusinessWithRolesResponse(): com.ground.dto.BusinessWithRolesResponse = com.ground.dto.BusinessWithRolesResponse(
+    id = id.toString(),
+    name = name,
+    slug = slug,
+    logo_url = logoUrl,
+    description = description,
+    website = website,
+    plan = plan,
+    status = status,
+    is_owner = isOwner,
+    roles = roles.map { it.toRoleInfoResponse() },
+    created_at = createdAt?.toString() ?: "",
+    updated_at = updatedAt?.toString()
+)
+
+fun RoleInfo.toRoleInfoResponse(): com.ground.dto.RoleInfoResponse = com.ground.dto.RoleInfoResponse(
+    id = id.toString(),
+    name = name,
+    display_name = displayName,
+    color = color,
+    is_system = isSystem
+)
+

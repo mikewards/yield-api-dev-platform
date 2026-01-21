@@ -19,6 +19,37 @@ data class BusinessListResponse(
     val businesses: List<BusinessWithRolesResponse>
 )
 
+@Serializable
+data class RolesListResponse(
+    val roles: List<com.ground.dto.RoleResponse>
+)
+
+@Serializable
+data class MembersListResponse(
+    val members: List<MemberResponse>,
+    val pending_invitations: List<PendingInvitationResponse> = emptyList()
+)
+
+@Serializable
+data class MemberResponse(
+    val user_id: String,
+    val email: String,
+    val first_name: String? = null,
+    val last_name: String? = null,
+    val avatar_url: String? = null,
+    val roles: List<RoleInfoResponse>,
+    val is_owner: Boolean,
+    val joined_at: String? = null
+)
+
+@Serializable
+data class PendingInvitationResponse(
+    val id: String,
+    val email: String,
+    val invited_at: String,
+    val expires_at: String
+)
+
 /**
  * Business management routes for RCAC.
  * 
@@ -68,7 +99,7 @@ fun Application.businessRoutes() {
                             ipAddress = ipAddress
                         )
                         
-                        call.respond(HttpStatusCode.Created, business)
+                        call.respond(HttpStatusCode.Created, business.toBusinessResponse())
                     } catch (e: IllegalArgumentException) {
                         call.respond(
                             HttpStatusCode.Conflict,
@@ -156,7 +187,11 @@ fun Application.businessRoutes() {
                     
                     try {
                         val members = businessService.listMembers(userId, businessId)
-                        call.respond(members.map { it.toMemberResponse() })
+                        // TODO: Add pending_invitations when we implement that lookup
+                        call.respond(MembersListResponse(
+                            members = members.map { it.toMemberResponse() },
+                            pending_invitations = emptyList()
+                        ))
                     } catch (e: IllegalArgumentException) {
                         call.respondForbidden(e.message ?: "Permission denied")
                     }
@@ -238,7 +273,7 @@ fun Application.businessRoutes() {
                     }
                     
                     val roles = roleService.listRoles(businessId)
-                    call.respond(roles.map { it.toRoleResponse() })
+                    call.respond(RolesListResponse(roles = roles.map { it.toRoleResponse() }))
                 }
                 
                 /**
