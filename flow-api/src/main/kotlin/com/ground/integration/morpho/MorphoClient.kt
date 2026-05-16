@@ -1,0 +1,324 @@
+package com.ground.integration.morpho
+
+import com.ground.service.Web3Service
+import com.ground.service.WalletService
+import com.ground.service.TokenApprovalService
+import com.ground.util.retryWithBackoff
+import com.ground.util.RetryConfig
+import com.typesafe.config.ConfigFactory
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import org.web3j.abi.FunctionEncoder
+import org.web3j.abi.datatypes.Function
+import org.web3j.abi.datatypes.Type
+import org.web3j.crypto.Credentials
+import org.web3j.protocol.core.methods.response.TransactionReceipt
+import org.web3j.tx.RawTransactionManager
+import org.web3j.tx.TransactionManager
+import org.web3j.utils.Convert
+import java.math.BigInteger
+import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+@Serializable
+data class MorphoGraphQLRequest(
+    val query: String,
+    val variables: Map<String, String>? = null
+)
+
+@Serializable
+data class MorphoGraphQLResponse(
+    val data: MorphoData? = null,
+    val errors: List<MorphoError>? = null
+)
+
+@Serializable
+data class MorphoData(
+    val markets: MorphoMarketsResponse? = null
+)
+
+@Serializable
+data class MorphoMarketsResponse(
+    val items: List<MorphoMarket>? = null
+)
+
+@Serializable
+data class MorphoMarket(
+    val id: String? = null,
+    val loanAsset: MorphoAsset? = null,
+    val collateralAsset: MorphoAsset? = null,
+    val state: MorphoMarketState? = null
+)
+
+@Serializable
+data class MorphoAsset(
+    val symbol: String? = null,
+    val address: String? = null
+)
+
+@Serializable
+data class MorphoMarketState(
+    val supplyApy: Double? = null
+)
+
+@Serializable
+data class MorphoError(
+    val message: String
+)
+
+class MorphoClient {
+    private val config = ConfigFactory.load()
+    private val graphqlUrl = "https://blue-api.morpho.org/graphql"
+    private val web3Service = Web3Service()
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    
+    /**
+     * Get current APY for a currency on Morpho
+     */
+    suspend fun getCurrentRate(currency: String): Double {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
+            )
+        ) {
+            try {
+                val query = """
+                    query GetMarkets {
+                        markets {
+                            items {
+                                id
+                                loanAsset {
+                                    symbol
+                                    address
+                                }
+                                state {
+                                    supplyApy
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+                
+                val request = MorphoGraphQLRequest(query = query)
+                val response: MorphoGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
+                
+                // Find all markets matching currency (USDC, USDT, etc.)
+                val matchingMarkets = response.data?.markets?.items?.filter { market ->
+                    market.loanAsset?.symbol?.equals(currency, ignoreCase = true) == true ||
+                    market.loanAsset?.address?.contains(currency, ignoreCase = true) == true
+                } ?: emptyList()
+                
+                // Find the market with the highest APY (best rate for users)
+                // Filter out null/zero rates only
+                // APY values are in decimal format (0.06 = 6%, 1.0 = 100%)
+                val bestMarket = matchingMarkets
+                    .mapNotNull { market ->
+                        val apy = market.state?.supplyApy
+                        if (apy != null && apy > 0.0) {
+                            Pair(market, apy)
+                        } else {
+                            null
+                        }
+                    }
+                    .maxByOrNull { it.second }
+                
+                // supplyApy is already a decimal (e.g., 0.06 for 6%), not a percentage
+                // Return the best rate found, or throw exception if no active markets
+                bestMarket?.second ?: throw IllegalArgumentException("No active markets found for currency: $currency")
+            } catch (e: IllegalArgumentException) {
+                // Re-throw IllegalArgumentException (no markets found) so route handler can handle it
+                throw e
+            } catch (e: Exception) {
+                // For other exceptions (network errors, etc.), throw as well
+                println("⚠️ Morpho API error: ${e.message}")
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * List all available markets from Morpho
+     */
+    suspend fun listMarkets(): List<MorphoMarket> {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2,
+                initialDelay = 50.milliseconds
+            )
+        ) {
+            try {
+                val query = """
+                    query GetMarkets {
+                        markets {
+                            items {
+                                id
+                                loanAsset {
+                                    symbol
+                                    address
+                                }
+                                collateralAsset {
+                                    symbol
+                                    address
+                                }
+                                state {
+                                    supplyApy
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+                
+                val request = MorphoGraphQLRequest(query = query)
+                val response: MorphoGraphQLResponse = client.post(graphqlUrl) {
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }.body()
+                
+                if (response.errors != null && response.errors.isNotEmpty()) {
+                    throw Exception("Morpho GraphQL errors: ${response.errors.joinToString { it.message }}")
+                }
+                
+                // Return all markets with active APY
+                response.data?.markets?.items
+                    ?.filter { it.state?.supplyApy != null && it.state.supplyApy > 0.0 }
+                    ?: emptyList()
+            } catch (e: Exception) {
+                println("⚠️ Morpho API error listing markets: ${e.message}")
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * Supply assets to Morpho (deposit)
+     * Automatically handles token approval if needed
+     */
+    suspend fun supply(
+        walletId: UUID,
+        environment: String,
+        marketParams: MarketParams,
+        amount: BigInteger,
+        onBehalf: String
+    ): TransactionReceipt {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2, // Fewer retries for transactions
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val morphoAddress = web3Service.getMorphoAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            // Ensure token approval before supply
+            val approvalService = TokenApprovalService(web3j, credentials, gasProvider)
+            val needsApproval = approvalService.ensureAllowance(
+                tokenAddress = marketParams.loanToken,
+                spenderAddress = morphoAddress,
+                requiredAmount = amount
+            )
+            
+            if (needsApproval) {
+                val approveTx = approvalService.approve(
+                    tokenAddress = marketParams.loanToken,
+                    spenderAddress = morphoAddress,
+                    amount = BigInteger("115792089237316195423570985008687907853269984665640564039457") // Max
+                )
+                approvalService.waitForReceipt(approveTx.transactionHash)
+            }
+            
+            val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
+            
+            // Supply with shares = 0 (let Morpho calculate)
+            val txResponse = wrapper.supply(
+                marketParams = marketParams,
+                assets = amount,
+                shares = BigInteger.ZERO,
+                onBehalf = onBehalf,
+                data = ByteArray(0)
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
+        }
+    }
+    
+    /**
+     * Withdraw assets from Morpho
+     */
+    suspend fun withdraw(
+        walletId: UUID,
+        environment: String,
+        marketParams: MarketParams,
+        assets: BigInteger,
+        shares: BigInteger,
+        receiver: String
+    ): TransactionReceipt {
+        return retryWithBackoff(
+            config = RetryConfig(
+                maxAttempts = 2,
+                initialDelay = 1.seconds
+            )
+        ) {
+            val walletService = WalletService()
+            val credentials = walletService.getCredentials(walletId)
+            val web3j = web3Service.getWeb3j(environment)
+            val morphoAddress = web3Service.getMorphoAddress(environment)
+            val gasProvider = web3Service.getGasProvider()
+            
+            val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
+            
+            val txResponse = wrapper.withdraw(
+                marketParams = marketParams,
+                assets = assets,
+                shares = shares,
+                onBehalf = receiver,
+                receiver = receiver,
+                data = ByteArray(0)
+            )
+            
+            // Wait for transaction receipt
+            val receipt = web3j.ethGetTransactionReceipt(txResponse.transactionHash).send()
+            receipt.transactionReceipt.get()
+        }
+    }
+    
+    /**
+     * Get position for a wallet in a market
+     */
+    suspend fun getPosition(
+        walletId: UUID,
+        environment: String,
+        marketParams: MarketParams
+    ): Position {
+        val walletService = WalletService()
+        val credentials = walletService.getCredentials(walletId)
+        val web3j = web3Service.getWeb3j(environment)
+        val morphoAddress = web3Service.getMorphoAddress(environment)
+        val gasProvider = web3Service.getGasProvider()
+        
+        val wrapper = MorphoContractWrapper(web3j, credentials, morphoAddress, gasProvider)
+        return wrapper.getPosition(marketParams, credentials.address)
+    }
+}

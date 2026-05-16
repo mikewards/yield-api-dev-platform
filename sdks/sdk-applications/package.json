@@ -1,0 +1,33 @@
+{
+  "name": "@flow/sdk-applications",
+  "version": "1.0.0",
+  "description": "Flow Applications SDK - Embeddable UI component for managing Flow applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest"
+  },
+  "keywords": [
+    "flow",
+    "defi",
+    "applications",
+    "sdk",
+    "embeddable"
+  ],
+  "author": "Flow",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flow-platform/sdk-applications.git"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+

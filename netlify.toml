@@ -1,0 +1,6 @@
+[build]
+  publish = "."
+  command = "echo 'No build needed'"
+
+# Netlify will serve static files automatically
+# No redirects needed - let files be served as-is

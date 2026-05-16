@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --qs-bg: #fafafa;
+            --qs-code-bg: #0f172a;
+            --qs-accent: #6366f1;
+            --qs-success: #22c55e;
+        }
+        
+        .qs-hero {
+            background: transparent;
+            padding: 48px 24px 32px;
+            text-align: center;
+        }
+        
+        .qs-hero h1 {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .qs-hero p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 450px;
+            margin: 0 auto 16px;
+            line-height: 1.6;
+        }
+        
+        .qs-time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .qs-time-badge svg {
+            color: var(--qs-accent);
+            width: 14px;
+            height: 14px;
+        }
+        
+        .qs-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+        
+        .qs-step {
+            position: relative;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .qs-step:first-of-type {
+            padding-top: 16px;
+        }
+        
+        .qs-step:last-of-type {
+            border-bottom: none;
+        }
+        
+        .qs-step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .qs-step-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #455162;
+            color: white;
+            border-radius: 50%;
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .qs-step-num.done {
+            background: var(--qs-success);
+        }
+        
+        .qs-step-num.done::after {
+            content: "✓";
+            font-size: 14px;
+        }
+        
+        .qs-step-num.done span {
+            display: none;
+        }
+        
+        .qs-step-content {
+            flex: 1;
+        }
+        
+        .qs-step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+        
+        .qs-step-desc {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        
+        .qs-step-desc a {
+            color: var(--qs-accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .qs-step-desc a:hover {
+            text-decoration: underline;
+        }
+        
+        .qs-step-desc strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .qs-instructions {
+            margin-top: 16px;
+            padding-left: 0;
+        }
+        
+        .qs-instructions li {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+            list-style: none;
+        }
+        
+        .qs-instructions li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 50%;
+        }
+        
+        .qs-code-block {
+            margin-top: 24px;
+            background: var(--qs-code-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .qs-code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .qs-code-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .qs-code-label::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+        
+        .qs-copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .qs-copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .qs-copy-btn.copied {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .qs-code-content {
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        .qs-code-content pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+        
+        .qs-code-content .token-url {
+            color: #38bdf8;
+        }
+        
+        .qs-code-content .token-flag {
+            color: #a78bfa;
+        }
+        
+        .qs-code-content .token-string {
+            color: #4ade80;
+        }
+        
+        .qs-code-content .token-var {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .qs-response {
+            margin-top: 20px;
+        }
+        
+        .qs-response-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        
+        .qs-response-content {
+            background: #455162;
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #94a3b8;
+            overflow-x: auto;
+        }
+        
+        .qs-response-content pre {
+            margin: 0;
+            color: #e2e8f0;
+        }
+        
+        .qs-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--bg-dark);
+            color: white;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            margin-top: 16px;
+        }
+        
+        .qs-cta-btn:hover {
+            background: #455162;
+            transform: translateY(-1px);
+        }
+        
+        .qs-cta-btn.secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .qs-cta-btn.secondary:hover {
+            background: var(--bg-gray);
+            border-color: var(--text-tertiary);
+        }
+        
+        .qs-next-steps {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .qs-next-steps h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .qs-links-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .qs-link-card {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.15s;
+            min-height: 80px;
+        }
+        
+        .qs-link-card:hover {
+            border-color: var(--qs-accent);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .qs-link-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .qs-link-card p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .qs-link-card .arrow {
+            color: var(--qs-accent);
+            margin-left: 4px;
+            transition: transform 0.15s;
+        }
+        
+        .qs-link-card:hover .arrow {
+            transform: translateX(3px);
+        }
+        
+        /* Logged in state */
+        .qs-logged-in-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--qs-success);
+            font-weight: 500;
+            margin-left: 12px;
+        }
+        
+        /* Try it button */
+        .qs-try-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .qs-try-section.show {
+            display: block;
+        }
+        
+        .qs-try-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .qs-try-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .qs-try-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .qs-live-result {
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .qs-live-result.show {
+            display: block;
+        }
+        
+        .qs-live-result pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #94a3b8;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+        
+        .qs-live-result.success pre {
+            border-left: 3px solid #22c55e;
+        }
+        
+        .qs-live-result.error pre {
+            border-left: 3px solid #ef4444;
+        }
+        
+        @media (max-width: 640px) {
+            .qs-hero {
+                padding: 48px 20px 40px;
+            }
+            
+            .qs-hero h1 {
+                font-size: 28px;
+            }
+            
+            .qs-hero p {
+                font-size: 16px;
+            }
+            
+            .qs-container {
+                padding: 0 20px 60px;
+            }
+            
+            .qs-step {
+                padding: 32px 0;
+            }
+            
+            .qs-step-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .qs-step-num {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+            
+            .qs-step-title {
+                font-size: 18px;
+            }
+            
+            .qs-code-content pre {
+                font-size: 11px;
+            }
+            
+            .qs-links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html" class="active">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <div class="qs-hero">
+            <h1>Get started with Ground</h1>
+        </div>
+
+        <!-- Steps -->
+        <div class="qs-container">
+            
+            <!-- Step 1 -->
+            <div class="qs-step" id="step1">
+                <div class="qs-step-header">
+                    <div class="qs-step-num" id="step1Num"><span>1</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Create your account</h2>
+                        <p class="qs-step-desc" id="step1Desc">
+                            <a href="signin.html?signup=true">Sign up for free</a> — takes 30 seconds.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="qs-step" id="step2">
+                <div class="qs-step-header">
+                    <div class="qs-step-num" id="step2Num"><span>2</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Get your API key</h2>
+                        <p class="qs-step-desc" id="step2Desc">
+                            Create an application in the <a href="dashboard.html">Dashboard</a>, then generate an API key.
+                        </p>
+                        <ul class="qs-instructions">
+                            <li>Go to <a href="dashboard.html">Dashboard</a> → click <strong>Applications</strong></li>
+                            <li>Select <strong>+ Create Application</strong> and name the App</li>
+                            <li>From your app → click <strong>Create Key</strong></li>
+                            <li>Select <strong>Sandbox</strong> environment</li>
+                            <li>Copy your API key</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="qs-step" id="step3">
+                <div class="qs-step-header">
+                    <div class="qs-step-num"><span>3</span></div>
+                    <div class="qs-step-content">
+                        <h2 class="qs-step-title">Make your first request</h2>
+                        <p class="qs-step-desc">
+                            Run this command in your terminal. Replace <code style="background: rgba(251,191,36,0.15); color: #d97706; padding: 2px 6px; border-radius: 4px; font-size: 13px;">YOUR_API_KEY</code> with your key.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Terminal</span>
+                        <button class="code-copy-btn" id="copyBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="curlCommand" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-flow-platform-staging.up.railway.app/v1/yield/rates</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var" id="tokenPlaceholder">YOUR_API_KEY</span>"</span></pre>
+                    </div>
+                    
+                    <div class="qs-try-section" id="trySection">
+                        <button class="qs-try-btn" id="tryBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5,3 19,12 5,21"/>
+                            </svg>
+                            Run this request
+                        </button>
+                        <div class="qs-live-result" id="liveResult">
+                            <pre id="liveResultJson" data-language="json"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block-unified" style="margin-top: 20px;">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Response</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre data-language="json">{
+  <span class="token-property">"rates"</span>: [
+    {
+      <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+      <span class="token-property">"protocol"</span>: <span class="token-string-value">"aave"</span>,
+      <span class="token-property">"network"</span>: <span class="token-string-value">"ethereum_sepolia"</span>,
+      <span class="token-property">"apy"</span>: <span class="token-number">0.0523</span>
+    },
+    {
+      <span class="token-property">"currency"</span>: <span class="token-string-value">"DAI"</span>,
+      <span class="token-property">"protocol"</span>: <span class="token-string-value">"aave"</span>,
+      <span class="token-property">"network"</span>: <span class="token-string-value">"ethereum_sepolia"</span>,
+      <span class="token-property">"apy"</span>: <span class="token-number">0.0302</span>
+    }
+  ]
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="qs-next-steps">
+                <h2>What's next?</h2>
+                <div class="qs-links-grid">
+                    <a href="guides.html" class="qs-link-card">
+                        <h3>Read the Guides <span class="signal-ground-icon"><svg width="14" height="18" viewBox="0 0 30 37.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="miter"><path d="M 15,24.5 L 15,4.5"/><path d="M 3.5,25 L 15.068807,34 L 26.995413,25 L 3.5,25 z"/></svg></span></h3>
+                        <p>Authentication, environments, and best practices</p>
+                    </a>
+                    <a href="api-reference.html" class="qs-link-card">
+                        <h3>API Reference <span class="signal-ground-icon"><svg width="14" height="18" viewBox="0 0 30 37.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="miter"><path d="M 15,24.5 L 15,4.5"/><path d="M 3.5,25 L 15.068807,34 L 26.995413,25 L 3.5,25 z"/></svg></span></h3>
+                        <p>Full documentation for all endpoints</p>
+                    </a>
+                    <a href="dashboard-webhooks.html" class="qs-link-card">
+                        <h3>Set Up Webhooks <span class="signal-ground-icon"><svg width="14" height="18" viewBox="0 0 30 37.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="miter"><path d="M 15,24.5 L 15,4.5"/><path d="M 3.5,25 L 15.068807,34 L 26.995413,25 L 3.5,25 z"/></svg></span></h3>
+                        <p>Get real-time notifications for events</p>
+                    </a>
+                    <a href="sdks.html" class="qs-link-card">
+                        <h3>Explore SDKs <span class="signal-ground-icon"><svg width="14" height="18" viewBox="0 0 30 37.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="miter"><path d="M 15,24.5 L 15,4.5"/><path d="M 3.5,25 L 15.068807,34 L 26.995413,25 L 3.5,25 z"/></svg></span></h3>
+                        <p>Pre-built components for faster integration</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script>
+        const token = localStorage.getItem('tbd_token');
+        const userInfo = localStorage.getItem('tbd_user');
+        let userApiKey = null;
+        
+        async function init() {
+            if (token && userInfo) {
+                // Mark step 1 as complete
+                document.getElementById('step1Num').classList.add('done');
+                const user = JSON.parse(userInfo);
+                document.getElementById('step1Desc').innerHTML = 
+                    `Signed in as <strong>${user.email}</strong>`;
+                
+                await checkForApiKey();
+            }
+        }
+        
+        async function checkForApiKey() {
+            try {
+                const appsRes = await fetch(`${API_BASE_URL}/v1/applications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!appsRes.ok) return;
+                
+                const apps = await appsRes.json();
+                if (!apps.applications?.length) return;
+                
+                const appId = apps.applications[0].application_id;
+                const tokensRes = await fetch(`${API_BASE_URL}/v1/applications/${appId}/tokens`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!tokensRes.ok) return;
+                
+                const tokens = await tokensRes.json();
+                if (!tokens.tokens?.length) return;
+                
+                // Mark step 2 as complete
+                document.getElementById('step2Num').classList.add('done');
+                document.getElementById('step2Desc').innerHTML = 
+                    `API key ready in <strong>${apps.applications[0].name}</strong>`;
+                
+                // Populate the token in the curl command
+                userApiKey = tokens.tokens[0].access_token;
+                const placeholder = document.getElementById('tokenPlaceholder');
+                placeholder.textContent = userApiKey;
+                placeholder.classList.remove('token-var');
+                placeholder.style.background = 'rgba(34, 197, 94, 0.15)';
+                placeholder.style.color = '#22c55e';
+                
+                // Show try button
+                document.getElementById('trySection').classList.add('show');
+                
+            } catch (e) {
+                console.error('Error:', e);
+            }
+        }
+        
+        // Copy button - use unified copyCode function
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            copyCode(this, 'curlCommand');
+        });
+        
+        // Try button
+        document.getElementById('tryBtn').addEventListener('click', async () => {
+            if (!userApiKey) return;
+            
+            const btn = document.getElementById('tryBtn');
+            const result = document.getElementById('liveResult');
+            const json = document.getElementById('liveResultJson');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32"/></svg> Running...';
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/v1/yield/rates`, {
+                    headers: { 'Authorization': `Bearer ${userApiKey}` }
+                });
+                const data = await res.json();
+                
+                result.classList.remove('success', 'error');
+                result.classList.add('show', res.ok ? 'success' : 'error');
+                json.textContent = JSON.stringify(data, null, 2);
+                
+            } catch (e) {
+                result.classList.remove('success');
+                result.classList.add('show', 'error');
+                json.textContent = JSON.stringify({ error: e.message }, null, 2);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Run again';
+        });
+        
+        // Add spin animation
+        const style = document.createElement('style');
+        style.textContent = '.spin { animation: spin 1s linear infinite; } @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+        
+        init();
+    </script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

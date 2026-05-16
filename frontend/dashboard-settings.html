@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - Ground</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/dashboard-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
+    <style>
+        /* Account Settings specific styles */
+        .settings-container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        
+        .settings-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .settings-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-section h2 svg {
+            color: var(--text-secondary);
+        }
+        
+        .settings-section p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 20px 0;
+        }
+        
+        .settings-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .settings-field:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .settings-field:first-of-type {
+            padding-top: 0;
+        }
+        
+        .field-info {
+            flex: 1;
+        }
+        
+        .field-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .field-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .field-action {
+            flex-shrink: 0;
+        }
+        
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .btn-text:hover {
+            background: var(--accent-light);
+        }
+        
+        /* Danger Zone */
+        .danger-zone {
+            border-color: #FEE2E2;
+            background: #FEF2F2;
+        }
+        
+        .danger-zone h2 {
+            color: #DC2626;
+        }
+        
+        .danger-zone h2 svg {
+            color: #DC2626;
+        }
+        
+        .danger-zone p {
+            color: #991B1B;
+        }
+        
+        .btn-danger {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-danger:hover {
+            background: #B91C1C;
+        }
+        
+        /* Sessions List */
+        .sessions-list {
+            margin-top: 16px;
+        }
+        
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .session-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .session-item.current {
+            border: 2px solid var(--accent);
+            background: white;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-device {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .current-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .session-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .btn-revoke {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-revoke:hover {
+            border-color: #DC2626;
+            color: #DC2626;
+            background: #FEF2F2;
+        }
+        
+        .empty-sessions {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+        
+        .modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 20px 0;
+        }
+        
+        .modal-form .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .modal-form label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .modal-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .modal-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .btn-cancel {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-cancel:hover {
+            background: var(--bg-light);
+        }
+        
+        /* Delete confirmation */
+        .delete-warning {
+            background: #FEF2F2;
+            border: 1px solid #FEE2E2;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .delete-warning p {
+            color: #991B1B;
+            margin: 0;
+            font-size: 13px;
+        }
+        
+        .delete-warning ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+            color: #991B1B;
+            font-size: 13px;
+        }
+        
+        /* Success/Error Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            display: block;
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+        
+        .message.error {
+            display: block;
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FEE2E2;
+        }
+        
+        /* Loading */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .settings-container {
+                max-width: 100%;
+                padding: 0 16px;
+            }
+            
+            .settings-section {
+                padding: 20px 16px;
+                margin-bottom: 20px;
+            }
+            
+            .settings-field {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px 0;
+            }
+            
+            .field-action {
+                width: 100%;
+            }
+            
+            .btn-text {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .session-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .btn-revoke {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .modal {
+                max-width: 90%;
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    
+                    <!-- Account dropdown (always shown on dashboard) -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation (Square-style) -->
+    <nav class="secondary-nav">
+        <div class="container">
+            <span class="secondary-nav-title">Dashboard</span>
+            <div class="secondary-nav-links">
+                <a href="dashboard.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Applications
+                </a>
+                <a href="dashboard-team.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team
+                </a>
+                <a href="dashboard-webhooks.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Webhooks
+                </a>
+                <a href="dashboard-logs.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Logs
+                </a>
+                <a href="dashboard-settings.html" class="secondary-nav-link active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Account Settings
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Settings Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Account Settings</h1>
+                <p>Manage your profile, security, and account preferences.</p>
+            </div>
+
+            <div class="settings-container">
+                <!-- Message display -->
+                <div id="pageMessage" class="message"></div>
+                
+                <!-- Profile Section -->
+                <div class="settings-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Profile
+                    </h2>
+                    <p>Your basic account information.</p>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Username</div>
+                            <div class="field-value" id="usernameValue">Loading...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Email</div>
+                            <div class="field-value" id="emailValue">Loading...</div>
+                        </div>
+                        <div class="field-action">
+                            <button class="btn-text" id="changeEmailBtn">Change</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Account ID</div>
+                            <div class="field-value" id="accountIdValue" style="font-family: monospace; font-size: 13px;">Loading...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Member Since</div>
+                            <div class="field-value" id="createdAtValue">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Section -->
+                <div class="settings-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        Security
+                    </h2>
+                    <p>Manage your password and active sessions.</p>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Password</div>
+                            <div class="field-value">Last changed: Unknown</div>
+                        </div>
+                        <div class="field-action">
+                            <button class="btn-text" id="changePasswordBtn">Change Password</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Sessions Section -->
+                <div class="settings-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        Active Sessions
+                    </h2>
+                    <p>Devices where you're currently logged in.</p>
+                    
+                    <div class="sessions-list" id="sessionsList">
+                        <div class="empty-sessions">Loading sessions...</div>
+                    </div>
+                    
+                    <div style="margin-top: 16px; text-align: right;">
+                        <button class="btn-text" id="revokeAllBtn" style="color: #DC2626;">Revoke All Other Sessions</button>
+                    </div>
+                </div>
+                
+                <!-- Admin Section (Legacy Migration) -->
+                <div class="settings-section" id="adminSection" style="display: none;">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Admin Tools
+                    </h2>
+                    <p>Advanced account management options.</p>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Account Migration</div>
+                            <div class="field-value">Migrate your account to enable team features (Role-Based Access Control).</div>
+                        </div>
+                        <div class="field-action">
+                            <button class="btn-primary" id="runMigrationBtn" style="background: #6366f1;">Run Migration</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Migration Status</div>
+                            <div class="field-value" id="migrationStatusValue">Not started</div>
+                        </div>
+                        <div class="field-action">
+                            <button class="btn-text" id="checkMigrationStatusBtn">Check Status</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Danger Zone -->
+                <div class="settings-section danger-zone">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        Danger Zone
+                    </h2>
+                    <p>Irreversible and destructive actions.</p>
+                    
+                    <div class="settings-field">
+                        <div class="field-info">
+                            <div class="field-label">Delete Account</div>
+                            <div class="field-value">Permanently delete your account and all associated data.</div>
+                        </div>
+                        <div class="field-action">
+                            <button class="btn-danger" id="deleteAccountBtn">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Change Email Modal -->
+    <div class="modal-overlay" id="emailModal">
+        <div class="modal">
+            <h3>Change Email Address</h3>
+            <p>Enter your new email address and current password to confirm.</p>
+            <form class="modal-form" id="emailForm">
+                <div class="form-group">
+                    <label for="newEmail">New Email Address</label>
+                    <input type="email" id="newEmail" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="emailPassword">Current Password</label>
+                    <input type="password" id="emailPassword" required placeholder="Enter your password">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('emailModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal">
+            <h3>Change Password</h3>
+            <p>Enter your current password and choose a new one.</p>
+            <form class="modal-form" id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" required placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" required placeholder="Enter new password" minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required placeholder="Confirm new password">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('passwordModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h3 style="color: #DC2626;">Delete Account</h3>
+            <div class="delete-warning">
+                <p><strong>This action cannot be undone.</strong> This will permanently delete:</p>
+                <ul>
+                    <li>Your account and profile</li>
+                    <li>All applications and API keys</li>
+                    <li>All yield accounts and positions</li>
+                    <li>All transaction history</li>
+                    <li>All webhook subscriptions</li>
+                </ul>
+            </div>
+            <form class="modal-form" id="deleteForm">
+                <div class="form-group">
+                    <label for="deletePassword">Enter your password to confirm</label>
+                    <input type="password" id="deletePassword" required placeholder="Your password">
+                </div>
+                <div class="form-group">
+                    <label for="deleteConfirmation">Type <strong>DELETE</strong> to confirm</label>
+                    <input type="text" id="deleteConfirmation" required placeholder="DELETE">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+                    <button type="submit" class="btn-danger">Delete My Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script>
+        const API_BASE_URL = window.API_BASE_URL || 'https://flow-platform-production.up.railway.app';
+        
+        // Check authentication
+        if (!TokenManager.isAuthenticated()) {
+            localStorage.setItem('tbd_redirect_after_login', window.location.pathname);
+            window.location.href = 'signin.html';
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccountSettings();
+            loadSessions();
+            setupEventListeners();
+            
+            // Update username in nav
+            const username = localStorage.getItem('tbd_user_name') || localStorage.getItem('tbd_username');
+            if (username) {
+                document.getElementById('userInfo').textContent = username;
+            }
+            
+            // Show admin section for legacy accounts
+            const authMode = localStorage.getItem('tbd_auth_mode');
+            if (authMode !== 'rcac') {
+                document.getElementById('adminSection').style.display = 'block';
+            }
+            
+            // Check for hash to scroll to admin section
+            if (window.location.hash === '#admin') {
+                setTimeout(() => {
+                    document.getElementById('adminSection').scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        });
+        
+        // Load account settings
+        async function loadAccountSettings() {
+            const authMode = localStorage.getItem('tbd_auth_mode');
+            
+            try {
+                if (authMode === 'rcac') {
+                    // RCAC: Use /v1/users/me endpoint
+                    const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/users/me`);
+                    
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        const user = data.user || data;
+                        document.getElementById('usernameValue').textContent = user.first_name || user.email?.split('@')[0] || 'N/A';
+                        document.getElementById('emailValue').textContent = user.email || 'Not set';
+                        document.getElementById('accountIdValue').textContent = user.id || localStorage.getItem('tbd_user_id');
+                        document.getElementById('createdAtValue').textContent = formatDate(user.created_at);
+                    } else {
+                        showMessage('Failed to load account settings', 'error');
+                    }
+                } else {
+                    // Legacy: Use /v1/account endpoint
+                    const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account`);
+                    
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        document.getElementById('usernameValue').textContent = data.username;
+                        document.getElementById('emailValue').textContent = data.email || 'Not set';
+                        document.getElementById('accountIdValue').textContent = data.account_id;
+                        document.getElementById('createdAtValue').textContent = formatDate(data.created_at);
+                    } else {
+                        showMessage('Failed to load account settings', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading account settings:', error);
+                showMessage('Failed to load account settings', 'error');
+            }
+        }
+        
+        // Load active sessions
+        async function loadSessions() {
+            const sessionsList = document.getElementById('sessionsList');
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/sessions`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.sessions.length === 0) {
+                        sessionsList.innerHTML = '<div class="empty-sessions">No active sessions found</div>';
+                        return;
+                    }
+                    
+                    sessionsList.innerHTML = data.sessions.map((session, index) => `
+                        <div class="session-item ${index === 0 ? 'current' : ''}">
+                            <div class="session-info">
+                                <div class="session-device">
+                                    ${session.device_info || 'Unknown Device'}
+                                    ${index === 0 ? '<span class="current-badge">Current</span>' : ''}
+                                </div>
+                                <div class="session-details">
+                                    ${session.ip_address || 'Unknown IP'} • Last active ${formatDate(session.last_active_at)}
+                                </div>
+                            </div>
+                            ${index !== 0 ? `<button class="btn-revoke" onclick="revokeSession('${session.session_id}')">Revoke</button>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    sessionsList.innerHTML = '<div class="empty-sessions">Unable to load sessions</div>';
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                sessionsList.innerHTML = '<div class="empty-sessions">Unable to load sessions</div>';
+            }
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Change email button
+            document.getElementById('changeEmailBtn').addEventListener('click', () => openModal('emailModal'));
+            
+            // Change password button
+            document.getElementById('changePasswordBtn').addEventListener('click', () => openModal('passwordModal'));
+            
+            // Delete account button
+            document.getElementById('deleteAccountBtn').addEventListener('click', () => openModal('deleteModal'));
+            
+            // Revoke all sessions button
+            document.getElementById('revokeAllBtn').addEventListener('click', revokeAllSessions);
+            
+            // Email form submission
+            document.getElementById('emailForm').addEventListener('submit', handleEmailUpdate);
+            
+            // Password form submission
+            document.getElementById('passwordForm').addEventListener('submit', handlePasswordChange);
+            
+            // Delete form submission
+            document.getElementById('deleteForm').addEventListener('submit', handleDeleteAccount);
+            
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+            
+            // Sign out button
+            document.getElementById('signOutBtn').addEventListener('click', function() {
+                TokenManager.logout();
+            });
+            
+            // Migration buttons
+            const runMigrationBtn = document.getElementById('runMigrationBtn');
+            const checkMigrationStatusBtn = document.getElementById('checkMigrationStatusBtn');
+            
+            if (runMigrationBtn) {
+                runMigrationBtn.addEventListener('click', runMigration);
+            }
+            
+            if (checkMigrationStatusBtn) {
+                checkMigrationStatusBtn.addEventListener('click', checkMigrationStatus);
+            }
+            
+            // Dashboard dropdown
+            const dropdownBtn = document.getElementById('dashboardDropdownBtn');
+            const dropdown = document.getElementById('dashboardDropdown');
+            
+            if (dropdownBtn && dropdown) {
+                dropdownBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Handle email update
+        async function handleEmailUpdate(e) {
+            e.preventDefault();
+            
+            const newEmail = document.getElementById('newEmail').value;
+            const password = document.getElementById('emailPassword').value;
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account/email`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: newEmail, password: password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeModal('emailModal');
+                    showMessage('Email updated successfully', 'success');
+                    document.getElementById('emailValue').textContent = newEmail;
+                    e.target.reset();
+                } else {
+                    showMessage(data.error?.message || 'Failed to update email', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating email:', error);
+                showMessage('Failed to update email', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Update Email';
+            }
+        }
+        
+        // Handle password change
+        async function handlePasswordChange(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account/password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeModal('passwordModal');
+                    showMessage('Password changed successfully', 'success');
+                    e.target.reset();
+                } else {
+                    showMessage(data.error?.message || 'Failed to change password', 'error');
+                }
+            } catch (error) {
+                console.error('Error changing password:', error);
+                showMessage('Failed to change password', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Update Password';
+            }
+        }
+        
+        // Handle account deletion
+        async function handleDeleteAccount(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('deletePassword').value;
+            const confirmation = document.getElementById('deleteConfirmation').value;
+            
+            if (confirmation !== 'DELETE') {
+                showMessage('Please type DELETE to confirm', 'error');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Deleting...';
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/account`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: password,
+                        confirmation: confirmation
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Clear all storage and redirect
+                    TokenManager.clearTokens();
+                    window.location.href = 'index.html';
+                } else {
+                    showMessage(data.error?.message || 'Failed to delete account', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                showMessage('Failed to delete account', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Delete My Account';
+            }
+        }
+        
+        // Revoke a specific session
+        async function revokeSession(sessionId) {
+            if (!confirm('Are you sure you want to revoke this session?')) return;
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/sessions/${sessionId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showMessage('Session revoked successfully', 'success');
+                    loadSessions();
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to revoke session', 'error');
+                }
+            } catch (error) {
+                console.error('Error revoking session:', error);
+                showMessage('Failed to revoke session', 'error');
+            }
+        }
+        
+        // Revoke all other sessions
+        async function revokeAllSessions() {
+            if (!confirm('Are you sure you want to revoke all other sessions? You will remain logged in on this device.')) return;
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/sessions`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`Revoked ${data.revoked_count} session(s)`, 'success');
+                    loadSessions();
+                } else {
+                    showMessage(data.error?.message || 'Failed to revoke sessions', 'error');
+                }
+            } catch (error) {
+                console.error('Error revoking sessions:', error);
+                showMessage('Failed to revoke sessions', 'error');
+            }
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // Reset form inside modal
+            const form = document.querySelector(`#${modalId} form`);
+            if (form) form.reset();
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('pageMessage');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 5000);
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Migration functions
+        async function runMigration() {
+            const btn = document.getElementById('runMigrationBtn');
+            btn.disabled = true;
+            btn.textContent = 'Migrating...';
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/admin/migration/run`, {
+                    method: 'POST'
+                });
+                
+                if (response && response.ok) {
+                    const data = await response.json();
+                    showMessage(`Migration completed! ${data.users_migrated || 0} accounts migrated.`, 'success');
+                    document.getElementById('migrationStatusValue').textContent = 'Completed';
+                    
+                    // Suggest re-login
+                    setTimeout(() => {
+                        if (confirm('Migration complete! Please sign out and sign back in to use the new features.')) {
+                            TokenManager.logout();
+                        }
+                    }, 1000);
+                } else {
+                    const data = await response?.json() || {};
+                    showMessage(data.error?.message || 'Migration failed', 'error');
+                }
+            } catch (error) {
+                console.error('Migration error:', error);
+                showMessage('Migration failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Migration';
+            }
+        }
+        
+        async function checkMigrationStatus() {
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/admin/migration/status`);
+                
+                if (response && response.ok) {
+                    const data = await response.json();
+                    document.getElementById('migrationStatusValue').textContent = 
+                        data.migrated ? `Completed (${data.users_count || 0} users, ${data.businesses_count || 0} businesses)` : 'Not migrated';
+                } else {
+                    document.getElementById('migrationStatusValue').textContent = 'Unable to check status';
+                }
+            } catch (error) {
+                console.error('Status check error:', error);
+                document.getElementById('migrationStatusValue').textContent = 'Error checking status';
+            }
+        }
+    </script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>
+

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/dashboard-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    
+                    <!-- Account dropdown (always shown on dashboard) -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item active">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation (Square-style) -->
+    <nav class="secondary-nav">
+        <div class="container">
+            <span class="secondary-nav-title">Dashboard</span>
+            <div class="secondary-nav-links">
+                <a href="dashboard.html" class="secondary-nav-link active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Applications
+                </a>
+                <a href="dashboard-team.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team
+                </a>
+                <a href="dashboard-webhooks.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Webhooks
+                </a>
+                <a href="dashboard-logs.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Logs
+                </a>
+                <a href="dashboard-settings.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Account Settings
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Applications</h1>
+                <p>Manage your applications, API keys, and configurations.</p>
+            </div>
+
+            <!-- Applications Section -->
+            <div class="section-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Your Applications
+                </h2>
+                <button class="btn-primary" id="createAppBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Create Application
+                </button>
+            </div>
+            
+            <div class="applications-grid" id="applicationsGrid">
+                <div class="loading-spinner">Loading applications...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Application Modal -->
+    <div class="modal" id="createAppModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Create New Application</h3>
+                <button class="modal-close" onclick="closeModal('createAppModal')">&times;</button>
+            </div>
+            <form id="createAppForm">
+                <div class="form-group">
+                    <label for="appName">Application Name *</label>
+                    <input type="text" id="appName" name="appName" required placeholder="My Application">
+                    <small>A unique name for your application</small>
+                </div>
+                <div class="form-group">
+                    <label for="appDescription">Description</label>
+                    <textarea id="appDescription" name="appDescription" rows="2" placeholder="Brief description of your application"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="appWebhook">Webhook URL</label>
+                    <input type="url" id="appWebhook" name="appWebhook" placeholder="https://your-server.com/webhooks/tbd">
+                    <small>Receive real-time notifications for deposits, withdrawals, and yield events</small>
+                </div>
+                <div class="form-group">
+                    <label for="appOrigins">Allowed Origins (CORS)</label>
+                    <input type="text" id="appOrigins" name="appOrigins" placeholder="https://your-app.com, https://sandbox.your-app.com">
+                    <small>Comma-separated list of domains that can make API calls from browsers</small>
+                </div>
+                <div class="info-box info-box-success">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p><strong>Ready to go!</strong> Create an API key after setup to start making API calls immediately.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createAppModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div class="modal" id="appDetailsModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-xlarge">
+            <div class="modal-header">
+                <h3 id="appDetailsTitle">Application Details</h3>
+                <button class="modal-close" onclick="closeModal('appDetailsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="app-details-layout">
+                    <!-- Left: App Info -->
+                    <div class="app-info-section">
+                        <div class="app-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Application ID</span>
+                                <code class="meta-value" id="detailAppId"></code>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Environment</span>
+                                <span class="environment-badge" id="detailAppEnv"></span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Status</span>
+                                <span class="status-badge" id="detailAppStatus"></span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Created</span>
+                                <span class="meta-value" id="detailAppCreated"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="webhook-section">
+                            <h4>Webhook Configuration</h4>
+                            <div class="meta-item">
+                                <span class="meta-label">Webhook URL</span>
+                                <span class="meta-value" id="detailWebhookUrl">Not configured</span>
+                            </div>
+                            <div class="meta-item" id="webhookSecretRow" style="display: none;">
+                                <span class="meta-label">Webhook Secret</span>
+                                <div class="secret-display">
+                                    <code id="detailWebhookSecret">••••••••••••••••</code>
+                                    <button class="btn-small btn-secondary" onclick="toggleWebhookSecret()">Show</button>
+                                    <button class="btn-small btn-secondary" onclick="regenerateWebhookSecret()">Regenerate</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Right: API Keys -->
+                    <div class="app-keys-section">
+                        <div class="keys-header">
+                            <h4>API Keys</h4>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary btn-small" onclick="openShareModal()" id="shareAppBtn" style="display: none;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="18" cy="5" r="3"/>
+                                        <circle cx="6" cy="12" r="3"/>
+                                        <circle cx="18" cy="19" r="3"/>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                    </svg>
+                                    Share
+                                </button>
+                                <button class="btn-primary btn-small" onclick="openCreateTokenModal()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Create Key
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tokens-list" id="appTokensList">
+                            <div class="loading-spinner">Loading keys...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-danger" onclick="deleteApplication()">Delete Application</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('appDetailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Token Modal -->
+    <div class="modal" id="createTokenModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create API Key</h3>
+                <button class="modal-close" onclick="closeModal('createTokenModal')">&times;</button>
+            </div>
+            <form id="createTokenForm">
+                <div class="form-group">
+                    <label for="tokenName">Key Name *</label>
+                    <input type="text" id="tokenName" name="tokenName" required placeholder="e.g., Production Server">
+                    <small>A descriptive name to identify this key</small>
+                </div>
+                <div class="form-group">
+                    <label for="tokenEnvironment">Environment *</label>
+                    <select id="tokenEnvironment" name="tokenEnvironment" required>
+                        <option value="sandbox">Sandbox (Testnet)</option>
+                        <option value="production">Production (Mainnet)</option>
+                    </select>
+                    <small>Choose the environment this API key will be used for</small>
+                </div>
+                <div class="form-group">
+                    <label for="tokenExpiry">Expiration</label>
+                    <select id="tokenExpiry" name="tokenExpiry">
+                        <option value="">Never expires</option>
+                        <option value="3600">1 hour</option>
+                        <option value="86400">24 hours</option>
+                        <option value="604800">7 days</option>
+                        <option value="2592000">30 days</option>
+                        <option value="7776000">90 days</option>
+                        <option value="31536000">1 year</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createTokenModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Key</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Token Created Modal -->
+    <div class="modal" id="tokenCreatedModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API Key Created!</h3>
+                <button class="modal-close" onclick="closeModal('tokenCreatedModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p><strong>Copy your API key now!</strong> You won't be able to see it again.</p>
+                </div>
+                <div class="token-display">
+                    <code id="newTokenValue"></code>
+                    <button class="copy-btn" onclick="copyNewToken()">Copy</button>
+                </div>
+                <div class="usage-example">
+                    <h4>Usage Example</h4>
+                    <div class="code-example-box">
+                        <pre><code id="tokenUsageExample"></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary" onclick="closeTokenCreatedModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Application Modal -->
+    <div class="modal" id="shareAppModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Share Application</h3>
+                <button class="modal-close" onclick="closeModal('shareAppModal')">&times;</button>
+            </div>
+            <form id="shareAppForm">
+                <div class="form-group">
+                    <label for="shareEmail">Email Address</label>
+                    <input type="email" id="shareEmail" required placeholder="colleague@example.com">
+                    <small>Grant access to this application to another user.</small>
+                </div>
+                <div class="form-group">
+                    <label for="sharePermission">Permission Level</label>
+                    <select id="sharePermission" required>
+                        <option value="read">Read - View application and API usage</option>
+                        <option value="write">Write - Create/edit API keys</option>
+                        <option value="admin">Admin - Full control including deletion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shareReason">Reason (optional)</label>
+                    <input type="text" id="shareReason" placeholder="Why are you sharing this?">
+                    <small>This will be recorded for audit purposes.</small>
+                </div>
+                
+                <!-- Current Access List -->
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+                    <h4 style="font-size: 14px; margin: 0 0 12px 0;">Current Access</h4>
+                    <div id="currentAccessList" style="max-height: 150px; overflow-y: auto;">
+                        <div style="color: var(--text-secondary); font-size: 13px;">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('shareAppModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Grant Access</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API_BASE_URL is set by config.js (loaded in head)
+        let currentAppId = null;
+        let currentAppData = null;
+        let webhookSecretVisible = false;
+        
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            // Wait for TokenManager initialization
+            await TokenManager.init();
+            
+            // Check if session is valid
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                // Don't redirect if modal is showing - let user click the button
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            // Session is valid, continue with page initialization
+            initializeDashboard();
+        })();
+        
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_user_name') || localStorage.getItem('tbd_username');
+            document.getElementById('userInfo').textContent = username || 'Account';
+            
+            // Show share button for RCAC users
+            const authMode = localStorage.getItem('tbd_auth_mode');
+            if (authMode === 'rcac') {
+                document.getElementById('shareAppBtn').style.display = 'inline-flex';
+            }
+            
+            // Load initial data
+            loadApplications();
+            
+            // Setup share form
+            document.getElementById('shareAppForm').addEventListener('submit', handleShareApp);
+        }
+        
+        // Helper function to handle API calls with automatic token refresh
+        async function handleApiCall(url, options = {}) {
+            const response = await TokenManager.apiCall(url, options);
+            // If response is null, session expired - don't continue
+            if (response === null) {
+                return null;
+            }
+            return response;
+        }
+        
+        // Dashboard dropdown toggle
+        const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
+        const dashboardDropdown = document.getElementById('dashboardDropdown');
+        
+        dashboardDropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dashboardDropdown.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!dashboardDropdown.contains(e.target) && !dashboardDropdownBtn.contains(e.target)) {
+                dashboardDropdown.classList.remove('active');
+            }
+        });
+        
+        // Sign out using TokenManager (properly revokes refresh tokens)
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            TokenManager.logout();
+        });
+        
+        // Create Application
+        document.getElementById('createAppBtn').addEventListener('click', () => openModal('createAppModal'));
+        
+        // Tooltip functionality
+        document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+            trigger.addEventListener('mouseenter', function() {
+                const tooltipId = this.dataset.tooltip;
+                const tooltip = document.getElementById(tooltipId);
+                if (tooltip) {
+                    tooltip.style.display = 'block';
+                }
+            });
+            trigger.addEventListener('mouseleave', function() {
+                const tooltipId = this.dataset.tooltip;
+                const tooltip = document.getElementById(tooltipId);
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        });
+        
+        document.getElementById('createAppForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const origins = document.getElementById('appOrigins').value;
+            const body = {
+                name: document.getElementById('appName').value,
+                description: document.getElementById('appDescription').value || undefined,
+                webhook_url: document.getElementById('appWebhook').value || undefined,
+                allowed_origins: origins ? origins.split(',').map(o => o.trim()) : undefined
+            };
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response) return; // Session expired
+                
+                if (response.ok) {
+                    closeModal('createAppModal');
+                    this.reset();
+                    loadApplications();
+                } else {
+                    const data = await response.json();
+                    alert(data.error?.message || 'Failed to create application');
+                }
+            } catch (error) {
+                alert('Failed to create application');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Application';
+            }
+        });
+        
+        
+        // Create Token Form
+        document.getElementById('createTokenForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const expiresIn = document.getElementById('tokenExpiry').value;
+            const body = {
+                name: document.getElementById('tokenName').value,
+                environment: document.getElementById('tokenEnvironment').value,
+                expires_in: expiresIn ? parseInt(expiresIn) : undefined
+            };
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response) return; // Redirected to sign-in
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeModal('createTokenModal');
+                    document.getElementById('newTokenValue').textContent = data.access_token;
+                    document.getElementById('tokenUsageExample').textContent = 
+`curl ${API_BASE_URL}/v1/yield/accounts \\
+  -H "Authorization: Bearer ${data.access_token}" \\
+  -H "Content-Type: application/json"`;
+                    openModal('tokenCreatedModal');
+                    this.reset();
+                } else {
+                    console.error('Token creation failed:', response.status, data);
+                    const errorMsg = data.error?.message || data.message || `Failed to create key (Status: ${response.status})`;
+                    alert(errorMsg);
+                }
+            } catch (error) {
+                console.error('Token creation error:', error);
+                alert('Failed to create key: ' + (error.message || 'Unknown error. Check console for details.'));
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Key';
+            }
+        });
+        
+        async function loadApplications() {
+            const grid = document.getElementById('applicationsGrid');
+            
+            console.log('📦 Loading applications...');
+            console.log('📦 API_BASE_URL:', window.API_BASE_URL);
+            console.log('📦 Token exists:', !!localStorage.getItem('tbd_token'));
+            
+            try {
+                const response = await handleApiCall(`${window.API_BASE_URL}/v1/applications`);
+                console.log('📦 API Response:', response);
+                if (!response) {
+                    console.log('📦 No response (session expired?)');
+                    grid.innerHTML = '<div class="empty-state">Session expired. Please <a href="signin.html">sign in</a> again.</div>';
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('📦 Applications data:', data);
+                
+                if (response.ok && data.applications?.length > 0) {
+                    grid.innerHTML = data.applications.map(app => `
+                        <div class="app-card" onclick="openAppDetails('${app.application_id}')">
+                            <div class="app-card-header">
+                                <span class="app-name">${app.name}</span>
+                                <span class="environment-badge">Both Environments</span>
+                            </div>
+                            <p class="app-description">${app.description || 'No description'}</p>
+                            <div class="app-card-footer">
+                                <span class="app-id">ID: ${app.application_id.substring(0, 8)}...</span>
+                                <span class="status-badge status-${app.status}">${app.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = `
+                        <div class="empty-state-large">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h3>No Applications Yet</h3>
+                            <p>Create your first application to get API keys and start building.</p>
+                            <button class="btn-primary" onclick="openModal('createAppModal')">Create Your First App</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('📦 Error loading applications:', error);
+                grid.innerHTML = `<div class="empty-state">Failed to load applications: ${error.message || error}</div>`;
+            }
+        }
+        
+        async function openAppDetails(appId) {
+            currentAppId = appId;
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${appId}`);
+                if (!response) return; // Session expired
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: { message: `HTTP ${response.status}` } }));
+                    console.error('API Error:', errorData);
+                    alert(`Failed to load application: ${errorData.error?.message || response.statusText}`);
+                    return;
+                }
+                
+                const app = await response.json();
+                currentAppData = app;
+                
+                document.getElementById('appDetailsTitle').textContent = app.name;
+                document.getElementById('detailAppId').textContent = app.application_id;
+                document.getElementById('detailAppEnv').textContent = 'Both (Sandbox & Production)';
+                document.getElementById('detailAppEnv').className = 'environment-badge';
+                document.getElementById('detailAppStatus').textContent = app.status;
+                document.getElementById('detailAppStatus').className = `status-badge status-${app.status}`;
+                document.getElementById('detailAppCreated').textContent = new Date(app.created_at).toLocaleString();
+                
+                // Webhook
+                document.getElementById('detailWebhookUrl').textContent = app.webhook_url || 'Not configured';
+                if (app.webhook_secret) {
+                    document.getElementById('webhookSecretRow').style.display = 'flex';
+                    document.getElementById('detailWebhookSecret').textContent = webhookSecretVisible ? app.webhook_secret : '••••••••••••••••';
+                } else {
+                    document.getElementById('webhookSecretRow').style.display = 'none';
+                }
+                
+                loadAppTokens(appId);
+                openModal('appDetailsModal');
+            } catch (error) {
+                console.error('Error loading application details:', error);
+                alert(`Failed to load application details: ${error.message || error}`);
+            }
+        }
+        
+        async function loadAppTokens(appId) {
+            const list = document.getElementById('appTokensList');
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${appId}/tokens`);
+                if (!response) return; // Session expired
+                
+                const data = await response.json();
+                
+                if (response.ok && data.tokens?.length > 0) {
+                    list.innerHTML = data.tokens.map(t => `
+                        <div class="token-item">
+                            <div class="token-info">
+                                <span class="token-name">${t.name}</span>
+                                <code class="token-preview">${t.access_token.substring(0, 25)}...</code>
+                                <span class="token-meta">Created: ${new Date(t.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <button class="btn-danger btn-small" onclick="revokeAppToken('${t.token_id}')">Revoke</button>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="empty-state">No API keys yet. Create one to get started.</div>';
+                }
+            } catch (error) {
+                list.innerHTML = '<div class="empty-state">Failed to load keys</div>';
+            }
+        }
+        
+        function openCreateTokenModal() {
+            openModal('createTokenModal');
+        }
+        
+        function openShareModal() {
+            openModal('shareAppModal');
+            loadCurrentAccess();
+        }
+        
+        async function loadCurrentAccess() {
+            const listEl = document.getElementById('currentAccessList');
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/resources/application/${currentAppId}/access`);
+                
+                if (!response) {
+                    listEl.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Unable to load access list</div>';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const grants = data.grants || [];
+                    
+                    if (grants.length === 0) {
+                        listEl.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Only you have access to this application.</div>';
+                    } else {
+                        listEl.innerHTML = grants.map(g => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <span style="font-size: 13px; font-weight: 500;">${g.user_email || g.role_name || 'Unknown'}</span>
+                                    <span style="font-size: 12px; color: var(--text-secondary); margin-left: 8px;">${g.permission}</span>
+                                </div>
+                                <button class="btn-small btn-danger" onclick="revokeAccess('${g.id}')" style="font-size: 11px; padding: 4px 8px;">Revoke</button>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    listEl.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Unable to load access list</div>';
+                }
+            } catch (error) {
+                console.error('Error loading access:', error);
+                listEl.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Error loading access</div>';
+            }
+        }
+        
+        async function handleShareApp(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Granting...';
+            
+            const body = {
+                grants: [{
+                    email: document.getElementById('shareEmail').value,
+                    permission: document.getElementById('sharePermission').value,
+                    reason: document.getElementById('shareReason').value || undefined
+                }]
+            };
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/resources/application/${currentAppId}/access`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response) return;
+                
+                if (response.ok) {
+                    e.target.reset();
+                    loadCurrentAccess();
+                    alert('Access granted successfully!');
+                } else {
+                    const data = await response.json();
+                    alert(data.error?.message || 'Failed to grant access');
+                }
+            } catch (error) {
+                console.error('Error sharing app:', error);
+                alert('Failed to grant access');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Grant Access';
+            }
+        }
+        
+        async function revokeAccess(grantId) {
+            if (!confirm('Revoke this access?')) return;
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/resources/application/${currentAppId}/access/${grantId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response && response.ok) {
+                    loadCurrentAccess();
+                } else {
+                    alert('Failed to revoke access');
+                }
+            } catch (error) {
+                console.error('Error revoking access:', error);
+                alert('Failed to revoke access');
+            }
+        }
+        
+        async function revokeAppToken(tokenId) {
+            if (!confirm('Are you sure you want to revoke this key? This cannot be undone.')) return;
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/tokens/${tokenId}`, {
+                    method: 'DELETE'
+                });
+                if (!response) return; // Session expired
+                loadAppTokens(currentAppId);
+            } catch (error) {
+                alert('Failed to revoke key');
+            }
+        }
+        
+        async function deleteApplication() {
+            if (!confirm('Are you sure you want to delete this application? All API keys will be revoked.')) return;
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}`, {
+                    method: 'DELETE'
+                });
+                if (!response) return; // Session expired
+                
+                if (response.ok) {
+                    closeModal('appDetailsModal');
+                    loadApplications();
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.error?.message || 'Failed to delete application');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Failed to delete application: ' + error.message);
+            }
+        }
+        
+        function toggleWebhookSecret() {
+            webhookSecretVisible = !webhookSecretVisible;
+            document.getElementById('detailWebhookSecret').textContent = 
+                webhookSecretVisible ? currentAppData.webhook_secret : '••••••••••••••••';
+        }
+        
+        async function regenerateWebhookSecret() {
+            if (!confirm('Regenerate webhook secret? Your current secret will stop working.')) return;
+            
+            try {
+                const response = await handleApiCall(`${API_BASE_URL}/v1/applications/${currentAppId}/webhook-secret/regenerate`, {
+                    method: 'POST'
+                });
+                if (!response) return; // Session expired
+                const data = await response.json();
+                currentAppData.webhook_secret = data.webhook_secret;
+                document.getElementById('detailWebhookSecret').textContent = 
+                    webhookSecretVisible ? data.webhook_secret : '••••••••••••••••';
+            } catch (error) {
+                alert('Failed to regenerate secret');
+            }
+        }
+        
+        function closeTokenCreatedModal() {
+            closeModal('tokenCreatedModal');
+            loadAppTokens(currentAppId);
+        }
+        
+        function copyNewToken() {
+            navigator.clipboard.writeText(document.getElementById('newTokenValue').textContent);
+            const btn = event.target;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy', 2000);
+        }
+        
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', function() {
+                this.closest('.modal').classList.remove('active');
+            });
+        });
+    </script>
+    <script src="scripts/tooltip.js"></script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="scripts/script.js"></script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

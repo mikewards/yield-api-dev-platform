@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Detail - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/api-detail-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- API Detail Content -->
+    <section class="api-detail-content">
+        <div class="container">
+            <div class="detail-header">
+                <a href="api-reference.html" class="back-link">← API Reference</a>
+                <div class="detail-title-section">
+                    <div class="method-badge" id="method-badge">POST</div>
+                    <h1 id="api-title">Create Yield Account</h1>
+                </div>
+                <p class="detail-description" id="api-description">
+                    Creates a yield account using the provided parameters.
+                </p>
+                <div class="endpoint-info">
+                    <span class="endpoint-method-badge" id="endpoint-method-badge">POST</span>
+                    <code class="endpoint-path-inline" id="endpoint-path-inline">/v1/yield/accounts</code>
+                    <span class="permissions-badge">Permissions: <span id="permissions-inline">YIELD_WRITE</span></span>
+                    <span class="rate-limit-badge" id="rate-limit-badge" title="Rate limit for this endpoint">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="rate-limit-inline">100 req/min</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-split-layout">
+                <!-- Left Column: Summary and Request Body -->
+                <div class="detail-left">
+                    <!-- Summary Section -->
+                    <div class="summary-section" id="summary-section">
+                        <h2>Summary</h2>
+                        <p id="summary-text">Create a new yield account to start earning interest on cryptocurrency deposits. Ground automatically routes funds to the best available protocol (Morpho or Aave) to ensure 6% yield.</p>
+                    </div>
+
+                    <!-- Request Body Section -->
+                    <div class="request-section" id="request-section">
+                        <h2>Request body</h2>
+                        <div class="params-container" id="request-body">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Examples and Response -->
+                <div class="detail-right">
+                    <!-- CURL Example -->
+                    <div class="example-section" id="example-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin: 0;">Example request</h2>
+                            <div class="env-toggle" style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 14px; color: #64748b;">Environment:</span>
+                                <div class="toggle-switch" style="display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px;">
+                                    <button class="env-btn active" data-env="production" style="padding: 6px 12px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s;">Production</button>
+                                    <button class="env-btn" data-env="sandbox" style="padding: 6px 12px; border: none; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.2s;">Sandbox</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block-unified" style="width: 100%; min-width: 100%; box-sizing: border-box;">
+                            <div class="code-block-header">
+                                <span class="code-block-label"><span class="code-block-label-text">request.sh</span></span>
+                                <button class="code-copy-btn" onclick="copyCode(this, 'curl-example')">
+                                    <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                    </svg>
+                                    <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span class="btn-text"></span>
+                                </button>
+                            </div>
+                            <div class="code-block-content">
+                                <pre id="curl-example" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "currency": "USDC",
+    "initial_deposit": {
+      "amount": "1000.00",
+      "currency": "USDC"
+    },
+    "protocol_preference": "auto"
+  }'</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Response Section -->
+                    <div class="response-section-right" id="response-section">
+                        <h2>Response</h2>
+                        <div class="response-tabs">
+                            <button class="tab-btn active" data-tab="success">Success</button>
+                            <button class="tab-btn" data-tab="error">Error</button>
+                        </div>
+                        <div class="response-content">
+                            <div class="tab-content active" id="success-tab">
+                                <div class="code-block-unified">
+                                    <div class="code-block-header">
+                                        <span class="code-block-label"><span class="code-block-label-text" id="success-label">200 OK</span></span>
+                                        <button class="code-copy-btn" onclick="copyCode(this, 'success-response')">
+                                            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                            </svg>
+                                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            <span class="btn-text"></span>
+                                        </button>
+                                    </div>
+                                    <div class="code-block-content">
+                                        <pre id="success-response" data-language="json">{
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234567890abcdef"</span>,
+  <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+  <span class="token-property">"protocol"</span>: <span class="token-string-value">"morpho"</span>,
+  <span class="token-property">"annual_yield_rate"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>,
+  <span class="token-property">"created_at"</span>: <span class="token-string-value">"2025-01-15T10:30:00Z"</span>,
+  <span class="token-property">"balance"</span>: {
+    <span class="token-property">"amount"</span>: <span class="token-string-value">"1000.00"</span>,
+    <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>
+  }
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-content" id="error-tab">
+                                <div class="code-block-unified">
+                                    <div class="code-block-header">
+                                        <span class="code-block-label error"><span class="code-block-label-text" id="error-label">400 Bad Request</span></span>
+                                        <button class="code-copy-btn" onclick="copyCode(this, 'error-response')">
+                                            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                            </svg>
+                                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            <span class="btn-text"></span>
+                                        </button>
+                                    </div>
+                                    <div class="code-block-content">
+                                        <pre id="error-response" data-language="json">{
+  <span class="token-property">"error"</span>: {
+    <span class="token-property">"code"</span>: <span class="token-string-value">"INSUFFICIENT_FUNDS"</span>,
+    <span class="token-property">"message"</span>: <span class="token-string-value">"Insufficient funds to create yield account"</span>,
+    <span class="token-property">"type"</span>: <span class="token-string-value">"invalid_request_error"</span>
+  }
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/api-detail-script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script src="scripts/tooltip.js"></script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

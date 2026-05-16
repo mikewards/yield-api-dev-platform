@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Guides-style layout for API Reference */
+        .api-reference-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 64px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+            background: transparent;
+        }
+        
+        .api-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .api-main {
+            max-width: 800px;
+        }
+        
+        .api-page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        
+        .api-page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+        
+        .api-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 100px;
+        }
+        
+        .api-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        
+        .section-description {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .api-resource {
+            margin-bottom: 32px;
+            scroll-margin-top: 100px;
+        }
+        
+        .resource-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .resource-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .resource-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-link {
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            gap: 16px;
+            padding: 12px 16px;
+            background: var(--bg-gray);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.15s;
+            align-items: start;
+        }
+        
+        .action-link:hover {
+            background: var(--bg-gray-dark);
+        }
+        
+        .action-method {
+            display: inline-block;
+            padding: 4px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: fit-content;
+        }
+        
+        .action-method.post { background: #10B981; }
+        .action-method.get { background: #006aff; }
+        .action-method.put, .action-method.patch { background: #F59E0B; }
+        .action-method.delete { background: #EF4444; }
+        
+        .action-path {
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .action-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Sidebar styling to match Guides */
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            margin-top: 0;
+        }
+        
+        .sidebar-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-list li {
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-list a {
+            display: block;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        
+        .sidebar-list a:hover {
+            color: var(--text-primary);
+            background: var(--bg-gray);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 900px) {
+            .api-reference-layout {
+                display: block;
+                padding: 24px 16px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .api-sidebar {
+                display: none;
+            }
+            
+            .api-main {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .api-page-title {
+                font-size: 28px;
+            }
+            
+            .api-page-subtitle {
+                font-size: 16px;
+            }
+            
+            .api-section h2 {
+                font-size: 20px;
+            }
+            
+            .action-link {
+                grid-template-columns: 60px 1fr;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .action-method {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            
+            .action-path {
+                font-size: 13px;
+                word-break: break-all;
+            }
+            
+            .action-desc {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html" class="active">API Reference</a>
+                    
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- API Reference Content - Guides-style layout -->
+    <div class="api-reference-layout">
+        <!-- Sidebar -->
+        <aside class="api-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Dev Essentials</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#authentication">Authentication</a></li>
+                            <li><a href="#accounts">Accounts</a></li>
+                            <li><a href="#applications">Applications</a></li>
+                            <li><a href="#wallets">Wallets</a></li>
+                            <li><a href="#access-tokens">Access Tokens</a></li>
+                            <li><a href="#webhooks">Webhooks</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>Webhook Events</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="api-detail.html?resource=webhook-events&action=deposit-completed">deposit.completed</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=withdrawal-completed">withdrawal.completed</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=yield-accrued">yield.accrued</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=rate-changed">rate.changed</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=account-status-changed">account.status.changed</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=application-created">application.created</a></li>
+                            <li><a href="api-detail.html?resource=webhook-events&action=api-key-created">api_key.created</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>Yield</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#yield-accounts">Yield Accounts</a></li>
+                            <li><a href="#yield-positions">Positions</a></li>
+                            <li><a href="#yield-rates">Yield Rates</a></li>
+                            <li><a href="#yield-history">Yield History</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>Markets</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#markets">List Markets</a></li>
+                            <li><a href="#market-details">Market Details</a></li>
+                            <li><a href="#market-rates">Market Rates</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>Positions</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#positions">List Positions</a></li>
+                            <li><a href="#position-details">Position Details</a></li>
+                            <li><a href="#position-history">Position History</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>Transactions</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#transactions">List Transactions</a></li>
+                            <li><a href="#transaction-details">Transaction Details</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="api-main">
+                    <h1 class="api-page-title">API Reference</h1>
+                    <p class="api-page-subtitle">Complete API documentation for TBD's DeFi yield platform. Our REST APIs wrap Morpho and Aave protocols for a unified interface.</p>
+                    
+                    <!-- Dev Essentials Section -->
+                    <section id="dev-essentials" class="api-section">
+                        <h2>Dev Essentials</h2>
+                        <p class="section-description">
+                            Authenticate your app, manage accounts, create access tokens, and subscribe to webhooks.
+                        </p>
+
+                        <!-- Authentication Resource -->
+                        <div class="api-resource" id="authentication">
+                            <div class="resource-header">
+                                <h3>Authentication</h3>
+                                <p>Authenticate API requests using Personal Access Tokens. All API requests must include your access token in the Authorization header.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=auth&action=authenticate" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/auth/authenticate</span>
+                                    <span class="action-desc">Authenticate with username and password</span>
+                                </a>
+                                <a href="api-detail.html?resource=auth&action=refresh" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/auth/refresh</span>
+                                    <span class="action-desc">Refresh an access token</span>
+                                </a>
+                                <a href="api-detail.html?resource=auth&action=revoke" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/auth/revoke</span>
+                                    <span class="action-desc">Revoke an access token</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Accounts Resource -->
+                        <div class="api-resource" id="accounts">
+                            <div class="resource-header">
+                                <h3>Accounts</h3>
+                                <p>Create and manage developer accounts. Each account can generate multiple Personal Access Tokens for API authentication.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=accounts&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/accounts</span>
+                                    <span class="action-desc">Create a new developer account</span>
+                                </a>
+                                <a href="api-detail.html?resource=accounts&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/accounts/{account_id}</span>
+                                    <span class="action-desc">Get account details</span>
+                                </a>
+                                <a href="api-detail.html?resource=accounts&action=update" class="action-link">
+                                    <span class="action-method">PATCH</span>
+                                    <span class="action-path">/v1/accounts/{account_id}</span>
+                                    <span class="action-desc">Update account information</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Access Tokens Resource -->
+                        <div class="api-resource" id="access-tokens">
+                            <div class="resource-header">
+                                <h3>Access Tokens</h3>
+                                <p>Generate and manage Personal Access Tokens for API authentication. Tokens are scoped to your account and can be revoked at any time.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=tokens&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/access-tokens</span>
+                                    <span class="action-desc">Create a new Personal Access Token</span>
+                                </a>
+                                <a href="api-detail.html?resource=tokens&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/access-tokens</span>
+                                    <span class="action-desc">List all access tokens for your account</span>
+                                </a>
+                                <a href="api-detail.html?resource=tokens&action=revoke" class="action-link">
+                                    <span class="action-method">DELETE</span>
+                                    <span class="action-path">/v1/access-tokens/{token_id}</span>
+                                    <span class="action-desc">Revoke an access token</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Applications Resource -->
+                        <div class="api-resource" id="applications">
+                            <div class="resource-header">
+                                <h3>Applications</h3>
+                                <p>Create and manage applications. Each application automatically gets an Ethereum wallet and can have multiple API keys. Applications can be in sandbox (testnet) or production (mainnet) mode.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=applications&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/applications</span>
+                                    <span class="action-desc">Create a new application (auto-creates wallet)</span>
+                                </a>
+                                <a href="api-detail.html?resource=applications&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/applications</span>
+                                    <span class="action-desc">List all applications</span>
+                                </a>
+                                <a href="api-detail.html?resource=applications&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/applications/{application_id}</span>
+                                    <span class="action-desc">Get application details</span>
+                                </a>
+                                <a href="api-detail.html?resource=applications&action=update" class="action-link">
+                                    <span class="action-method">PATCH</span>
+                                    <span class="action-path">/v1/applications/{application_id}</span>
+                                    <span class="action-desc">Update application settings</span>
+                                </a>
+                                <a href="api-detail.html?resource=applications&action=delete" class="action-link">
+                                    <span class="action-method">DELETE</span>
+                                    <span class="action-path">/v1/applications/{application_id}</span>
+                                    <span class="action-desc">Delete an application</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Wallets Resource -->
+                        <div class="api-resource" id="wallets">
+                            <div class="resource-header">
+                                <h3>Wallets</h3>
+                                <p>Manage Ethereum wallets for your applications. Each application can have multiple wallets. Wallets are automatically created when you create an application, but you can create additional wallets as needed.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=wallets&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/applications/{application_id}/wallets</span>
+                                    <span class="action-desc">Create a new wallet for an application</span>
+                                </a>
+                                <a href="api-detail.html?resource=wallets&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/applications/{application_id}/wallets</span>
+                                    <span class="action-desc">List all wallets for an application</span>
+                                </a>
+                                <a href="api-detail.html?resource=wallets&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/applications/{application_id}/wallets/{wallet_id}</span>
+                                    <span class="action-desc">Get wallet details</span>
+                                </a>
+                                <a href="api-detail.html?resource=wallets&action=delete" class="action-link">
+                                    <span class="action-method">DELETE</span>
+                                    <span class="action-path">/v1/applications/{application_id}/wallets/{wallet_id}</span>
+                                    <span class="action-desc">Archive a wallet</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Application Tokens Resource -->
+                        <div class="api-resource" id="app-tokens">
+                            <div class="resource-header">
+                                <h3>Application Tokens</h3>
+                                <p>Create API keys scoped to specific applications. These tokens inherit the application's environment (sandbox/production) and can be used to make authenticated API calls.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=app-tokens&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/applications/{application_id}/tokens</span>
+                                    <span class="action-desc">Create a new API key for an application</span>
+                                </a>
+                                <a href="api-detail.html?resource=app-tokens&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/applications/{application_id}/tokens</span>
+                                    <span class="action-desc">List all API keys for an application</span>
+                                </a>
+                                <a href="api-detail.html?resource=app-tokens&action=revoke" class="action-link">
+                                    <span class="action-method">DELETE</span>
+                                    <span class="action-path">/v1/applications/{application_id}/tokens/{token_id}</span>
+                                    <span class="action-desc">Revoke an API key</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Webhooks Resource -->
+                        <div class="api-resource" id="webhooks">
+                            <div class="resource-header">
+                                <h3>Webhooks</h3>
+                                <p>Receive real-time notifications for deposits, withdrawals, yield accruals, and rate changes. Powered by Svix with automatic retries and signature verification.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=webhooks&action=event-types" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/webhooks/event-types</span>
+                                    <span class="action-desc">List available event types</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/webhooks</span>
+                                    <span class="action-desc">Create a webhook endpoint</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/webhooks</span>
+                                    <span class="action-desc">List webhook endpoints</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/webhooks/{id}</span>
+                                    <span class="action-desc">Get webhook endpoint details</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=delete" class="action-link">
+                                    <span class="action-method">DELETE</span>
+                                    <span class="action-path">/v1/webhooks/{id}</span>
+                                    <span class="action-desc">Delete a webhook endpoint</span>
+                                </a>
+                                <a href="api-detail.html?resource=webhooks&action=test" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/webhooks/{id}/test</span>
+                                    <span class="action-desc">Send a test webhook event</span>
+                                </a>
+                            </div>
+                            
+                            <!-- Webhook Events Subsection -->
+                            <div class="resource-events" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                                <h4 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Webhook Events</h4>
+                                
+                                <div class="resource-actions">
+                                    <a href="api-detail.html?resource=webhook-events&action=deposit-completed" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">deposit.completed</span>
+                                        <span class="action-desc">Funds successfully deposited to a yield account</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=withdrawal-completed" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">withdrawal.completed</span>
+                                        <span class="action-desc">Funds successfully withdrawn from a yield account</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=yield-accrued" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">yield.accrued</span>
+                                        <span class="action-desc">Yield accrued to account (triggered daily)</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=rate-changed" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">rate.changed</span>
+                                        <span class="action-desc">Yield rate changed significantly (&gt;0.5%)</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=account-status-changed" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">account.status.changed</span>
+                                        <span class="action-desc">Yield account status changed</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=application-created" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">application.created</span>
+                                        <span class="action-desc">New application created in your account</span>
+                                    </a>
+                                    <a href="api-detail.html?resource=webhook-events&action=api-key-created" class="action-link">
+                                        <span class="action-method" style="background: #8b5cf6;">EVENT</span>
+                                        <span class="action-path">api_key.created</span>
+                                        <span class="action-desc">New API key generated for an application</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Yield Section -->
+                    <section id="yield" class="api-section">
+                        <h2>Yield</h2>
+                        <p class="section-description">
+                            Create yield accounts, manage positions, and track yield generation across supported cryptocurrencies. 
+                            TBD wraps Morpho and Aave protocols to provide a unified 6% yield interface.
+                        </p>
+
+                        <!-- Yield Accounts Resource -->
+                        <div class="api-resource" id="yield-accounts">
+                            <div class="resource-header">
+                                <h3>Yield Accounts</h3>
+                                <p>Create and manage yield accounts for earning interest on cryptocurrency deposits. Each account is backed by Morpho or Aave protocols.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=yield-accounts&action=create" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/yield/accounts</span>
+                                    <span class="action-desc">Create a new yield account</span>
+                                </a>
+                                <a href="api-detail.html?resource=yield-accounts&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/accounts</span>
+                                    <span class="action-desc">List all yield accounts</span>
+                                </a>
+                                <a href="api-detail.html?resource=yield-accounts&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/accounts/{account_id}</span>
+                                    <span class="action-desc">Get yield account details</span>
+                                </a>
+                                <a href="api-detail.html?resource=yield-accounts&action=deposit" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/yield/accounts/{account_id}/deposit</span>
+                                    <span class="action-desc">Deposit funds into a yield account</span>
+                                </a>
+                                <a href="api-detail.html?resource=yield-accounts&action=withdraw" class="action-link">
+                                    <span class="action-method">POST</span>
+                                    <span class="action-path">/v1/yield/accounts/{account_id}/withdraw</span>
+                                    <span class="action-desc">Withdraw funds from a yield account</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Yield Positions Resource -->
+                        <div class="api-resource" id="yield-positions">
+                            <div class="resource-header">
+                                <h3>Positions</h3>
+                                <p>View and manage your active yield positions across different protocols and cryptocurrencies.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=positions&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/positions</span>
+                                    <span class="action-desc">List all yield positions</span>
+                                </a>
+                                <a href="api-detail.html?resource=positions&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/positions/{position_id}</span>
+                                    <span class="action-desc">Get position details</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Yield Rates Resource -->
+                        <div class="api-resource" id="yield-rates">
+                            <div class="resource-header">
+                                <h3>Yield Rates</h3>
+                                <p>Get current and historical yield rates for supported cryptocurrencies and protocols.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=rates&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/rates</span>
+                                    <span class="action-desc">Get current yield rates</span>
+                                </a>
+                                <a href="api-detail.html?resource=rates&action=history" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/rates/history</span>
+                                    <span class="action-desc">Get historical yield rates</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Yield History Resource -->
+                        <div class="api-resource" id="yield-history">
+                            <div class="resource-header">
+                                <h3>Yield History</h3>
+                                <p>Retrieve historical yield accrual data for your accounts and positions.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=history&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/yield/history</span>
+                                    <span class="action-desc">Get yield accrual history</span>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Markets Section -->
+                    <section id="markets-section" class="api-section">
+                        <h2>Markets</h2>
+                        <p class="section-description">
+                            Explore available markets and protocols. TBD aggregates data from Morpho and Aave to show you all available yield opportunities.
+                        </p>
+
+                        <div class="api-resource" id="markets">
+                            <div class="resource-header">
+                                <h3>Markets</h3>
+                                <p>List all available markets across Morpho and Aave protocols with current rates and availability.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=markets&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/markets</span>
+                                    <span class="action-desc">List all available markets</span>
+                                </a>
+                                <a href="api-detail.html?resource=markets&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/markets/{market_id}</span>
+                                    <span class="action-desc">Get market details</span>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Transactions Section -->
+                    <section id="transactions-section" class="api-section">
+                        <h2>Transactions</h2>
+                        <p class="section-description">
+                            Track all transactions including deposits, withdrawals, and yield accruals across your accounts.
+                        </p>
+
+                        <div class="api-resource" id="transactions">
+                            <div class="resource-header">
+                                <h3>Transactions</h3>
+                                <p>List and retrieve transaction details for deposits, withdrawals, and yield accruals.</p>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="api-detail.html?resource=transactions&action=list" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/transactions</span>
+                                    <span class="action-desc">List all transactions</span>
+                                </a>
+                                <a href="api-detail.html?resource=transactions&action=get" class="action-link">
+                                    <span class="action-method">GET</span>
+                                    <span class="action-path">/v1/transactions/{transaction_id}</span>
+                                    <span class="action-desc">Get transaction details</span>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        </svg>
+                        </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/api-script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script src="scripts/tooltip.js"></script>
+    <script>
+        // Add color classes to HTTP method badges based on CRUD actions
+        document.addEventListener('DOMContentLoaded', function() {
+            const methodBadges = document.querySelectorAll('.action-method');
+            methodBadges.forEach(badge => {
+                const method = badge.textContent.trim().toUpperCase();
+                // Remove any existing method classes
+                badge.classList.remove('post', 'get', 'put', 'patch', 'delete');
+                
+                // Add appropriate class based on method
+                if (method === 'POST') {
+                    badge.classList.add('post');
+                } else if (method === 'GET') {
+                    badge.classList.add('get');
+                } else if (method === 'PUT' || method === 'PATCH') {
+                    badge.classList.add(method.toLowerCase());
+                } else if (method === 'DELETE') {
+                    badge.classList.add('delete');
+                }
+            });
+        });
+    </script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

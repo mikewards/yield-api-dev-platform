@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <div class="nav-links">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    <a href="getting-started.html" class="active">Get Started</a>
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Getting Started Header -->
+    <section class="api-header">
+        <div class="container">
+            <div class="api-header-content">
+                <h1>Getting Started</h1>
+                <p class="api-subtitle">
+                    Get up and running with Ground APIs in minutes. Create an account, generate an access token, and make your first API call.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started Content -->
+    <section class="api-content">
+        <div class="container">
+            <div class="getting-started-layout">
+                <aside class="getting-started-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Quick Start</h3>
+                        <ul class="sidebar-list">
+                            <li><a href="#step1">1. Create Account</a></li>
+                            <li><a href="#step2">2. Generate Token</a></li>
+                            <li><a href="#step3">3. Make API Call</a></li>
+                            <li><a href="#step4">4. Next Steps</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <main class="getting-started-main">
+                    <!-- Step 1 -->
+                    <section id="step1" class="guide-section">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h2>Create Your Account</h2>
+                            <p>Start by creating a TBD developer account. You'll need a username and password.</p>
+                            
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-create-account')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre id="code-create-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "username": "your_username",
+    "password": "your_secure_password",
+    "email": "your_email@example.com"
+  }'</span></pre>
+                                </div>
+                            </div>
+
+                            <div class="code-block-unified" style="margin-top: 16px;">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Response</span>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre data-language="json">{
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"acc_1234567890abcdef"</span>,
+  <span class="token-property">"username"</span>: <span class="token-string-value">"your_username"</span>,
+  <span class="token-property">"created_at"</span>: <span class="token-string-value">"2025-01-15T10:30:00Z"</span>,
+  <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>
+}</pre>
+                                </div>
+                            </div>
+
+                            <p class="note">
+                                <strong>Note:</strong> You can also create an account through our <a href="account.html">web interface</a>.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Step 2 -->
+                    <section id="step2" class="guide-section">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h2>Generate a Personal Access Token</h2>
+                            <p>Authenticate with your account credentials to receive an access token, then create a Personal Access Token for API calls.</p>
+                            
+                            <h3>Step 2a: Authenticate</h3>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-auth')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre id="code-auth" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/auth/authenticate</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "username": "your_username",
+    "password": "your_secure_password"
+  }'</span></pre>
+                                </div>
+                            </div>
+
+                            <div class="code-block-unified" style="margin-top: 16px;">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Response</span>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre data-language="json">{
+  <span class="token-property">"access_token"</span>: <span class="token-string-value">"YOUR_ACCESS_TOKEN"</span>,
+  <span class="token-property">"token_type"</span>: <span class="token-string-value">"Bearer"</span>,
+  <span class="token-property">"expires_in"</span>: <span class="token-number">3600</span>,
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"acc_1234567890abcdef"</span>
+}</pre>
+                                </div>
+                            </div>
+
+                            <h3>Step 2b: Create Personal Access Token</h3>
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-create-token')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre id="code-create-token" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/access-tokens</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "name": "My API Key",
+    "expires_in": 31536000
+  }'</span></pre>
+                                </div>
+                            </div>
+
+                            <div class="code-block-unified" style="margin-top: 16px;">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Response</span>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre data-language="json">{
+  <span class="token-property">"token_id"</span>: <span class="token-string-value">"tok_1234567890abcdef"</span>,
+  <span class="token-property">"access_token"</span>: <span class="token-string-value">"YOUR_API_KEY"</span>,
+  <span class="token-property">"name"</span>: <span class="token-string-value">"My API Key"</span>,
+  <span class="token-property">"created_at"</span>: <span class="token-string-value">"2025-01-15T10:30:00Z"</span>,
+  <span class="token-property">"expires_at"</span>: <span class="token-null">null</span>
+}</pre>
+                                </div>
+                            </div>
+
+                            <div class="warning-box">
+                                <strong>Important:</strong> Save your access token securely. You won't be able to see it again after creation. Use this token in the <code>Authorization: Bearer</code> header for all API requests.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Step 3 -->
+                    <section id="step3" class="guide-section">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h2>Make Your First API Call</h2>
+                            <p>Now that you have an access token, let's create your first yield account and start earning 6% yield.</p>
+                            
+                            <div class="code-block-unified">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Terminal</span>
+                                    <button class="code-copy-btn" onclick="copyCode(this, 'code-yield-account')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre id="code-yield-account" data-language="bash"><span class="token-cmd">curl</span> <span class="token-url">https://flow-platform-production.up.railway.app/v1/yield/accounts</span> \
+  <span class="token-flag">-X</span> POST \
+  <span class="token-flag">-H</span> <span class="token-string">"Authorization: Bearer <span class="token-var">YOUR_API_KEY</span>"</span> \
+  <span class="token-flag">-H</span> <span class="token-string">"Content-Type: application/json"</span> \
+  <span class="token-flag">-d</span> <span class="token-string">'{
+    "currency": "USDC",
+    "initial_deposit": {
+      "amount": "1000.00",
+      "currency": "USDC"
+    },
+    "protocol_preference": "auto"
+  }'</span></pre>
+                                </div>
+                            </div>
+
+                            <div class="code-block-unified" style="margin-top: 16px;">
+                                <div class="code-block-header">
+                                    <span class="code-block-label">Response</span>
+                                </div>
+                                <div class="code-block-content">
+                                    <pre data-language="json">{
+  <span class="token-property">"account_id"</span>: <span class="token-string-value">"ya_1234567890abcdef"</span>,
+  <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>,
+  <span class="token-property">"protocol"</span>: <span class="token-string-value">"morpho"</span>,
+  <span class="token-property">"annual_yield_rate"</span>: <span class="token-number">0.06</span>,
+  <span class="token-property">"status"</span>: <span class="token-string-value">"active"</span>,
+  <span class="token-property">"created_at"</span>: <span class="token-string-value">"2025-01-15T10:30:00Z"</span>,
+  <span class="token-property">"balance"</span>: {
+    <span class="token-property">"amount"</span>: <span class="token-string-value">"1000.00"</span>,
+    <span class="token-property">"currency"</span>: <span class="token-string-value">"USDC"</span>
+  }
+}</pre>
+                                </div>
+                            </div>
+
+                            <p class="success-note">
+                                <strong>Success!</strong> You've created your first yield account. Your funds are now earning 6% annual yield through TBD.s integration with Morpho and Aave protocols.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Step 4 -->
+                    <section id="step4" class="guide-section">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h2>Next Steps</h2>
+                            <p>Now that you're set up, here's what you can do next:</p>
+                            
+                            <div class="next-steps-grid">
+                                <div class="next-step-card">
+                                    <h3>Explore the API</h3>
+                                    <p>Browse our complete <a href="api-reference.html">API Reference</a> to see all available endpoints for managing yield accounts, positions, and transactions.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>Manage Positions</h3>
+                                    <p>Use the Positions API to view your active yield positions, check balances, and track yield accruals in real-time.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>View Markets</h3>
+                                    <p>Explore available markets across Morpho and Aave protocols to see current rates and opportunities.</p>
+                                </div>
+                                <div class="next-step-card">
+                                    <h3>Set Up Webhooks</h3>
+                                    <p>Subscribe to webhooks to receive real-time notifications for yield accruals, deposits, withdrawals, and more.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Authentication Section -->
+                    <section class="guide-section">
+                        <h2>Authentication</h2>
+                        <p>All API requests must include your Personal Access Token in the Authorization header:</p>
+                        
+                        <div class="code-example-box">
+                            <pre data-language="http"><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+                        </div>
+
+                        <h3>Base URL</h3>
+                        <p>All API requests should be made to:</p>
+                        <div class="code-example-box">
+                            <pre data-language="text"><code>https://flow-platform-production.up.railway.app</code></pre>
+                        </div>
+
+                        <h3>API Versioning</h3>
+                        <p>Ground APIs are versioned. The current version is <code>2025-01-15</code>. Include the version in your API path:</p>
+                        <div class="code-example-box">
+                            <pre data-language="text"><code>https://flow-platform-production.up.railway.app/v1/yield/accounts</code></pre>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/env-toggle.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

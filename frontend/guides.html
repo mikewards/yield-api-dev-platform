@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guides - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .guides-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 64px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        
+        .guides-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .guides-sidebar h3 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            margin-top: 24px;
+        }
+        
+        .guides-sidebar h3:first-child {
+            margin-top: 0;
+        }
+        
+        .guides-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .guides-sidebar li {
+            margin-bottom: 4px;
+        }
+        
+        .guides-sidebar a {
+            display: block;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        
+        .guides-sidebar a:hover {
+            color: var(--text-primary);
+            background: var(--bg-gray);
+        }
+        
+        .guides-main {
+            max-width: 720px;
+        }
+        
+        .guides-main h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        
+        .guides-main > p:first-of-type {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+        
+        .guide-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 100px;
+        }
+        
+        .guide-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .guide-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .guide-section p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+        
+        .guide-section ul {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+        
+        .guide-section li {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .guide-section code {
+            background: var(--bg-gray);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .code-block {
+            background: #455162;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            padding: 20px;
+            background: #455162;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #E2E8F0;
+        }
+        
+        .code-block code {
+            background: none !important;
+            padding: 0;
+            color: #E2E8F0 !important;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: normal;
+        }
+        
+        .step-list .code-block code {
+            background: none !important;
+            color: #E2E8F0 !important;
+        }
+        
+        .code-block .comment { color: #64748b; }
+        .code-block .string { color: #34d399; }
+        .code-block .keyword { color: #60a5fa; }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 900px) {
+            .guides-layout {
+                display: block;
+                padding: 24px 16px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .guides-sidebar {
+                display: none;
+            }
+            
+            .guides-main {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .guides-main h1 {
+                font-size: 28px;
+            }
+            
+            .guide-section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .guide-section h2 {
+                font-size: 20px;
+            }
+            
+            .api-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .api-table td,
+            .api-table th {
+                font-size: 14px;
+                padding: 10px 8px;
+            }
+            
+            .code-block {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+            
+            .code-block pre {
+                font-size: 12px;
+                padding: 16px;
+                width: max-content;
+                min-width: 100%;
+            }
+            
+            .step-list li {
+                padding-left: 40px;
+            }
+            
+            .step-list li::before {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .method-badge {
+                font-size: 10px;
+                padding: 2px 6px;
+                margin-right: 4px;
+            }
+            
+            .endpoint-text {
+                font-size: 12px;
+                word-break: break-all;
+            }
+        }
+        
+        .callout {
+            background: var(--bg-gray);
+            border-left: 3px solid var(--primary);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .callout p {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .callout strong {
+            color: var(--text-primary);
+        }
+        
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+            margin: 24px 0;
+        }
+        
+        .step-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 48px;
+            margin-bottom: 24px;
+        }
+        
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .step-list h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .step-list p {
+            margin: 0;
+        }
+        
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        
+        .api-table th,
+        .api-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+        }
+        
+        .api-table th {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .api-table td {
+            color: var(--text-secondary);
+        }
+        
+        .api-table code {
+            font-size: 14px;
+        }
+        
+        /* API Method badges with colors */
+        .method-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .method-badge.post { background: #10B981; }
+        .method-badge.get { background: #006aff; }
+        .method-badge.put, .method-badge.patch { background: #F59E0B; }
+        .method-badge.delete { background: #EF4444; }
+        
+        .endpoint-text {
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html" class="active">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="guides-layout">
+        <aside class="guides-sidebar">
+            <h3>Getting Started</h3>
+            <ul>
+                <li><a href="#authentication">Authentication</a></li>
+            </ul>
+            
+            <h3>Core Concepts</h3>
+            <ul>
+                <li><a href="#accounts">Accounts</a></li>
+                <li><a href="#applications">Applications</a></li>
+                <li><a href="#wallets">Wallets</a></li>
+                <li><a href="#yield-accounts">Yield Accounts</a></li>
+            </ul>
+            
+            <h3>Working with Data</h3>
+            <ul>
+                <li><a href="#markets">Markets</a></li>
+                <li><a href="#positions">Positions</a></li>
+                <li><a href="#transactions">Transactions</a></li>
+            </ul>
+            
+            <h3>Going to Production</h3>
+            <ul>
+                <li><a href="#environments">Environments</a></li>
+                <li><a href="#rate-limits">Rate Limits</a></li>
+                <li><a href="#webhooks">Webhooks</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </aside>
+
+        <main class="guides-main">
+            <h1>TBD Guides</h1>
+            <p>Learn how to integrate TBD's DeFi yield APIs into your application. This guide covers everything from authentication to production deployment.</p>
+
+            <!-- Authentication -->
+            <section id="authentication" class="guide-section">
+                <h2>Authentication</h2>
+                <p>All API requests require a Bearer token in the Authorization header:</p>
+                
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Header</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-auth-header')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-auth-header" data-language="http">Authorization: Bearer <span class="token-var">YOUR_API_KEY</span></pre>
+                    </div>
+                </div>
+                
+                <h3>API Keys</h3>
+                <p>Create API keys in your dashboard. Each key is scoped to an application and environment (sandbox or production).</p>
+                <ul>
+                    <li><strong>Sandbox keys</strong> start with <code>tbd_sand_</code> and connect to testnets</li>
+                    <li><strong>Production keys</strong> start with <code>tbd_prod_</code> and connect to mainnet</li>
+                </ul>
+                
+                <h3>Base URL</h3>
+                <table class="api-table">
+                    <tr>
+                        <th>Environment</th>
+                        <th>URL</th>
+                    </tr>
+                    <tr>
+                        <td>Production</td>
+                        <td><code>https://flow-platform-production.up.railway.app</code></td>
+                    </tr>
+                    <tr>
+                        <td>Sandbox</td>
+                        <td><code>https://flow-platform-flow-platform-staging.up.railway.app</code></td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Accounts -->
+            <section id="accounts" class="guide-section">
+                <h2>Accounts</h2>
+                <p>Your TBD account is your identity on the platform. Create one account, then create multiple applications under it.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/accounts</span></td>
+                        <td>Create a new account</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/accounts/{id}</span></td>
+                        <td>Get account details</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge patch">PATCH</span><span class="endpoint-text">/v1/accounts/{id}</span></td>
+                        <td>Update account</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Applications -->
+            <section id="applications" class="guide-section">
+                <h2>Applications</h2>
+                <p>Applications organize your projects. Each application gets its own Ethereum wallet and can have multiple API keys.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications</span></td>
+                        <td>Create application</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications</span></td>
+                        <td>List applications</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}</span></td>
+                        <td>Get application</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications/{id}/tokens</span></td>
+                        <td>Create API key</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Wallets -->
+            <section id="wallets" class="guide-section">
+                <h2>Wallets</h2>
+                <p>Each application automatically receives a segregated Ethereum wallet. Private keys are encrypted with AES-256-GCM.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/applications/{id}/wallets</span></td>
+                        <td>Create additional wallet</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}/wallets</span></td>
+                        <td>List wallets</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/applications/{id}/wallets/{wallet_id}</span></td>
+                        <td>Get wallet details</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Yield Accounts -->
+            <section id="yield-accounts" class="guide-section">
+                <h2>Yield Accounts</h2>
+                <p>Yield accounts hold your cryptocurrency and earn interest. Ground automatically routes deposits to the best available protocol (Morpho or Aave).</p>
+                
+                <h3>Supported Currencies</h3>
+                <ul>
+                    <li>USDC, USDT, DAI (stablecoins)</li>
+                    <li>ETH, WBTC (volatile assets)</li>
+                </ul>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts</span></td>
+                        <td>Create yield account</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/accounts</span></td>
+                        <td>List yield accounts</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts/{id}/deposit</span></td>
+                        <td>Deposit funds</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge post">POST</span><span class="endpoint-text">/v1/yield/accounts/{id}/withdraw</span></td>
+                        <td>Withdraw funds</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/rates</span></td>
+                        <td>Get current rates</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Markets -->
+            <section id="markets" class="guide-section">
+                <h2>Markets</h2>
+                <p>View available markets across Morpho and Aave protocols with current yield rates.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/markets</span></td>
+                        <td>List all markets</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/markets/{id}</span></td>
+                        <td>Get market details</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Positions -->
+            <section id="positions" class="guide-section">
+                <h2>Positions</h2>
+                <p>Track your active yield positions, balances, and accrued interest.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/positions</span></td>
+                        <td>List all positions</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/yield/positions/{id}</span></td>
+                        <td>Get position details</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Transactions -->
+            <section id="transactions" class="guide-section">
+                <h2>Transactions</h2>
+                <p>View transaction history including deposits, withdrawals, and yield accruals.</p>
+                
+                <table class="api-table">
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/transactions</span></td>
+                        <td>List transactions</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method-badge get">GET</span><span class="endpoint-text">/v1/transactions/{id}</span></td>
+                        <td>Get transaction</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Environments -->
+            <section id="environments" class="guide-section">
+                <h2>Environments</h2>
+                <p>Ground provides two environments for development and production use.</p>
+                
+                <h3>Sandbox</h3>
+                <p>Use sandbox for development and testing. Connects to Ethereum testnets (Sepolia). No real funds required.</p>
+                <ul>
+                    <li>API keys start with <code>tbd_sand_</code></li>
+                    <li>Use testnet RPC URLs (Alchemy/Infura Sepolia)</li>
+                    <li>Get testnet tokens from faucets</li>
+                </ul>
+                
+                <h3>Production</h3>
+                <p>Use production for live applications. Connects to Ethereum mainnet with real funds.</p>
+                <ul>
+                    <li>API keys start with <code>tbd_prod_</code></li>
+                    <li>Use mainnet RPC URLs</li>
+                    <li>Real cryptocurrency deposits</li>
+                </ul>
+            </section>
+
+            <!-- Rate Limits -->
+            <section id="rate-limits" class="guide-section">
+                <h2>Rate Limits</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px;">
+                    TBD enforces rate limits on all API endpoints to ensure fair usage and platform stability. 
+                    Limits are configured per-endpoint and may vary based on the resource intensity of each operation.
+                </p>
+                
+                <h3>Default Limits</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Most endpoints have a default rate limit of <strong>100 requests per minute</strong> per client.
+                </p>
+                
+                <h3>Endpoint-Specific Limits</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+                    <thead>
+                        <tr style="background: var(--bg-gray); text-align: left;">
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Endpoint</th>
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Limit</th>
+                            <th style="padding: 12px; border-bottom: 1px solid var(--border);">Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /v1/markets</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">75 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /v1/yield/rates</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">75 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>All other endpoints</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">100 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);"><code>GET /health</code></td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">300 req</td>
+                            <td style="padding: 12px; border-bottom: 1px solid var(--border);">1 minute</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Rate Limit Headers</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    All API responses include rate limit information in the headers:
+                </p>
+                <ul style="font-size: 16px;">
+                    <li><code>X-RateLimit-Limit</code> — Maximum requests allowed per window</li>
+                    <li><code>X-RateLimit-Remaining</code> — Requests remaining in current window</li>
+                    <li><code>X-RateLimit-Reset</code> — Unix timestamp when the window resets</li>
+                </ul>
+                
+                <h3>Handling Rate Limits</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    When you exceed a rate limit, the API returns a <code>429 Too Many Requests</code> response:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Error Response</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre data-language="json">{
+  <span class="token-property">"status"</span>: <span class="token-string-value">"error"</span>,
+  <span class="token-property">"code"</span>: <span class="token-number">429</span>,
+  <span class="token-property">"message"</span>: <span class="token-string-value">"Rate limit exceeded. Please retry after 45 seconds."</span>,
+  <span class="token-property">"error"</span>: {
+    <span class="token-property">"code"</span>: <span class="token-string-value">"RATE_LIMIT_EXCEEDED"</span>,
+    <span class="token-property">"message"</span>: <span class="token-string-value">"You have exceeded the rate limit of 100 requests per minute."</span>,
+    <span class="token-property">"type"</span>: <span class="token-string-value">"rate_limit_error"</span>,
+    <span class="token-property">"retry_after_seconds"</span>: <span class="token-number">45</span>
+  }
+}</pre>
+                    </div>
+                </div>
+                <p style="font-size: 16px; color: var(--text-secondary);">
+                    The <code>Retry-After</code> header indicates how long to wait before retrying. 
+                    Implement exponential backoff in your code to gracefully handle rate limits.
+                </p>
+            </section>
+
+            <!-- Webhooks -->
+            <section id="webhooks" class="guide-section">
+                <h2>Webhooks</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px;">
+                    Receive real-time notifications when events happen in your account. Webhooks are delivered via Svix with automatic retries, signature verification, and delivery guarantees.
+                </p>
+                
+                <h3>Event Types</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Subscribe to the following events:
+                </p>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Event</th>
+                            <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>deposit.completed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Funds deposited to yield account</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>withdrawal.completed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Funds withdrawn from yield account</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>yield.accrued</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield accrued to account (daily)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>rate.changed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield rate changed significantly (&gt;0.5%)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px 16px;"><code>account.status.changed</code></td>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);">Yield account status changed</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Registering Endpoints</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Register a webhook endpoint via the API or <a href="dashboard-webhooks.html" class="text-link">dashboard</a>:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Create Webhook Endpoint</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-webhook-create')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-webhook-create" data-language="bash">curl https://flow-platform-production.up.railway.app/v1/webhooks \
+  -X POST \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-server.com/webhooks",
+    "description": "Production webhook",
+    "filter_types": ["deposit.completed", "withdrawal.completed"]
+  }'</pre>
+                    </div>
+                </div>
+                
+                <h3>Webhook Payload</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Webhook payloads are sent as POST requests with a JSON body. All payloads include <code>application_id</code> and <code>application_name</code> so you can identify which application triggered the event:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Example Payload</span>
+                    </div>
+                    <div class="code-block-content">
+                        <pre data-language="json">{
+  "event_type": "deposit.completed",
+  "event_id": "evt_abc123def456",
+  "timestamp": 1701456789000,
+  "data": {
+    "application_id": "app_abc123",
+    "application_name": "Production App",
+    "environment": "production",
+    "yield_account_id": "ya_1234567890",
+    "amount": "1000.00",
+    "currency": "USDC",
+    "protocol": "aave",
+    "transaction_id": "txn_abc123"
+  }
+}</pre>
+                    </div>
+                </div>
+                
+                <p style="font-size: 14px; color: var(--text-tertiary); margin-top: 12px; margin-bottom: 24px;">
+                    <strong>Note:</strong> If the request was made via dashboard (JWT auth) rather than an API key, <code>application_id</code> will be <code>null</code>.
+                </p>
+                
+                <h3>Verifying Signatures</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    All webhooks include a signature header for verification. Use the Svix SDK to verify:
+                </p>
+                <div class="code-block-unified">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Node.js</span>
+                        <button class="code-copy-btn" onclick="copyCode(this, 'code-webhook-verify')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-block-content">
+                        <pre id="code-webhook-verify" data-language="javascript">import { Webhook } from 'svix';
+
+const wh = new Webhook(process.env.WEBHOOK_SECRET);
+
+app.post('/webhooks', (req, res) => {
+  try {
+    const payload = wh.verify(req.body, req.headers);
+    // Process the webhook
+    console.log('Received event:', payload.event_type);
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error('Webhook verification failed:', err);
+    res.status(400).send('Invalid signature');
+  }
+});</pre>
+                    </div>
+                </div>
+                
+                <h3>Retry Policy</h3>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Failed deliveries are automatically retried with exponential backoff:
+                </p>
+                <ul>
+                    <li>Immediate retry on 5xx errors</li>
+                    <li>Up to 5 retry attempts over 24 hours</li>
+                    <li>Backoff intervals: 5min, 30min, 2hr, 8hr, 24hr</li>
+                    <li>Endpoints disabled after consecutive failures</li>
+                </ul>
+                <p style="font-size: 14px; color: var(--text-tertiary); margin-top: 16px;">
+                    View delivery history and debug failed webhooks in your <a href="dashboard-webhooks.html" class="text-link">dashboard</a>.
+                </p>
+            </section>
+
+            <!-- Best Practices -->
+            <section id="best-practices" class="guide-section">
+                <h2>Best Practices</h2>
+                
+                <h3>API Key Security</h3>
+                <ul>
+                    <li>Never commit API keys to version control</li>
+                    <li>Use environment variables for key storage</li>
+                    <li>Rotate keys regularly</li>
+                    <li>Use separate keys for sandbox and production</li>
+                </ul>
+                
+                <h3>Error Handling</h3>
+                <ul>
+                    <li>Implement retry logic with exponential backoff</li>
+                    <li>Handle rate limits (429 responses)</li>
+                    <li>Log all API errors for debugging</li>
+                    <li>Set up webhook handlers for async errors</li>
+                </ul>
+                
+                <h3>Production Checklist</h3>
+                <ul>
+                    <li>Test thoroughly in sandbox first</li>
+                    <li>Start with small amounts on mainnet</li>
+                    <li>Monitor positions and transactions</li>
+                    <li>Set up alerts for failures</li>
+                    <li>Keep RPC keys secure</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script src="scripts/tooltip.js"></script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Ground</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <!-- Logged out state -->
+                    <div class="nav-auth" id="navAuthLoggedOut">
+                        <a href="signin.html" class="btn-secondary">Sign In</a>
+                    </div>
+                    
+                    <!-- Logged in state -->
+                    <div class="nav-auth nav-dropdown" id="navAuthLoggedIn" style="display: none;">
+                        <button class="btn-secondary dropdown-trigger" id="accountDropdownBtn">
+                            <span id="navUsername">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="accountDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="navSignOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign In Section -->
+    <section class="account-section">
+        <div class="container">
+            <div class="account-container">
+                <div class="account-header">
+                    <h1>Sign In to Ground</h1>
+                    <p>Access your dashboard and manage your DeFi yield accounts.</p>
+                </div>
+
+                <form class="account-form" id="signinForm" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large btn-full">Sign In</button>
+                </form>
+
+                <div class="account-footer">
+                    <p>Don't have an account? <a href="account.html">Create one</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/config.js"></script>
+    <script>
+        console.log('🔐 Sign-in page script loading...');
+        
+        // API_BASE_URL is now set by config.js
+        if (typeof API_BASE_URL === 'undefined') {
+            console.error('API_BASE_URL is not defined! Check config.js');
+            alert('Configuration error: API URL not set. Please refresh the page.');
+        } else {
+            console.log('✅ API_BASE_URL:', API_BASE_URL);
+        }
+        
+        // Check if already logged in with valid session
+        (async function checkExistingSession() {
+            console.log('🔍 Checking existing session...');
+            const existingToken = localStorage.getItem('tbd_token');
+            const refreshToken = localStorage.getItem('tbd_refresh_token');
+            
+            if (existingToken && refreshToken) {
+                const expiresAt = parseInt(localStorage.getItem('tbd_token_expires') || '0');
+                
+                if (expiresAt > Date.now()) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refresh_token: refreshToken })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('tbd_token', data.access_token);
+                        localStorage.setItem('tbd_refresh_token', data.refresh_token);
+                        localStorage.setItem('tbd_token_expires', (Date.now() + (data.expires_in * 1000)).toString());
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Session refresh failed, showing login form');
+                }
+                
+                localStorage.removeItem('tbd_token');
+                localStorage.removeItem('tbd_refresh_token');
+                localStorage.removeItem('tbd_token_expires');
+            }
+        })();
+        
+        // Form submission handler
+        const signinForm = document.getElementById('signinForm');
+        console.log('📝 Sign-in form found:', !!signinForm);
+        
+        if (signinForm) {
+            signinForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('🚀 Form submitted!');
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Signing In...';
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                console.log('📧 Attempting login for:', email);
+
+                try {
+                    // Try RCAC login first (email-based)
+                    console.log('🔗 Calling RCAC login:', `${API_BASE_URL}/v1/users/login`);
+                    let response = await fetch(`${API_BASE_URL}/v1/users/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    let data = await response.json();
+                    let isRcac = response.ok;
+                    
+                    // Fall back to legacy auth if RCAC fails
+                    if (!response.ok) {
+                        console.log('RCAC login failed, trying legacy auth...');
+                        response = await fetch(`${API_BASE_URL}/v1/auth/authenticate`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: email, password })
+                        });
+                        data = await response.json();
+                        isRcac = false;
+                    }
+                    
+                    if (response.ok) {
+                        localStorage.setItem('tbd_token', data.access_token);
+                        localStorage.setItem('tbd_refresh_token', data.refresh_token);
+                        localStorage.setItem('tbd_token_expires', Date.now() + (data.expires_in * 1000));
+                        
+                        if (isRcac) {
+                            localStorage.setItem('tbd_user_id', data.user?.id || '');
+                            localStorage.setItem('tbd_username', data.user?.email || email);
+                            localStorage.setItem('tbd_user_name', `${data.user?.first_name || ''} ${data.user?.last_name || ''}`.trim() || email.split('@')[0]);
+                            localStorage.setItem('tbd_auth_mode', 'rcac');
+                            
+                            try {
+                                const bizResponse = await fetch(`${API_BASE_URL}/v1/businesses`, {
+                                    headers: { 'Authorization': `Bearer ${data.access_token}` }
+                                });
+                                if (bizResponse.ok) {
+                                    const bizData = await bizResponse.json();
+                                    localStorage.setItem('tbd_businesses', JSON.stringify(bizData.businesses || []));
+                                    if (bizData.businesses?.length > 0) {
+                                        localStorage.setItem('tbd_current_business_id', bizData.businesses[0].id);
+                                        localStorage.setItem('tbd_current_business_name', bizData.businesses[0].name);
+                                    }
+                                }
+                            } catch (bizErr) {
+                                console.log('Failed to fetch businesses:', bizErr);
+                            }
+                        } else {
+                            localStorage.setItem('tbd_account_id', data.account_id);
+                            localStorage.setItem('tbd_username', email);
+                            localStorage.setItem('tbd_auth_mode', 'legacy');
+                        }
+                        
+                        const redirectPath = localStorage.getItem('tbd_redirect_after_login');
+                        localStorage.removeItem('tbd_redirect_after_login');
+                        window.location.href = redirectPath || 'dashboard.html';
+                    } else {
+                        showErrorMessage(data.error?.message || data.message || 'Invalid email or password');
+                    }
+                } catch (error) {
+                    console.error('Error signing in:', error);
+                    showErrorMessage('Unable to connect to the server. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        } else {
+            console.error('❌ Sign-in form not found!');
+        }
+        
+        function showErrorMessage(message) {
+            const existingError = document.querySelector('.error-message');
+            if (existingError) existingError.remove();
+            
+            const form = document.getElementById('signinForm');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>${message}</span>
+            `;
+            form.insertBefore(errorDiv, form.firstChild);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+    </script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>
+

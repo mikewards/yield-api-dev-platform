@@ -1,0 +1,9 @@
+{
+  "name": "ground-platform",
+  "compatibility_date": "2025-11-29",
+  "main": "worker.js",
+  "assets": {
+    "directory": "."
+  }
+}
+

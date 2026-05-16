@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - Ground</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/dashboard-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
+    <style>
+        /* Team Page Styles */
+        .team-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .team-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .team-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .team-section h2 svg {
+            color: var(--text-secondary);
+        }
+        
+        .team-section > p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 20px 0;
+        }
+        
+        /* Business Selector */
+        .business-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .business-selector label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .business-selector select {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .business-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .business-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .business-badge.owner {
+            background: #ECFDF5;
+            color: #065F46;
+        }
+        
+        .business-badge.member {
+            background: #EFF6FF;
+            color: #1E40AF;
+        }
+        
+        /* Member List */
+        .members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .members-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        
+        .member-item:hover {
+            background: var(--bg-light);
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .member-details h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .member-details p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .member-roles {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .role-tag {
+            padding: 4px 8px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .role-tag.admin {
+            background: #FEF3C7;
+            border-color: #FCD34D;
+            color: #92400E;
+        }
+        
+        .member-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Roles Section */
+        .role-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .role-info {
+            flex: 1;
+        }
+        
+        .role-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .role-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .role-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .system-role-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: var(--bg-light);
+            border-radius: 3px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        /* Pending Invitations */
+        .invitation-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .invitation-info {
+            flex: 1;
+        }
+        
+        .invitation-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .invitation-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* Empty States */
+        .empty-team {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-team svg {
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-team h4 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+        }
+        
+        .empty-team p {
+            margin: 0 0 16px 0;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-overlay .modal-box {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .modal-overlay .modal-box h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+        
+        .modal-overlay .modal-box > p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 20px 0;
+        }
+        
+        .modal-overlay .modal-form .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .modal-form label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .modal-form input,
+        .modal-form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .modal-form input:focus,
+        .modal-form select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .modal-form small {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .btn-cancel {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-cancel:hover {
+            background: var(--bg-light);
+        }
+        
+        /* Role checkboxes */
+        .roles-checklist {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+        }
+        
+        .role-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .role-checkbox:hover {
+            background: var(--bg-light);
+        }
+        
+        .role-checkbox input {
+            width: auto;
+            margin: 0;
+        }
+        
+        .role-checkbox-info {
+            flex: 1;
+        }
+        
+        .role-checkbox-info span {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .role-checkbox-info small {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            display: block;
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+        
+        .message.error {
+            display: block;
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FEE2E2;
+        }
+        
+        .message.info {
+            display: block;
+            background: #EFF6FF;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+        }
+        
+        /* RCAC-only notice */
+        .rcac-notice {
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .rcac-notice svg {
+            flex-shrink: 0;
+            color: #0284C7;
+        }
+        
+        .rcac-notice p {
+            margin: 0;
+            font-size: 14px;
+            color: #0369A1;
+        }
+        
+        .rcac-notice a {
+            color: #0284C7;
+            font-weight: 500;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .team-container {
+                padding: 0 16px;
+            }
+            
+            .team-section {
+                padding: 20px 16px;
+            }
+            
+            .business-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .member-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .member-actions {
+                width: 100%;
+            }
+            
+            .member-actions button {
+                flex: 1;
+            }
+            
+            .modal-overlay .modal-box {
+                max-width: 90%;
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="25.6" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <!-- Account dropdown -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="container">
+            <span class="secondary-nav-title">Dashboard</span>
+            <div class="secondary-nav-links">
+                <a href="dashboard.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Applications
+                </a>
+                <a href="dashboard-team.html" class="secondary-nav-link active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team
+                </a>
+                <a href="dashboard-webhooks.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Webhooks
+                </a>
+                <a href="dashboard-logs.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Logs
+                </a>
+                <a href="dashboard-settings.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Account Settings
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Team Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Team Management</h1>
+                <p>Manage your business, team members, and access roles.</p>
+            </div>
+
+            <div class="team-container">
+                <!-- Message display -->
+                <div id="pageMessage" class="message"></div>
+                
+                <!-- Legacy account notice -->
+                <div class="rcac-notice" id="legacyNotice" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p>
+                        <strong>Team features require account migration.</strong><br>
+                        Your account uses the legacy authentication system. To enable team features, please 
+                        <a href="dashboard-settings.html#admin">migrate your account</a> or create a new account.
+                    </p>
+                </div>
+                
+                <!-- Business Selector -->
+                <div class="business-selector" id="businessSelector">
+                    <label for="businessSelect">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                    </label>
+                    <select id="businessSelect">
+                        <option value="">Select a business...</option>
+                    </select>
+                    <button class="btn-primary btn-small" id="createBusinessBtn" onclick="console.log('BIZ CLICKED!'); openModal('createBusinessModal');">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        New Business
+                    </button>
+                </div>
+                
+                <!-- Team Members Section -->
+                <div class="team-section" id="teamMembersSection">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Team Members
+                    </h2>
+                    <p>People with access to this business.</p>
+                    
+                    <div class="members-header">
+                        <h3 id="memberCount">0 members</h3>
+                        <button class="btn-primary btn-small" id="inviteMemberBtn" onclick="console.log('INVITE CLICKED!'); openModal('inviteModal');">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Invite Member
+                        </button>
+                    </div>
+                    
+                    <div id="membersList">
+                        <div class="empty-team">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <h4>No team members yet</h4>
+                            <p>Invite people to collaborate on this business.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Invitations -->
+                <div class="team-section" id="invitationsSection" style="display: none;">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Pending Invitations
+                    </h2>
+                    <p>Invitations waiting to be accepted.</p>
+                    
+                    <div id="invitationsList"></div>
+                </div>
+                
+                <!-- Roles Section -->
+                <div class="team-section" id="rolesSection">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Roles & Permissions
+                    </h2>
+                    <p>Define access levels for team members.</p>
+                    
+                    <div class="members-header">
+                        <h3 id="roleCount">0 roles</h3>
+                        <button class="btn-primary btn-small" id="createRoleBtn" onclick="console.log('CLICKED!'); openModal('createRoleModal');">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Create Role
+                        </button>
+                    </div>
+                    
+                    <div id="rolesList">
+                        <div class="empty-team">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            <h4>No custom roles</h4>
+                            <p>System roles are available. Create custom roles for fine-grained access.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Invite Member Modal -->
+    <div class="modal-overlay" id="inviteModal">
+        <div class="modal-box">
+            <h3>Invite Team Member</h3>
+            <p>Send an invitation to join this business.</p>
+            <form class="modal-form" id="inviteForm" novalidate>
+                <div class="form-group">
+                    <label for="inviteEmail">Email Address</label>
+                    <input type="email" id="inviteEmail" required placeholder="colleague@example.com">
+                    <small>They'll receive an email invitation to join.</small>
+                </div>
+                <div class="form-group">
+                    <label>Assign Roles</label>
+                    <div class="roles-checklist" id="inviteRolesChecklist">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <small>Select the roles this member should have.</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('inviteModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Send Invitation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Create Business Modal -->
+    <div class="modal-overlay" id="createBusinessModal">
+        <div class="modal-box">
+            <h3>Create New Business</h3>
+            <p>Set up a new business organization.</p>
+            <form class="modal-form" id="createBusinessForm" novalidate>
+                <div class="form-group">
+                    <label for="businessName">Business Name</label>
+                    <input type="text" id="businessName" required placeholder="Acme Inc." minlength="3" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="businessWebsite">Website (optional)</label>
+                    <input type="url" id="businessWebsite" placeholder="https://acme.com">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('createBusinessModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Business</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Create Role Modal -->
+    <div class="modal-overlay" id="createRoleModal">
+        <div class="modal-box">
+            <h3>Create Custom Role</h3>
+            <p>Define a new role with specific permissions.</p>
+            <form class="modal-form" id="createRoleForm" novalidate>
+                <div class="form-group">
+                    <label for="roleName">Role Name</label>
+                    <input type="text" id="roleName" required placeholder="e.g., Developer, Analyst" minlength="2" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="roleDescription">Description</label>
+                    <input type="text" id="roleDescription" placeholder="What can this role do?">
+                </div>
+                <div class="form-group">
+                    <label for="roleColor">Color</label>
+                    <input type="color" id="roleColor" value="#6366f1" style="width: 60px; height: 36px; padding: 2px;">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('createRoleModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="quickstart.html">Quick Start</a></li>
+                        <li><a href="api-reference.html">API Reference</a></li>
+                        <li><a href="sdks.html">SDKs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="guides.html">Guides</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script>
+        console.log('🚀 Team page script starting...');
+        
+        const API_BASE_URL = window.API_BASE_URL || 'https://flow-platform-production.up.railway.app';
+        console.log('🚀 API_BASE_URL:', API_BASE_URL);
+        
+        let currentBusinessId = null;
+        let businesses = [];
+        let members = [];
+        let roles = [];
+        
+        // Check authentication
+        try {
+            console.log('🚀 Checking TokenManager...');
+            if (typeof TokenManager === 'undefined') {
+                console.error('❌ TokenManager is not defined!');
+            } else if (!TokenManager.isAuthenticated()) {
+                console.log('🚀 Not authenticated, redirecting...');
+                localStorage.setItem('tbd_redirect_after_login', window.location.pathname);
+                window.location.href = 'signin.html';
+            } else {
+                console.log('🚀 User is authenticated');
+            }
+        } catch (e) {
+            console.error('❌ Error checking auth:', e);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 DOMContentLoaded fired');
+            const authMode = localStorage.getItem('tbd_auth_mode');
+            console.log('🚀 Auth mode:', authMode);
+            
+            // Update username in nav
+            const username = localStorage.getItem('tbd_user_name') || localStorage.getItem('tbd_username');
+            if (username) {
+                document.getElementById('userInfo').textContent = username;
+            }
+            
+            // Check if using RCAC
+            if (authMode !== 'rcac') {
+                console.log('⚠️ Not in RCAC mode, showing legacy notice');
+                // Show legacy notice
+                document.getElementById('legacyNotice').style.display = 'flex';
+                document.getElementById('businessSelector').style.display = 'none';
+                document.getElementById('teamMembersSection').style.opacity = '0.5';
+                document.getElementById('rolesSection').style.opacity = '0.5';
+                // NOTE: Removed pointer-events:none so buttons still work for testing
+                // Still setup event listeners so buttons work
+                setupEventListeners();
+                return;
+            }
+            
+            // Setup event listeners first (so buttons work even if API fails)
+            setupEventListeners();
+            
+            // Load businesses
+            await loadBusinesses();
+        });
+        
+        async function loadBusinesses() {
+            console.log('📊 Loading businesses...');
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses`);
+                console.log('📊 Businesses API response:', response?.status);
+                
+                if (response && response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Businesses data:', data);
+                    console.log('📊 First business:', data.businesses?.[0]);
+                    businesses = data.businesses || [];
+                    
+                    const select = document.getElementById('businessSelect');
+                    select.innerHTML = businesses.length 
+                        ? businesses.map(b => `<option value="${b.id}">${b.name}</option>`).join('')
+                        : '<option value="">No businesses - create one!</option>';
+                    
+                    // Store in localStorage for nav selector
+                    localStorage.setItem('tbd_businesses', JSON.stringify(businesses));
+                    
+                    // Select current business or first one
+                    const savedBusinessId = localStorage.getItem('tbd_current_business_id');
+                    console.log('📊 Saved business ID from localStorage:', savedBusinessId);
+                    console.log('📊 Business IDs in array:', businesses.map(b => b.id));
+                    
+                    if (savedBusinessId && businesses.find(b => b.id === savedBusinessId)) {
+                        select.value = savedBusinessId;
+                        currentBusinessId = savedBusinessId;
+                        console.log('📊 Using saved business ID:', currentBusinessId);
+                    } else if (businesses.length > 0) {
+                        select.value = businesses[0].id;
+                        currentBusinessId = businesses[0].id;
+                        localStorage.setItem('tbd_current_business_id', currentBusinessId);
+                        localStorage.setItem('tbd_current_business_name', businesses[0].name);
+                        console.log('📊 Using first business ID:', currentBusinessId);
+                    }
+                    
+                    console.log('📊 Final currentBusinessId:', currentBusinessId);
+                    
+                    if (currentBusinessId) {
+                        loadBusinessData(currentBusinessId);
+                    }
+                } else {
+                    showMessage('Failed to load businesses', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading businesses:', error);
+                showMessage('Failed to load businesses', 'error');
+            }
+        }
+        
+        async function loadBusinessData(businessId) {
+            await Promise.all([
+                loadMembers(businessId),
+                loadRoles(businessId)
+            ]);
+        }
+        
+        async function loadMembers(businessId) {
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${businessId}/members`);
+                
+                if (response && response.ok) {
+                    const data = await response.json();
+                    members = data.members || [];
+                    
+                    document.getElementById('memberCount').textContent = `${members.length} member${members.length !== 1 ? 's' : ''}`;
+                    
+                    if (members.length > 0) {
+                        document.getElementById('membersList').innerHTML = members.map(m => `
+                            <div class="member-item">
+                                <div class="member-info">
+                                    <div class="member-avatar">${getInitials(m.email)}</div>
+                                    <div class="member-details">
+                                        <h4>${m.first_name || m.email.split('@')[0]} ${m.last_name || ''}</h4>
+                                        <p>${m.email}</p>
+                                    </div>
+                                </div>
+                                <div class="member-roles">
+                                    ${(m.roles || []).map(r => `<span class="role-tag${r.name === 'admin' ? ' admin' : ''}">${r.display_name || r.name}</span>`).join('')}
+                                </div>
+                                <div class="member-actions">
+                                    <button class="btn-secondary btn-small" onclick="editMemberRoles('${m.user_id}')">Edit Roles</button>
+                                    ${m.is_owner ? '' : `<button class="btn-danger btn-small" onclick="removeMember('${m.user_id}')">Remove</button>`}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        document.getElementById('membersList').innerHTML = `
+                            <div class="empty-team">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                <h4>No team members yet</h4>
+                                <p>Invite people to collaborate on this business.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Check for pending invitations
+                    const pendingInvites = data.pending_invitations || [];
+                    if (pendingInvites.length > 0) {
+                        document.getElementById('invitationsSection').style.display = 'block';
+                        document.getElementById('invitationsList').innerHTML = pendingInvites.map(inv => `
+                            <div class="invitation-item">
+                                <div class="invitation-info">
+                                    <h4>${inv.email}</h4>
+                                    <p>Invited ${formatDate(inv.invited_at)}</p>
+                                </div>
+                                <button class="btn-secondary btn-small" onclick="cancelInvitation('${inv.id}')">Cancel</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        document.getElementById('invitationsSection').style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading members:', error);
+            }
+        }
+        
+        async function loadRoles(businessId) {
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${businessId}/roles`);
+                
+                if (response && response.ok) {
+                    const data = await response.json();
+                    roles = data.roles || [];
+                    
+                    document.getElementById('roleCount').textContent = `${roles.length} role${roles.length !== 1 ? 's' : ''}`;
+                    
+                    if (roles.length > 0) {
+                        document.getElementById('rolesList').innerHTML = roles.map(r => `
+                            <div class="role-item">
+                                <div class="role-info">
+                                    <h4>
+                                        <span class="role-color" style="background: ${r.color || '#6366f1'}"></span>
+                                        ${r.display_name || r.name}
+                                        ${r.is_system ? '<span class="system-role-badge">System</span>' : ''}
+                                    </h4>
+                                    <p>${r.description || 'No description'}</p>
+                                </div>
+                                ${r.is_system ? '' : `
+                                    <div class="member-actions">
+                                        <button class="btn-secondary btn-small" onclick="editRole('${r.id}')">Edit</button>
+                                        <button class="btn-danger btn-small" onclick="deleteRole('${r.id}')">Delete</button>
+                                    </div>
+                                `}
+                            </div>
+                        `).join('');
+                    } else {
+                        document.getElementById('rolesList').innerHTML = `
+                            <div class="empty-team">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                                <h4>No custom roles</h4>
+                                <p>System roles are available. Create custom roles for fine-grained access.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Update invite modal roles checklist
+                    updateRolesChecklist();
+                }
+            } catch (error) {
+                console.error('Error loading roles:', error);
+            }
+        }
+        
+        function updateRolesChecklist() {
+            const checklist = document.getElementById('inviteRolesChecklist');
+            checklist.innerHTML = roles.map(r => `
+                <label class="role-checkbox">
+                    <input type="checkbox" name="roles" value="${r.id}">
+                    <span class="role-color" style="background: ${r.color || '#6366f1'}; width: 10px; height: 10px; border-radius: 2px;"></span>
+                    <div class="role-checkbox-info">
+                        <span>${r.display_name || r.name}</span>
+                        <small>${r.description || ''}</small>
+                    </div>
+                </label>
+            `).join('');
+        }
+        
+        function setupEventListeners() {
+            console.log('🔧 Setting up event listeners...');
+            
+            // Business selector change
+            document.getElementById('businessSelect').addEventListener('change', function() {
+                currentBusinessId = this.value;
+                const business = businesses.find(b => b.id === currentBusinessId);
+                if (business) {
+                    localStorage.setItem('tbd_current_business_id', currentBusinessId);
+                    localStorage.setItem('tbd_current_business_name', business.name);
+                    loadBusinessData(currentBusinessId);
+                }
+            });
+            
+            // Create business button
+            document.getElementById('createBusinessBtn').addEventListener('click', () => openModal('createBusinessModal'));
+            
+            // Invite member button
+            document.getElementById('inviteMemberBtn').addEventListener('click', () => openModal('inviteModal'));
+            
+            // Create role button
+            document.getElementById('createRoleBtn').addEventListener('click', () => {
+                console.log('🎭 Create Role button clicked');
+                openModal('createRoleModal');
+            });
+            
+            // Create business form
+            document.getElementById('createBusinessForm').addEventListener('submit', handleCreateBusiness);
+            
+            // Invite form
+            document.getElementById('inviteForm').addEventListener('submit', handleInviteMember);
+            
+            // Create role form
+            document.getElementById('createRoleForm').addEventListener('submit', (e) => {
+                console.log('🎭 Create Role form submitted');
+                handleCreateRole(e);
+            });
+            
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+            
+            // Sign out button
+            document.getElementById('signOutBtn').addEventListener('click', function() {
+                TokenManager.logout();
+            });
+            
+            // Dashboard dropdown
+            const dropdownBtn = document.getElementById('dashboardDropdownBtn');
+            const dropdown = document.getElementById('dashboardDropdown');
+            
+            if (dropdownBtn && dropdown) {
+                dropdownBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        async function handleCreateBusiness(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const body = {
+                name: document.getElementById('businessName').value,
+                website: document.getElementById('businessWebsite').value || undefined
+            };
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response && response.ok) {
+                    closeModal('createBusinessModal');
+                    e.target.reset();
+                    showMessage('Business created successfully!', 'success');
+                    await loadBusinesses();
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to create business', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating business:', error);
+                showMessage('Failed to create business', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Business';
+            }
+        }
+        
+        async function handleInviteMember(e) {
+            e.preventDefault();
+            
+            if (!currentBusinessId) {
+                showMessage('Please select or create a business first', 'error');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            const selectedRoles = Array.from(document.querySelectorAll('#inviteRolesChecklist input:checked'))
+                .map(cb => cb.value);
+            
+            const body = {
+                email: document.getElementById('inviteEmail').value,
+                role_ids: selectedRoles
+            };
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${currentBusinessId}/invitations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response && response.ok) {
+                    closeModal('inviteModal');
+                    e.target.reset();
+                    showMessage('Invitation sent successfully!', 'success');
+                    await loadMembers(currentBusinessId);
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to send invitation', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending invitation:', error);
+                showMessage('Failed to send invitation', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Invitation';
+            }
+        }
+        
+        async function handleCreateRole(e) {
+            e.preventDefault();
+            console.log('🎭 handleCreateRole called, currentBusinessId:', currentBusinessId);
+            
+            if (!currentBusinessId) {
+                console.log('🎭 No business ID, showing error');
+                showMessage('Please select or create a business first', 'error');
+                closeModal('createRoleModal');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            const body = {
+                name: document.getElementById('roleName').value.toLowerCase().replace(/\s+/g, '_'),
+                display_name: document.getElementById('roleName').value,
+                description: document.getElementById('roleDescription').value || undefined,
+                color: document.getElementById('roleColor').value
+            };
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${currentBusinessId}/roles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response && response.ok) {
+                    closeModal('createRoleModal');
+                    e.target.reset();
+                    showMessage('Role created successfully!', 'success');
+                    await loadRoles(currentBusinessId);
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to create role', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating role:', error);
+                showMessage('Failed to create role', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Role';
+            }
+        }
+        
+        async function removeMember(userId) {
+            if (!confirm('Are you sure you want to remove this member?')) return;
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${currentBusinessId}/members/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response && response.ok) {
+                    showMessage('Member removed successfully', 'success');
+                    await loadMembers(currentBusinessId);
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to remove member', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing member:', error);
+                showMessage('Failed to remove member', 'error');
+            }
+        }
+        
+        async function cancelInvitation(invitationId) {
+            if (!confirm('Cancel this invitation?')) return;
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${currentBusinessId}/invitations/${invitationId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response && response.ok) {
+                    showMessage('Invitation cancelled', 'success');
+                    await loadMembers(currentBusinessId);
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to cancel invitation', 'error');
+                }
+            } catch (error) {
+                console.error('Error cancelling invitation:', error);
+                showMessage('Failed to cancel invitation', 'error');
+            }
+        }
+        
+        async function deleteRole(roleId) {
+            if (!confirm('Delete this role? Members with this role will lose these permissions.')) return;
+            
+            try {
+                const response = await TokenManager.apiCall(`${API_BASE_URL}/v1/businesses/${currentBusinessId}/roles/${roleId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response && response.ok) {
+                    showMessage('Role deleted successfully', 'success');
+                    await loadRoles(currentBusinessId);
+                } else {
+                    const data = await response.json();
+                    showMessage(data.error?.message || 'Failed to delete role', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting role:', error);
+                showMessage('Failed to delete role', 'error');
+            }
+        }
+        
+        function editMemberRoles(userId) {
+            // TODO: Implement edit member roles modal
+            showMessage('Edit member roles - coming soon!', 'info');
+        }
+        
+        function editRole(roleId) {
+            // TODO: Implement edit role modal
+            showMessage('Edit role - coming soon!', 'info');
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            console.log('🔓 Opening modal:', modalId);
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                console.log('🔓 Modal element found and activated');
+            } else {
+                console.error('🔓 Modal element not found:', modalId);
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            const form = document.querySelector(`#${modalId} form`);
+            if (form) form.reset();
+        }
+        
+        // Utility functions
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('pageMessage');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 5000);
+        }
+        
+        function getInitials(email) {
+            const name = email.split('@')[0];
+            return name.substring(0, 2).toUpperCase();
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+    </script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>
+

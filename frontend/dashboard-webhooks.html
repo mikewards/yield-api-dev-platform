@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhooks - TBD</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/api-styles.css">
+    <link rel="stylesheet" href="styles/dashboard-styles.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/token-manager.js"></script>
+    <style>
+        .webhook-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+        .webhook-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .webhook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .webhook-url {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            color: var(--primary);
+            word-break: break-all;
+            flex: 1;
+            margin-right: 16px;
+        }
+        .webhook-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .webhook-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .webhook-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .webhook-events {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .event-badge {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .event-badge.all {
+            background: var(--primary);
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .info-cards-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 768px) {
+            .info-cards-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .portal-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 0;
+        }
+        .portal-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .portal-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0284c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .portal-text h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .portal-text p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .portal-text p span {
+            font-weight: 600;
+            color: #0284c7;
+        }
+        .event-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .event-type-card {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .event-type-name {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .event-type-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-icon:hover {
+            background: var(--bg-light);
+            border-color: var(--primary);
+        }
+        .btn-icon.danger:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        .btn-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .checkbox-item:hover {
+            background: #e2e8f0;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+        .checkbox-item label {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            line-height: 18px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-badge.active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .status-badge.disabled {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .webhook-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .webhook-info h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .webhook-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar (Mobile) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <svg id="closeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div class="nav-links" id="navLinks">
+                    <a href="quickstart.html">Quick Start</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="sdks.html">SDKs</a>
+                    <a href="api-reference.html">API Reference</a>
+                    
+                    <!-- Account dropdown -->
+                    <div class="nav-auth nav-dropdown">
+                        <button class="btn-secondary dropdown-trigger" id="dashboardDropdownBtn">
+                            <span id="userInfo">Account</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dashboardDropdown">
+                            <a href="dashboard.html" class="dropdown-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            </a>
+                            <button class="dropdown-item" id="signOutBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation (Square-style) -->
+    <nav class="secondary-nav">
+        <div class="container">
+            <span class="secondary-nav-title">Dashboard</span>
+            <div class="secondary-nav-links">
+                <a href="dashboard.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Applications
+                </a>
+                <a href="dashboard-team.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team
+                </a>
+                <a href="dashboard-webhooks.html" class="secondary-nav-link active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Webhooks
+                </a>
+                <a href="dashboard-logs.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Logs
+                </a>
+                <a href="dashboard-settings.html" class="secondary-nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Account Settings
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Webhooks</h1>
+                <p>Receive real-time notifications when events happen in your account.</p>
+            </div>
+
+            <!-- Info Cards Row -->
+            <div class="info-cards-row">
+                <!-- Webhook Logs Portal Card -->
+                <div class="portal-card" id="portalCard" style="display: none;">
+                    <div class="portal-info">
+                        <div class="portal-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="portal-text">
+                            <h4>Webhook Delivery Logs</h4>
+                            <p><span id="recentMessageCount">0</span> recent messages delivered</p>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="viewLogsBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Logs
+                    </button>
+                </div>
+
+                <!-- Info Box -->
+                <div class="webhook-info">
+                    <h4>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Real-time Event Delivery
+                    </h4>
+                    <p>Webhooks are delivered via Svix with automatic retries, signature verification, and a developer portal for debugging. Events are delivered within seconds of occurring.</p>
+                </div>
+            </div>
+
+            <!-- Endpoints Section -->
+            <div class="section-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Webhook Endpoints
+                </h2>
+                <button class="btn-primary" id="createWebhookBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Add Endpoint
+                </button>
+            </div>
+            
+            <div id="webhooksContainer">
+                <div class="loading-spinner">Loading webhooks...</div>
+            </div>
+
+            <!-- Event Types Section -->
+            <div class="section-header" style="margin-top: 48px;">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                    Available Event Types
+                </h2>
+            </div>
+            
+            <div class="event-types-grid" id="eventTypesGrid">
+                <div class="loading-spinner">Loading event types...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Webhook Modal -->
+    <div class="modal" id="createWebhookModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Add Webhook Endpoint</h3>
+                <button class="modal-close" id="closeCreateModal">&times;</button>
+            </div>
+            <form id="createWebhookForm">
+                <div class="form-group">
+                    <label for="webhookUrl">Endpoint URL</label>
+                    <input type="url" id="webhookUrl" placeholder="https://your-server.com/webhooks" required>
+                    <small>Must be HTTPS. We'll send POST requests to this URL.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="webhookDescription">Description (optional)</label>
+                    <input type="text" id="webhookDescription" placeholder="Production webhook endpoint">
+                </div>
+                
+                <div class="form-group">
+                    <label>Event Types</label>
+                    <small style="display: block; margin-bottom: 8px;">Select which events should trigger this webhook. Leave all unchecked to receive all events.</small>
+                    <div class="checkbox-group" id="eventCheckboxes">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelCreateBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Endpoint</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Test Webhook Modal -->
+    <div class="modal" id="testWebhookModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Test Webhook</h3>
+                <button class="modal-close" id="closeTestModal">&times;</button>
+            </div>
+            <form id="testWebhookForm">
+                <div class="form-group">
+                    <label for="testEventType">Event Type</label>
+                    <select id="testEventType" required>
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelTestBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Send Test Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <svg width="38.4" height="38.4" viewBox="0 0 12.873 16.787" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(-131.13 -149.1)">
+                            <g>
+                                <path d="m131.45 158.38h12.24" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m133.78 161.91h7.58" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m135.8 165.57h3.54" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                                <path d="m137.57 158.5v-9.09" style="stroke:#0F172A;stroke-width:.625;fill:none"/>
+                            </g>
+                        </g>
+                    </svg>
+                        
+                    </div>
+                    <p class="footer-tagline">DeFi APIs for developers</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="quickstart.html">Quick Start</a></li>
+                            <li><a href="api-reference.html">API Reference</a></li>
+                            <li><a href="sdks.html">SDKs</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Developers</h4>
+                        <ul>
+                            <li><a href="guides.html">Guides</a></li>
+                            <li><a href="status.html">Status</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                            <li><a href="terms.html">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ground. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/script.js"></script>
+    <script src="scripts/nav-auth.js"></script>
+    <script>
+        const API_BASE = window.API_BASE_URL || 'https://flow-platform-production.up.railway.app';
+        let eventTypes = [];
+        let currentTestEndpointId = null;
+
+        // Wait for TokenManager to initialize and verify authentication
+        (async function() {
+            await TokenManager.init();
+            
+            const isAuth = await TokenManager.ensureAuthenticated();
+            if (!isAuth) {
+                if (!TokenManager.sessionExpired) {
+                    window.location.href = 'signin.html';
+                }
+                return;
+            }
+            
+            initializeDashboard();
+        })();
+        
+        function initializeDashboard() {
+            const username = localStorage.getItem('tbd_username');
+            if (document.getElementById('userInfo')) {
+                document.getElementById('userInfo').textContent = username || 'Account';
+            }
+            
+            // Load initial data
+            loadEventTypes();
+            loadWebhooks();
+            loadPortalInfo();
+        }
+
+        async function checkAuth() {
+            const token = await TokenManager.getValidToken();
+            if (!token) {
+                return null;
+            }
+            return token;
+        }
+
+        // Load webhook portal info
+        let portalUrl = null;
+        async function loadPortalInfo() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks/portal`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    portalUrl = data.url;
+                    document.getElementById('recentMessageCount').textContent = data.recent_messages || 0;
+                    document.getElementById('portalCard').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Failed to load portal info:', error);
+            }
+        }
+
+        // View logs button handler
+        document.getElementById('viewLogsBtn').addEventListener('click', function() {
+            if (portalUrl) {
+                window.open(portalUrl, '_blank');
+            } else {
+                alert('Webhook portal is not available. Please try again later.');
+            }
+        });
+
+        // Load event types
+        async function loadEventTypes() {
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks/event-types`);
+                const data = await response.json();
+                eventTypes = data.event_types || [];
+                renderEventTypes();
+                populateEventCheckboxes();
+                populateTestEventSelect();
+            } catch (error) {
+                console.error('Failed to load event types:', error);
+                document.getElementById('eventTypesGrid').innerHTML = `
+                    <div class="empty-state">
+                        <p>Failed to load event types. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render event types grid
+        function renderEventTypes() {
+            const container = document.getElementById('eventTypesGrid');
+            if (eventTypes.length === 0) {
+                container.innerHTML = '<p>No event types available.</p>';
+                return;
+            }
+            
+            container.innerHTML = eventTypes.map(et => `
+                <div class="event-type-card">
+                    <div class="event-type-name">${et.name}</div>
+                    <div class="event-type-desc">${et.description}</div>
+                </div>
+            `).join('');
+        }
+
+        // Populate event checkboxes in create modal
+        function populateEventCheckboxes() {
+            const container = document.getElementById('eventCheckboxes');
+            container.innerHTML = eventTypes.map(et => `
+                <div class="checkbox-item">
+                    <input type="checkbox" id="evt_${et.name}" name="events" value="${et.name}">
+                    <label for="evt_${et.name}">${et.name}</label>
+                </div>
+            `).join('');
+        }
+
+        // Populate test event select
+        function populateTestEventSelect() {
+            const select = document.getElementById('testEventType');
+            select.innerHTML = eventTypes.map(et => `
+                <option value="${et.name}">${et.name}</option>
+            `).join('');
+        }
+
+        // Load webhooks
+        async function loadWebhooks() {
+            const token = checkAuth();
+            if (!token) return;
+
+            const container = document.getElementById('webhooksContainer');
+            
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('tbd_token');
+                    localStorage.removeItem('tbd_token_expires');
+                    localStorage.removeItem('tbd_account_id');
+                    localStorage.removeItem('tbd_username');
+                    alert('Your session has expired. Please sign in again.');
+                    window.location.href = 'signin.html';
+                    return;
+                }
+
+                const data = await response.json();
+                renderWebhooks(data.endpoints || []);
+            } catch (error) {
+                console.error('Failed to load webhooks:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h3>Failed to load webhooks</h3>
+                        <p>Please refresh the page to try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render webhooks
+        function renderWebhooks(webhooks) {
+            const container = document.getElementById('webhooksContainer');
+            
+            if (webhooks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <h3>No webhook endpoints</h3>
+                        <p>Add a webhook endpoint to start receiving real-time event notifications.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = webhooks.map(webhook => `
+                <div class="webhook-card" data-id="${webhook.id}">
+                    <div class="webhook-header">
+                        <div class="webhook-url">${webhook.url}</div>
+                        <div class="webhook-actions">
+                            <button class="btn-icon" onclick="testWebhook('${webhook.id}')" title="Send test event">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                            <button class="btn-icon danger" onclick="deleteWebhook('${webhook.id}')" title="Delete endpoint">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="webhook-meta">
+                        <span class="webhook-meta-item">
+                            <span class="status-badge ${webhook.disabled ? 'disabled' : 'active'}">
+                                <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
+                                ${webhook.disabled ? 'Disabled' : 'Active'}
+                            </span>
+                        </span>
+                        ${webhook.description ? `<span class="webhook-meta-item">${webhook.description}</span>` : ''}
+                        ${webhook.created_at ? `<span class="webhook-meta-item">Created ${new Date(webhook.created_at).toLocaleDateString()}</span>` : ''}
+                    </div>
+                    <div class="webhook-events">
+                        ${webhook.filter_types && webhook.filter_types.length > 0 
+                            ? webhook.filter_types.map(et => `<span class="event-badge">${et}</span>`).join('')
+                            : '<span class="event-badge all">All events</span>'
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create webhook
+        async function createWebhook(e) {
+            e.preventDefault();
+            const token = checkAuth();
+            if (!token) return;
+
+            const url = document.getElementById('webhookUrl').value;
+            const description = document.getElementById('webhookDescription').value;
+            const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
+                .map(cb => cb.value);
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url,
+                        description: description || null,
+                        filter_types: selectedEvents.length > 0 ? selectedEvents : null
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to create webhook');
+                    return;
+                }
+
+                closeModal('createWebhookModal');
+                document.getElementById('createWebhookForm').reset();
+                loadWebhooks();
+            } catch (error) {
+                console.error('Failed to create webhook:', error);
+                alert('Failed to create webhook. Please try again.');
+            }
+        }
+
+        // Delete webhook
+        async function deleteWebhook(endpointId) {
+            if (!confirm('Are you sure you want to delete this webhook endpoint?')) {
+                return;
+            }
+
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks/${endpointId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok || response.status === 204) {
+                    loadWebhooks();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to delete webhook');
+                }
+            } catch (error) {
+                console.error('Failed to delete webhook:', error);
+                alert('Failed to delete webhook. Please try again.');
+            }
+        }
+
+        // Test webhook
+        function testWebhook(endpointId) {
+            currentTestEndpointId = endpointId;
+            openModal('testWebhookModal');
+        }
+
+        // Send test webhook
+        async function sendTestWebhook(e) {
+            e.preventDefault();
+            const token = checkAuth();
+            if (!token || !currentTestEndpointId) return;
+
+            const eventType = document.getElementById('testEventType').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/webhooks/${currentTestEndpointId}/test`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_type: eventType
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Test webhook sent successfully!');
+                    closeModal('testWebhookModal');
+                } else {
+                    alert(data.message || 'Failed to send test webhook');
+                }
+            } catch (error) {
+                console.error('Failed to send test webhook:', error);
+                alert('Failed to send test webhook. Please try again.');
+            }
+        }
+
+        // Modal helpers
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Event listeners
+        document.getElementById('createWebhookBtn').addEventListener('click', () => openModal('createWebhookModal'));
+        document.getElementById('closeCreateModal').addEventListener('click', () => closeModal('createWebhookModal'));
+        document.getElementById('cancelCreateBtn').addEventListener('click', () => closeModal('createWebhookModal'));
+        document.getElementById('createWebhookForm').addEventListener('submit', createWebhook);
+
+        document.getElementById('closeTestModal').addEventListener('click', () => closeModal('testWebhookModal'));
+        document.getElementById('cancelTestBtn').addEventListener('click', () => closeModal('testWebhookModal'));
+        document.getElementById('testWebhookForm').addEventListener('submit', sendTestWebhook);
+
+        // Close modals on backdrop click
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', () => {
+                backdrop.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Dashboard dropdown toggle
+        const dashboardDropdownBtn = document.getElementById('dashboardDropdownBtn');
+        const dashboardDropdown = document.getElementById('dashboardDropdown');
+        
+        if (dashboardDropdownBtn && dashboardDropdown) {
+            dashboardDropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dashboardDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!dashboardDropdown.contains(e.target) && !dashboardDropdownBtn.contains(e.target)) {
+                    dashboardDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+        // Sign out using TokenManager (properly revokes refresh tokens)
+        const signOutBtn = document.getElementById('signOutBtn');
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', function() {
+                TokenManager.logout();
+            });
+        }
+
+    </script>
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d7878080439a4cd4a55a58fc4a4f1af4"}'></script>
+</body>
+</html>
+
