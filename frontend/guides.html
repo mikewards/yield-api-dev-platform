@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guides - TBD</title>
+    <title>Guides — developer platform prototype</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/api-styles.css">
@@ -588,7 +588,7 @@
             <!-- Yield Accounts -->
             <section id="yield-accounts" class="guide-section">
                 <h2>Yield Accounts</h2>
-                <p>Yield accounts hold your cryptocurrency and earn interest. Ground automatically routes deposits to the best available protocol (Morpho or Aave).</p>
+                <p>In this prototype, yield accounts model how cryptocurrency could be held to earn interest, with deposits routed to a protocol such as Morpho or Aave. This is illustrative only — no real funds move.</p>
                 
                 <h3>Supported Currencies</h3>
                 <ul>
@@ -690,7 +690,7 @@
             <!-- Environments -->
             <section id="environments" class="guide-section">
                 <h2>Environments</h2>
-                <p>Ground provides two environments for development and production use.</p>
+                <p>The prototype illustrates two environments for development and production use.</p>
                 
                 <h3>Sandbox</h3>
                 <p>Use sandbox for development and testing. Connects to Ethereum testnets (Sepolia). No real funds required.</p>
@@ -701,11 +701,11 @@
                 </ul>
                 
                 <h3>Production</h3>
-                <p>Use production for live applications. Connects to Ethereum mainnet with real funds.</p>
+                <p>In the design, production would target live applications on Ethereum mainnet. This prototype does not operate a production service — no real funds move.</p>
                 <ul>
                     <li>API keys start with <code>tbd_prod_</code></li>
-                    <li>Use mainnet RPC URLs</li>
-                    <li>Real cryptocurrency deposits</li>
+                    <li>Mainnet RPC URLs (in the intended design)</li>
+                    <li>Real cryptocurrency deposits (not handled by this prototype)</li>
                 </ul>
             </section>
 
@@ -987,7 +987,7 @@ app.post('/webhooks', (req, res) => {
                     </svg>
                         
                     </div>
-                    <p class="footer-tagline">DeFi APIs for developers</p>
+                    <p class="footer-tagline">A developer-platform prototype</p>
                 </div>
                 <div class="footer-section">
                     <h4>Product</h4>
@@ -1013,7 +1013,7 @@ app.post('/webhooks', (req, res) => {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2025 Ground. All rights reserved.</p>
+                <p>A developer-platform prototype by Mike Ward · github.com/mikewards/ground</p>
             </div>
         </div>
     </footer>
