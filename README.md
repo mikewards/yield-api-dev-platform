@@ -29,8 +29,8 @@ Ground is a demonstrative proof of concept: the Square developer-platform playbo
 
 ```bash
 # Clone repository
-git clone https://github.com/mikewards/ground.git
-cd ground
+git clone https://github.com/mikewards/yield-api-dev-platform.git
+cd yield-api-dev-platform
 
 # Set up database
 createdb flow_api
