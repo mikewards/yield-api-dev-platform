@@ -41,6 +41,11 @@ object RateLimitConfig {
         "POST /v1/auth/refresh" to 20,        // 20 token refreshes per minute
         "POST /v1/accounts" to 3,             // 3 signups per minute (spam prevention)
         
+        // RCAC user auth endpoints - same strictness as the legacy flow
+        "POST /v1/users/login" to 5,          // 5 login attempts per minute per IP
+        "POST /v1/users/refresh" to 20,       // 20 token refreshes per minute
+        "POST /v1/users/register" to 3,       // 3 signups per minute (spam prevention)
+        
         // Account settings - sensitive operations
         "POST /v1/account/password" to 3,     // 3 password change attempts per minute
         "PATCH /v1/account/email" to 3,       // 3 email change attempts per minute
@@ -275,7 +280,10 @@ private fun isAuthEndpoint(path: String): Boolean {
     return path.startsWith("/v1/auth") || 
            path.startsWith("/v1/accounts") ||
            path.startsWith("/v1/account") ||
-           path.startsWith("/v1/sessions")
+           path.startsWith("/v1/sessions") ||
+           path == "/v1/users/login" ||
+           path == "/v1/users/register" ||
+           path == "/v1/users/refresh"
 }
 
 /**

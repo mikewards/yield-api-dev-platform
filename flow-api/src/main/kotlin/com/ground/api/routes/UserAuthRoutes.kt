@@ -10,11 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.ground.middleware.CurrentUserIdKey
-import com.typesafe.config.ConfigFactory
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import kotlinx.serialization.Serializable
-import java.time.Instant
 import java.util.*
 
 /**
@@ -45,10 +41,7 @@ data class MfaRequiredResponse(
 fun Application.userAuthRoutes() {
     val userService = UserService()
     val businessService = BusinessService()
-    
-    val config = ConfigFactory.load()
-    val jwtSecret = System.getenv("JWT_SECRET") ?: config.getString("jwt.secret")
-    val jwtKey = Keys.hmacShaKeyFor(jwtSecret.toByteArray())
+    val userTokenService = UserTokenService()
     
     routing {
         route("/v1/users") {
@@ -93,11 +86,9 @@ fun Application.userAuthRoutes() {
                         userAgent = userAgent
                     )
                     
-                    // Generate tokens
-                    val (accessToken, expiresIn) = generateAccessToken(user.id.toString(), jwtKey)
-                    val refreshToken = generateRefreshToken()
-                    
-                    // TODO: Store refresh token in database
+                    // Generate tokens (refresh token is persisted hashed, rotated on use)
+                    val (accessToken, expiresIn) = userTokenService.generateAccessToken(user.id)
+                    val refreshToken = userTokenService.generateRefreshToken(user.id)
                     
                     call.respond(
                         HttpStatusCode.Created,
@@ -150,11 +141,9 @@ fun Application.userAuthRoutes() {
                         
                         // TODO: Verify MFA code if provided
                         
-                        // Generate tokens
-                        val (accessToken, expiresIn) = generateAccessToken(user.id.toString(), jwtKey)
-                        val refreshToken = generateRefreshToken()
-                        
-                        // TODO: Store refresh token in database
+                        // Generate tokens (refresh token is persisted hashed, rotated on use)
+                        val (accessToken, expiresIn) = userTokenService.generateAccessToken(user.id)
+                        val refreshToken = userTokenService.generateRefreshToken(user.id)
                         
                         call.respond(LoginResponse(
                             access_token = accessToken,
@@ -188,6 +177,38 @@ fun Application.userAuthRoutes() {
                             MfaRequiredResponse()
                         )
                     }
+                }
+            }
+            
+            /**
+             * Refresh - exchange a valid refresh token for a new access token
+             * and refresh token. The presented refresh token is revoked
+             * (rotation) — each refresh token is single-use.
+             */
+            post("/refresh") {
+                try {
+                    val request = call.receive<RefreshTokenRequest>()
+                    val result = userTokenService.refresh(request.refresh_token)
+                    if (result == null) {
+                        call.respond(
+                            HttpStatusCode.Unauthorized,
+                            ErrorResponse(ErrorDetail("INVALID_TOKEN", "Refresh token expired or invalid. Please sign in again.", "authentication_error"))
+                        )
+                        return@post
+                    }
+                    
+                    call.respond(RefreshTokenResponse(
+                        access_token = result.accessToken,
+                        refresh_token = result.refreshToken,
+                        token_type = "Bearer",
+                        expires_in = result.expiresIn
+                    ))
+                } catch (e: Exception) {
+                    println("❌ User refresh token error: ${e.message}")
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ErrorDetail("INVALID_REQUEST", "Invalid refresh token request", "validation_error"))
+                    )
                 }
             }
             
@@ -313,7 +334,7 @@ fun Application.userAuthRoutes() {
                 post("/logout") {
                     val userId = call.getCurrentUserId() ?: return@post call.respondUnauthorized()
                     
-                    // TODO: Revoke refresh tokens
+                    userTokenService.revokeAllRefreshTokens(userId)
                     
                     call.respond(SimpleMessageResponse("Successfully logged out"))
                 }
@@ -325,24 +346,6 @@ fun Application.userAuthRoutes() {
 // ═══════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
-
-private fun generateAccessToken(userId: String, key: javax.crypto.SecretKey): Pair<String, Int> {
-    val expiresIn = 3600 // 1 hour
-    val now = Instant.now()
-    
-    val token = Jwts.builder()
-        .subject(userId)
-        .issuedAt(Date.from(now))
-        .expiration(Date.from(now.plusSeconds(expiresIn.toLong())))
-        .signWith(key)
-        .compact()
-    
-    return token to expiresIn
-}
-
-private fun generateRefreshToken(): String {
-    return "grt_${UUID.randomUUID().toString().replace("-", "")}"
-}
 
 private fun isValidEmail(email: String): Boolean {
     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$".toRegex()

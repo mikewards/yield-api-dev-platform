@@ -4,6 +4,7 @@ import com.ground.dto.*
 import com.ground.service.AccountLockedException
 import com.ground.service.AccountService
 import com.ground.service.TokenService
+import com.ground.service.UserTokenService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -16,6 +17,7 @@ import java.util.*
 fun Application.authRoutes() {
     val accountService = AccountService()
     val tokenService = TokenService()
+    val userTokenService = UserTokenService()
     
     routing {
         route("/v1/auth") {
@@ -48,6 +50,27 @@ fun Application.authRoutes() {
             post("/refresh") {
                 try {
                     val request = call.receive<RefreshTokenRequest>()
+                    
+                    // RCAC user refresh tokens (grt_ prefix) are handled by the
+                    // user token service; the dashboard uses this single refresh
+                    // endpoint for both auth models.
+                    if (request.refresh_token.startsWith("grt_")) {
+                        val userResult = userTokenService.refresh(request.refresh_token)
+                        if (userResult == null) {
+                            call.respond(
+                                HttpStatusCode.Unauthorized,
+                                ErrorResponse(ErrorDetail("INVALID_TOKEN", "Refresh token expired or invalid. Please sign in again.", "authentication_error"))
+                            )
+                            return@post
+                        }
+                        call.respond(RefreshTokenResponse(
+                            access_token = userResult.accessToken,
+                            refresh_token = userResult.refreshToken,
+                            token_type = "Bearer",
+                            expires_in = userResult.expiresIn
+                        ))
+                        return@post
+                    }
                     
                     // Note: We don't pass sessionId here - the session stays linked to the original
                     // refresh token chain. When you refresh, you're continuing the same session.
@@ -90,6 +113,10 @@ fun Application.authRoutes() {
                         
                         val accountId = UUID.fromString(principal.name)
                         tokenService.revokeAllRefreshTokens(accountId)
+                        // The dashboard uses this endpoint for both auth models;
+                        // revoke RCAC user tokens under the same ID too (no-op
+                        // if the ID doesn't belong to an RCAC user).
+                        userTokenService.revokeAllRefreshTokens(accountId)
                         
                         call.respond(mapOf("message" to "Successfully logged out"))
                     } catch (e: Exception) {

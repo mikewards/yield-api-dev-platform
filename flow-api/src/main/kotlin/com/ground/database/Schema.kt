@@ -55,6 +55,7 @@ object Schema {
                     // ═══════════════════════════════════════════════════════════
                     AccessTokens,
                     RefreshTokens,
+                    UserRefreshTokens,
                     UserSessions,
                     
                     // ═══════════════════════════════════════════════════════════
@@ -89,6 +90,7 @@ object Schema {
                     // Auth & Session Tables
                     AccessTokens,
                     RefreshTokens,
+                    UserRefreshTokens,
                     UserSessions,
                     
                     // Operational Tables
