@@ -977,6 +977,35 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /v1/users/refresh:
+    post:
+      operationId: refreshUserToken
+      tags: [Users]
+      summary: Refresh user access token
+      description: >
+        Exchange a user refresh token (`grt_` prefix) for a new 15-minute
+        access token and a new refresh token. Refresh tokens are single-use:
+        the presented token is revoked on rotation. Refresh tokens are stored
+        server-side only as HMAC-SHA256 hashes.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          description: New token pair issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /v1/users/me:
     get:
       operationId: getCurrentUser

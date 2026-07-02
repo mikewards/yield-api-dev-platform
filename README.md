@@ -109,6 +109,8 @@ All documentation is organized in the [`docs/`](./docs/) directory:
 
 - **[Development Setup](./docs/development/setup.md)** - Local development guide
 - **[API Specification](./docs/api/specification.md)** - Complete API reference
+- **[OpenAPI 3.1 spec](./frontend/openapi.yaml)** - Machine-readable endpoint contract (served at `/openapi.yaml`)
+- **[llms.txt](./frontend/llms.txt)** - Docs index for coding agents (served at `/llms.txt`)
 - **[Deployment Guide](./docs/deployment/railway.md)** - Production deployment
 - **[Architecture Overview](./docs/architecture/overview.md)** - System design
 - **[Environment Variables](./docs/development/environment-variables.md)** - Configuration reference
